@@ -17,7 +17,7 @@ int Previous_Analog[NBR_POT] = { // 0 1024
   0, 0, 0, 0, 0, 0, 0, 0
 };
 
-boolean Analog_Debug[NBR_POT] = { // 0 or 1
+bool Analog_Debug[NBR_POT] = { // 0 or 1
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0,
@@ -97,14 +97,15 @@ void AIN_NotifyChange() {
 
 #if DEBUG_analog
           // print something like : A0-### value
-          Serial.print(F("ain_pin ")); Serial.print(ain_pin); Serial.print(F(" ain_pin_value ")); Serial.println(ain_pin_value);
+          Serial.print(F("AIN_NotifyChange()")); Serial.print(F("ain_pin ")); Serial.print(ain_pin); Serial.print(F(" ain_pin_value ")); Serial.println(ain_pin_value);
 #endif
 
           if (ain_pin == 11)
           {
             LivePanel_HandleAin(ain_pin, 127 - ain_pin_value); // le bouton DCO MIX tourne dans le mauvais sens
           }
-          else        LivePanel_HandleAin(ain_pin, ain_pin_value); // consomme 1,8 KB de RAM !!! à optimiser
+          else
+            LivePanel_HandleAin(ain_pin, ain_pin_value); // consomme 1,8 KB de RAM !!! à optimiser
           //      appflag_updateDisplay = 1;
         }
         Previous_Analog[i] = Analog[i]; //reset current value
@@ -122,12 +123,12 @@ void AIN_NotifyChange() {
 ///////////////////////////////////////////////////////////
 void Recall()
 {
-  if (InitFlag) 
+  if (InitFlag)
   {
     //ANALOG INIT
-    for (int i = 0; i < NBR_POT; i++) 
+    for (int i = 0; i < NBR_POT; i++)
     {
-      if (Analog_Debug[i] == LOW) 
+      if (Analog_Debug[i] == LOW)
       {
         Analog_Mapped[i] = (Analog[i] >> 3);
       }

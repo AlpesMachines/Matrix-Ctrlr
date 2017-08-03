@@ -151,16 +151,23 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
   //    MIDI3.sendNoteOff(pitch, velocity, channel);
 
 #if SOFTSERIAL_ENABLED
-  if (channel == MIDI_CHANNEL + 3)
+  if (channel == MIDI_CHANNEL + 2)
     MIDI4.sendNoteOff(pitch, velocity, channel);
 
-  if (channel == MIDI_CHANNEL + 4)
+  if (channel == MIDI_CHANNEL + 3)
     MIDI5.sendNoteOff(pitch, velocity, channel);
 #endif
 
 #if DEBUG_router
   Serial.print(F("Note OFF handled and sent : ")); Serial.print(channel, DEC); Serial.print(F(" ")); Serial.print(pitch, DEC); Serial.print(F(" ")); Serial.println (velocity, DEC);
 #endif
+
+  // external midi note trigger (e.g rimshot, note=37, channel=10)
+  if (ui_external_clk == MTRGCLK && channel == MIDI_DRUMS_CHANNEL && pitch == MIDI_TRIGGER_NOTE)
+  {
+    ARP3(true);
+    SEQ2(true);
+  }
 }
 
 
@@ -169,6 +176,7 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
 ///////////////////////////////////////////////////////////
 void HandleNoteOn(byte channel, byte pitch, byte velocity)
 {
+  // rimshot = 37
   MIDI_Incoming = true;
 
   if (velocity == 0)
@@ -311,10 +319,10 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
     //     MIDI3.sendNoteOn(pitch,velocity,channel);
 
 #if SOFTSERIAL_ENABLED
-    if (channel == MIDI_CHANNEL + 3)
+    if (channel == MIDI_CHANNEL + 2)
       MIDI4.sendNoteOn(pitch, velocity, channel);
 
-    if (channel == MIDI_CHANNEL + 4)
+    if (channel == MIDI_CHANNEL + 3)
       MIDI5.sendNoteOn(pitch, velocity, channel);
 #endif
   }
@@ -323,6 +331,12 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
   Serial.print(F("Note ON  handled and sent : ")); Serial.print(channel, DEC); Serial.print(F(" ")); Serial.print(pitch, DEC); Serial.print(F(" ")); Serial.println (velocity, DEC);
 #endif
 
+  // external midi note trigger (e.g rimshot, note=37, channel=10)
+  if (ui_external_clk == MTRGCLK && channel == MIDI_DRUMS_CHANNEL && pitch == MIDI_TRIGGER_NOTE)
+  {
+    ARP3(false);
+    SEQ2(false);
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -737,7 +751,7 @@ void HandleContinue(void)
 
 
 ///////////////////////////////////////////////////////
-//
+// Midi SysEx handler
 ////////////////////////////////////////////////////////
 void HandleSystemExclusive(byte* sysex, unsigned int length)
 {
@@ -768,6 +782,308 @@ void HandleSystemExclusive(byte* sysex, unsigned int length)
 
   SR.Led_Pin_Write(DOUT_ACTIVITY, 0); // midi led Off
 }
+
+///////////////////////////////////////////////////////
+// Midi SysEx handler
+////////////////////////////////////////////////////////
+unsigned int HandleBank(byte* sysex, unsigned int length)
+{
+  if ((sysex[1] == 0x10) && (sysex[2] == 0x06))     // for matrix synths and Matrix Ctrlr units
+  {
+    switch (length)
+    {
+      case 275:
+        switch (sysex[3])
+        {
+          case 0x01:
+            // sysex[4]: numéro de patch 0-99
+
+            SR.Led_Pin_Write(DOUT_SHIFT, 1); // shift led ON
+            for (unsigned char i = 0; i < 134; ++i)
+            {
+              EditBuffer[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
+            }
+
+            UpdateDinStates(); // update LEDs at the end of the sysex
+
+            Write_Bank_To_BS(uBank, sysex[4]); // write received patch without setting its number bankpatch in internal EEPROM !
+            // Wire.h de l'arduino n'est pas assez rapide et n'arrive pas à faire cette fonction v0.96 : introduction dun delai de 300ms lors de l upload
+
+#if (DEBUG_sysexhandler)
+            Serial.print(F("sysex[4]=patch num : ")); Serial.println(sysex[4], DEC);
+            for (unsigned int i = 0; i < length; ++i) {
+              Serial.print(sysex[i], HEX); Serial.print(F(" "));
+            }
+            Serial.println(F(" "));
+
+            Serial.println(F("editbuffer : "));
+            for (unsigned char i = 0; i < 134; ++i) {
+              Serial.print(EditBuffer[i], HEX); Serial.print(F(" "));
+            }
+            Serial.println();
+            Serial.println();
+
+            Serial.print(F("END_MIDI_HandleBank "));
+            Serial.println(sysex[4], DEC);
+            Serial.println();
+            Serial.println();
+#endif
+
+            SR.Led_Pin_Write(DOUT_SHIFT, 0); // shift led Off
+            return sysex[4];
+            break;
+
+          case 0x0d: //editbuffer
+            SR.Led_Pin_Write(DOUT_SHIFT, 1); // Shift LED ON
+            // update editbuffer
+            for (unsigned char i = 0; i < 134; ++i)
+            {
+              EditBuffer[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
+            }
+            UpdateDinStates();
+            SendEditBuffer(INTERFACE_SERIAL);
+            SR.Led_Pin_Write(DOUT_SHIFT, 0); // Shift LED Off
+
+#if DEBUG_sysexhandler
+            Serial.println(F("EditBuffer sysex msg type (received from DAW) !"));
+            Serial.println(F("Editbuffer sent to Mx : "));
+            for (unsigned char i = 0; i < 134; ++i) {
+              Serial.print(EditBuffer[i], HEX); Serial.print(F(" "));
+            }
+            Serial.println();
+#endif
+
+            return 1;
+            break;
+
+          default:
+            return sysex[4];
+            break;
+        }
+        break;
+
+      case 351:
+        if ((sysex[3] == 0x03) && (sysex[4] == 0x03))
+        {
+          SR.Led_Pin_Write(DOUT_SHIFT, 1); // shift led ON
+          SR.Led_Pin_Write(DOUT_EDIT, 1);
+          SR.Led_Pin_Write(DOUT_MATRIXMOD, 1);
+          for (unsigned char i = 0; i < 172; ++i)
+          {
+            // define buffer
+            GlobalParameters[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
+            // write master parameters in internal EEPROM here :
+            EEPROM.write(EEPROM_GLOBALPARAMETERS + i, GlobalParameters[i]);
+
+#if DEBUG_inteeprom
+            Serial.print(F("writing GlobalParameter[")); Serial.print(i, DEC); Serial.print(F("] on internal EEPROM addr : $")); Serial.println(EEPROM_GLOBALPARAMETERS + i , HEX);
+            Serial.println();
+#endif
+          }
+
+#if DEBUG_sysexhandler
+          Serial.println(F("Master Parameters[ ] = "));
+          for (unsigned char i = 0; i < 172; ++i) {
+            Serial.print(GlobalParameters[i], DEC); Serial.print(F(",")); // to get it via serial debug and put into code easily ;)
+          }
+          Serial.println();
+#endif
+
+          SR.Led_Pin_Write(DOUT_SHIFT, 0); // shift led Off
+          SR.Led_Pin_Write(DOUT_EDIT, 0);
+          SR.Led_Pin_Write(DOUT_ARP, 0);
+
+          return 3; // code3 = master parameters sysex
+        }
+        else
+          return 350;
+
+        break;
+
+      case 6:
+        if (sysex[3] == 0x0a)
+        {
+          uBank = sysex[4];
+          return 0x0a;
+        }
+        else return sysex[3];
+        break;
+
+      case 143:
+        if (sysex[3] == 0x09) // arp sysex
+        {
+          SR.Led_Pin_Write(DOUT_ARP, 1); // arp led ON
+          SR.Led_Pin_Write(DOUT_EDIT, 1);
+          // get arrays
+          for (unsigned char i = 0; i < 20; ++i)
+          {
+            ArpParameters[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
+          }
+          for (unsigned char j = 0; j < 32; j++)
+          {
+            sequence[j][0] = (sysex[46 + (2 * j)] << 4) + (sysex[45 + (2 * j)] & 0x0f);
+          }
+          for (unsigned char k = 0; k < 32; k++)
+          {
+            sequence[k][1] = (sysex[78 + (2 * k)] << 4) + (sysex[77 + (2 * k)] & 0x0f);
+          }
+          //saving is done by the Bank dump,
+          //so upload arpsysex BEFORE PatchData
+
+          SR.Led_Pin_Write(DOUT_ARP, 0); // arp led ON
+          SR.Led_Pin_Write(DOUT_EDIT, 0);
+          return 0x09;
+        }
+        else
+          return sysex[3];
+        break;
+
+      case 9:
+        if (sysex[3] == 0x08) // Unison sysex
+        {
+          UnisonDetune = (sysex[6] << 4) + (sysex[5] & 0x0f);
+          //saving is done by the Bank dump,
+          //so upload Unisonsysex BEFORE PatchData
+          return 6;
+        }
+        else
+          return sysex[3];
+        break;
+
+      case 20: // SystemCfg
+        if (sysex[3] == 0x0f) // // SystemCfg
+        {
+          // update system cfg parameters in RAM
+          MIDI_CHANNEL = sysex[4];
+          FilterSustainMode = sysex[5];
+          uBank = sysex[6];
+          uPatch = sysex[7];
+          device = sysex[8];
+          matrix_model.A = sysex[9];
+          matrix_model.B = sysex[10];
+          matrix_model.C = sysex[11];
+          matrix_model.D = sysex[12];
+          encoder_inverted = sysex[13];
+          mThru_XCc = sysex[14];
+
+#if DEBUG_sysexhandler
+          Serial.println(F("SystemCfg msg received "));
+          for (unsigned char i = 0; i < 20; ++i)
+          {
+            Serial.print(sysex[i], HEX); Serial.print(F(" ")); // to get it via serial debug and put into code easily ;)
+          }
+          Serial.println();
+#endif
+
+          // update system cfg parameters in ROM
+          EEPROM.write(EEPROM_MIDI_CHANNEL, MIDI_CHANNEL);
+          EEPROM.write(EEPROM_FILTERSUSTAIN_MODE, FilterSustainMode); // save this
+          EEPROM.write(EEPROM_LASTBANK, uBank);
+          EEPROM.write(EEPROM_LASTPATCH, uPatch);
+          EEPROM.write(EEPROM_DEVICE, device); // save last device used (note : don't use too much write eeprom)
+          EEPROM.write(EEPROM_MATRIX_MODELE_A, matrix_model.A);
+          EEPROM.write(EEPROM_MATRIX_MODELE_B, matrix_model.B);
+          EEPROM.write(EEPROM_MATRIX_MODELE_C, matrix_model.C);
+          EEPROM.write(EEPROM_MATRIX_MODELE_D, matrix_model.D);
+          EEPROM.write(EEPROM_ENCODER_INVERTED, encoder_inverted);
+          EEPROM.write(EEPROM_MTHRU_XCC, mThru_XCc);
+
+#if DEBUG_inteeprom
+          Serial.print(F("writing SystemCfg, ")); Serial.print(F("sysex type $")); Serial.println(sysex[3], HEX);
+
+#endif
+          // reboot system :
+          Serial.println(F("rebooting"));
+          software_Reboot();
+
+          return 20;
+        }
+        else
+          return sysex[3];
+        break;
+
+      default:
+        return 0x10;
+        break;
+    }
+  }
+  else
+  {
+    // not matrix, it is something else, so return.
+    return 0;
+  }
+#if DEBUG_sysexhandler
+  //    Serial.print(F("Sysex Handled type ")); Serial.println(HandleBank,DEC);
+  Serial.println(F("END_MIDI_HandleBank "));
+#endif
+}
+///////////////////////////////////////////////////////////////////////////////////
+// Activate all necessary MIDI callbacks
+///////////////////////////////////////////////////////////////////////////////////
+void enableMidiCallbacks(void)
+{
+  // Connect the midi callbacks to the library,
+  // Core in
+  MIDI3.setHandleNoteOff(HandleNoteOff);
+  MIDI3.setHandleNoteOn(HandleNoteOn);
+  MIDI3.setHandleControlChange(HandleControlChange);
+  MIDI3.setHandleProgramChange(HandleProgramChange);
+  MIDI3.setHandleAfterTouchChannel(HandleAfterTouchChannel);
+  MIDI3.setHandlePitchBend(HandlePitchBend);
+  MIDI3.setHandleSystemExclusive(HandleSystemExclusive);
+  MIDI3.setHandleClock(HandleClock);
+  MIDI3.setHandleStart(HandleStart);
+  MIDI3.setHandleContinue(HandleContinue);
+  MIDI3.setHandleStop(HandleStop);
+
+  // Midi in A (deviceA)
+  MIDI1.setHandleNoteOff(HandleNoteOff);
+  MIDI1.setHandleNoteOn(HandleNoteOn);
+  MIDI1.setHandleControlChange(HandleControlChange);
+  MIDI1.setHandleProgramChange(HandleProgramChange);
+  MIDI1.setHandleAfterTouchChannel(HandleAfterTouchChannel);
+  MIDI1.setHandlePitchBend(HandlePitchBend);
+  MIDI1.setHandleSystemExclusive(HandleSystemExclusive);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// Deactivate all activated MIDI callbacks
+////////////////////////////////////////////////////////////////////////////////////
+void disableMidiCallbacks(void)
+{
+  // Core MIDI IN
+  MIDI3.disconnectCallbackFromType(midi::NoteOn);
+  MIDI3.disconnectCallbackFromType(midi::NoteOff);
+  MIDI3.disconnectCallbackFromType(midi::ControlChange);
+  MIDI3.disconnectCallbackFromType(midi::ProgramChange);
+  MIDI3.disconnectCallbackFromType(midi::AfterTouchChannel);
+  MIDI3.disconnectCallbackFromType(midi::PitchBend);
+  MIDI3.disconnectCallbackFromType(midi::SystemExclusive);
+  MIDI3.disconnectCallbackFromType(midi::Clock);
+  MIDI3.disconnectCallbackFromType(midi::Start);
+  MIDI3.disconnectCallbackFromType(midi::Continue);
+  MIDI3.disconnectCallbackFromType(midi::Stop);
+
+  // Midi IN A
+  MIDI1.disconnectCallbackFromType(midi::NoteOn);
+  MIDI1.disconnectCallbackFromType(midi::NoteOff);
+  MIDI1.disconnectCallbackFromType(midi::ControlChange);
+  MIDI1.disconnectCallbackFromType(midi::ProgramChange); // can be removed
+  MIDI1.disconnectCallbackFromType(midi::AfterTouchChannel);
+  MIDI1.disconnectCallbackFromType(midi::PitchBend);
+  MIDI1.disconnectCallbackFromType(midi::SystemExclusive);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////
 ////
@@ -907,252 +1223,6 @@ void HandleSystemExclusive(byte* sysex, unsigned int length)
 //  //    Serial.print(F("Sysex Handled type ")); Serial.println(HandleBank,DEC);
 //#endif
 //}
-
-unsigned int HandleBank(byte* sysex, unsigned int length)
-{
-  if ((sysex[1] == 0x10) && (sysex[2] == 0x06))     // for matrix synths
-  {
-    switch (length)
-    {
-      case 275:
-        switch (sysex[3])
-        {
-          case 0x01:
-            // sysex[4]: numéro de patch 0-99
-
-            SR.Led_Pin_Write(DOUT_SHIFT, 1); // shift led ON
-            for (unsigned char i = 0; i < 134; ++i) 
-            {
-              EditBuffer[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
-            }
-
-            UpdateDinStates(); // update LEDs at the end of the sysex
-
-            Write_Bank_To_BS(uBank, sysex[4]); // write received patch without setting its number bankpatch in internal EEPROM !
-            // Wire.h de l'arduino n'est pas assez rapide et n'arrive pas à faire cette fonction v0.96 : introduction dun delai de 300ms lors de l upload
-
-#if (DEBUG_sysexhandler)
-            Serial.print(F("sysex[4]=patch num : ")); Serial.println(sysex[4], DEC);
-            for (unsigned int i = 0; i < length; ++i) {
-              Serial.print(sysex[i], HEX); Serial.print(F(" "));
-            }
-            Serial.println(F(" "));
-
-            Serial.println(F("editbuffer : "));
-            for (unsigned char i = 0; i < 134; ++i) {
-              Serial.print(EditBuffer[i], HEX); Serial.print(F(" "));
-            }
-            Serial.println();
-            Serial.println();
-
-            Serial.print(F("END_MIDI_HandleBank "));
-            Serial.println(sysex[4], DEC);
-            Serial.println();
-            Serial.println();
-#endif
-
-            SR.Led_Pin_Write(DOUT_SHIFT, 0); // shift led Off
-            return sysex[4];
-            break;
-
-          case 0x0d: //editbuffer
-            SR.Led_Pin_Write(DOUT_SHIFT, 1); // Shift LED ON
-            // update editbuffer
-            for (unsigned char i = 0; i < 134; ++i) 
-            {
-              EditBuffer[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
-            }
-            UpdateDinStates();
-            SendEditBuffer(INTERFACE_SERIAL);
-            SR.Led_Pin_Write(DOUT_SHIFT, 0); // Shift LED Off
-
-#if DEBUG_sysexhandler
-            Serial.println(F("EditBuffer sysex msg type (received from DAW) !"));
-            Serial.println(F("Editbuffer sent to Mx : "));
-            for (unsigned char i = 0; i < 134; ++i) {
-              Serial.print(EditBuffer[i], HEX); Serial.print(F(" "));
-            }
-            Serial.println();
-#endif
-
-            return 1;
-            break;
-
-          default:
-          return sysex[4];
-            break;
-        }
-        break;
-
-      case 351:
-        if ((sysex[3] == 0x03) && (sysex[4] == 0x03))
-        {
-          SR.Led_Pin_Write(DOUT_SHIFT, 1); // shift led ON
-          SR.Led_Pin_Write(DOUT_EDIT, 1);
-          SR.Led_Pin_Write(DOUT_MATRIXMOD, 1);
-          for (unsigned char i = 0; i < 172; ++i)
-          {
-            // define buffer
-            GlobalParameters[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
-            // write master parameters in internal EEPROM here :
-            EEPROM.write(EEPROM_GLOBALPARAMETERS + i, GlobalParameters[i]);
-
-#if DEBUG_inteeprom
-            Serial.print(F("writing GlobalParameter[")); Serial.print(i, DEC); Serial.print(F("] on internal EEPROM addr : $")); Serial.println(EEPROM_GLOBALPARAMETERS + i , HEX);
-            Serial.println();
-#endif
-          }
-
-#if DEBUG_sysexhandler
-          Serial.println(F("Master Parameters[ ] = "));
-          for (unsigned char i = 0; i < 172; ++i) {
-            Serial.print(GlobalParameters[i], DEC); Serial.print(F(",")); // to get it via serial debug and put into code easily ;)
-          }
-          Serial.println();
-#endif
-
-          SR.Led_Pin_Write(DOUT_SHIFT, 0); // shift led Off
-          SR.Led_Pin_Write(DOUT_EDIT, 0);
-          SR.Led_Pin_Write(DOUT_ARP, 0);
-
-          return 3; // code3 = master parameters sysex
-        }
-        else
-          return 350;
-
-        break;
-
-      case 6:
-        if (sysex[3] == 0x0a)
-        {
-          uBank = sysex[4];
-          return 0x0a;
-        }
-        else return sysex[3];
-        break;
-
-      case 143:
-        if (sysex[3] == 0x09) // arp sysex
-        {
-          SR.Led_Pin_Write(DOUT_ARP, 1); // arp led ON
-          SR.Led_Pin_Write(DOUT_EDIT, 1);
-          // get arrays
-          for (unsigned char i = 0; i < 20; ++i) 
-          {
-            ArpParameters[i] = (sysex[5 + 2 * i + 1] << 4) + (sysex[5 + 2 * i] & 0x0f);
-          }
-          for (unsigned char j = 0; j < 32; j++) 
-          {
-            sequence[j][0] = (sysex[46 + (2 * j)] << 4) + (sysex[45 + (2 * j)] & 0x0f);
-          }
-          for (unsigned char k = 0; k < 32; k++) 
-          {
-            sequence[k][1] = (sysex[78 + (2 * k)] << 4) + (sysex[77 + (2 * k)] & 0x0f);
-          }
-          //saving is done by the Bank dump,
-          //so upload arpsysex BEFORE PatchData
-
-          SR.Led_Pin_Write(DOUT_ARP, 0); // arp led ON
-          SR.Led_Pin_Write(DOUT_EDIT, 0);
-          return 0x09;
-        }
-        else 
-        return sysex[3];
-        break;
-
-      case 9:
-        if (sysex[3] == 0x08) // Unison sysex
-        {
-          UnisonDetune = (sysex[6] << 4) + (sysex[5] & 0x0f);
-          //saving is done by the Bank dump,
-          //so upload Unisonsysex BEFORE PatchData
-          return 6;
-        }
-        else return sysex[3];
-        break;
-
-      default:
-      return 10;
-        break;
-    }
-  }
-  else
-  {
-    // not matrix, it is something else, so return.
-    return 0;
-  }
-#if DEBUG_sysexhandler
-  //    Serial.print(F("Sysex Handled type ")); Serial.println(HandleBank,DEC);
-  Serial.println(F("END_MIDI_HandleBank "));
-#endif
-}
-///////////////////////////////////////////////////////////////////////////////////
-// Activate all necessary MIDI callbacks
-///////////////////////////////////////////////////////////////////////////////////
-void enableMidiCallbacks(void)
-{
-  // Connect the midi callbacks to the library,
-  // Core in
-  MIDI3.setHandleNoteOff(HandleNoteOff);
-  MIDI3.setHandleNoteOn(HandleNoteOn);
-  MIDI3.setHandleControlChange(HandleControlChange);
-  MIDI3.setHandleProgramChange(HandleProgramChange);
-  MIDI3.setHandleAfterTouchChannel(HandleAfterTouchChannel);
-  MIDI3.setHandlePitchBend(HandlePitchBend);
-  MIDI3.setHandleClock(HandleClock);
-  MIDI3.setHandleStart(HandleStart);
-  MIDI3.setHandleContinue(HandleContinue);
-  MIDI3.setHandleStop(HandleStop);
-  MIDI3.setHandleSystemExclusive(HandleSystemExclusive);
-
-  // Midi in A (deviceA)
-  MIDI1.setHandleNoteOff(HandleNoteOff);
-  MIDI1.setHandleNoteOn(HandleNoteOn);
-  MIDI1.setHandleControlChange(HandleControlChange);
-  //  MIDI1.setHandleProgramChange(HandleProgramChange);
-  MIDI1.setHandleAfterTouchChannel(HandleAfterTouchChannel);
-  MIDI1.setHandlePitchBend(HandlePitchBend);
-  MIDI1.setHandleSystemExclusive(HandleSystemExclusive);
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-// Deactivate all activated MIDI callbacks
-////////////////////////////////////////////////////////////////////////////////////
-void disableMidiCallbacks(void)
-{
-  MIDI3.disconnectCallbackFromType(midi::NoteOn);
-  MIDI3.disconnectCallbackFromType(midi::NoteOff);
-  MIDI3.disconnectCallbackFromType(midi::ControlChange);
-  MIDI3.disconnectCallbackFromType(midi::ProgramChange);
-  MIDI3.disconnectCallbackFromType(midi::AfterTouchChannel);
-  MIDI3.disconnectCallbackFromType(midi::PitchBend);
-  MIDI3.disconnectCallbackFromType(midi::SystemExclusive);
-  MIDI3.disconnectCallbackFromType(midi::Clock);
-  MIDI3.disconnectCallbackFromType(midi::Start);
-  MIDI3.disconnectCallbackFromType(midi::Continue);
-  MIDI3.disconnectCallbackFromType(midi::Stop);
-
-  MIDI1.disconnectCallbackFromType(midi::SystemExclusive);
-  MIDI1.disconnectCallbackFromType(midi::NoteOn);
-  MIDI1.disconnectCallbackFromType(midi::NoteOff);
-  MIDI1.disconnectCallbackFromType(midi::ControlChange);
-  //  MIDI1.disconnectCallbackFromType(midi::ProgramChange);
-  MIDI1.disconnectCallbackFromType(midi::AfterTouchChannel);
-  MIDI1.disconnectCallbackFromType(midi::PitchBend);
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

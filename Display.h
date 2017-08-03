@@ -2,10 +2,11 @@
 #ifndef Display_h
 #define Display_h
 
-
 // status of  application
-typedef union {
-  struct {
+typedef union 
+{
+  struct 
+  {
     unsigned ALL: 8;
   };
 
@@ -18,7 +19,5 @@ typedef union {
     //unsigned Transmit_Delayed_Pot:1;	//added for matrix
   };
 } app_flags_t;
-
-
 
 #endif

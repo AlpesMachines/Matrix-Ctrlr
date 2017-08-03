@@ -35,13 +35,18 @@
 #define MIDCLK 1
 #define S24CLK 2
 #define TRGCLK 3
+#define MTRGCLK 4
+
+#define MIDI_TRIGGER_NOTE 37
+#define MIDI_DRUMS_CHANNEL 10
 
 
-// speed i2c (400 KHz :  400000L), default 100000L (100 KHz) and buffer length :
-#define TWI_FREQ 100000L
+// i2c speed and buffer length :
+#define TWI_FREQ 400000L // default 100000L (100 KHz, 400 KHz :  400000L)
 #define TWI_BUFFER_LENGTH 32 // default 32
 #define BUFFER_LENGTH 32 // default 32
-#define MINIBUFFER 16 //default 16
+// eeprom512 lib buffer :
+#define MINIBUFFER 32 //default 16
 
 //// augmenter la taille du buffer d'entrée pour les données midi.
 //// Par défaut, la taille du buffer est de 64 octets
@@ -56,6 +61,40 @@
 // taille maxi de sysex prise en compte par l'appareil
 //#define SYSEXMAXSIZE 479 // NE PAS METTRE , éditer direct midi_settings.h
 
+// http://www.electronic-engineering.ch/microchip/datasheets/lcd/charset.gif
+#define CHAR_DOWN   B01111111 // ASCII left arrow
+#define CHAR_UP     B01111110 // ASCII right arrow
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Method retained to store patches ( ext EEPROM)
+///////////////////////////////////////////////////////////////////////////////////////////
+#define PATCH_USE_BANKSTICK     1 // if 24LC512 set 1, else 0 and use internal eeprom 4KB
+#define ext_EEPROM_PAGING       1 // read/write 24LC512 using paging method 
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Setting max bank and max patch :
+///////////////////////////////////////////////////////////////////////////////////////////
+// use 24LC512 and paging method to store patches
+#define uBank_max           9 // 4 if paging, as 512 patches in total at MAX (000 ... 499), 12 slots are lost
+#define uPatch_max          99 // defined to 999 for 4 x 24LC512
+
+// adresses in internal EEPROM for midi channel, filtermode, and various stuff :
+#define EEPROM_MIDI_CHANNEL        0x00
+#define EEPROM_FILTERSUSTAIN_MODE  0x01
+
+#define EEPROM_LASTBANK           0x02
+#define EEPROM_LASTPATCH         0x03
+#define EEPROM_DEVICE           0x04
+
+#define EEPROM_MATRIX_MODELE_A       0x05
+#define EEPROM_MATRIX_MODELE_B       0x06
+#define EEPROM_MATRIX_MODELE_C       0x07
+#define EEPROM_MATRIX_MODELE_D       0x08
+#define EEPROM_ENCODER_INVERTED 0x09
+#define EEPROM_GLOBALPARAMETERS 0x10 // 172 bytes ! start address $10 , end adress $BB
+// lots of cells after ...
+#define EEPROM_MTHRU_XCC 0xbc
+#define EEPROM_EXTCLOCK 0xbd
 
 /*
     Oberheim Matrix 1000 sysex parameter numbers

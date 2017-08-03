@@ -486,7 +486,7 @@ void Rec_Seq(byte pitch, byte velo, byte channel, unsigned char opt) // 0.97a c'
 #endif
 
     // update display lcd :
-    UI_Display_Arp();
+    if(SoftPanel.Mode == Arp) UI_Display_Arp();
   }
   else if (ui_seqRec == 0) // if we don't record the sequence
   {
@@ -536,7 +536,7 @@ void Insert_SeqRest(unsigned char param)
 #endif
 
     // update display lcd :
-    UI_Display_Arp();
+    if(SoftPanel.Mode == Arp) UI_Display_Arp();
   }
 }
 
@@ -550,7 +550,7 @@ void Play_Seq(byte pitch, byte velocity, byte channel, bool trigger)
     // we can't record :
     ui_seqRec = false;
 
-    seqMonoMode = !seqMonoMode; // change state boolean
+    seqMonoMode = !seqMonoMode; // change state bool
 
 #if DEBUG_SEQ
     Serial.print(F("seqMonoMode = ")); Serial.println(seqMonoMode);
@@ -564,7 +564,7 @@ void Play_Seq(byte pitch, byte velocity, byte channel, bool trigger)
     playSeqTrigger[3] = trigger; // = seqTrig (note on/off = true/false)
 
     // update display lcd :
-    UI_Display_Arp();
+    if(SoftPanel.Mode == Arp) UI_Display_Arp();
     
   }
   else

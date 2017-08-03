@@ -152,7 +152,7 @@ void UpdateDinStates(void)
 //  Osc_Pulse_Modulate[DCO2] = 0;
 
 #if DEBUG_dout
-  Serial.println(F("UpdateDinStates() "));
+  Serial.println(F("UpdateDinStates()"));
   Serial.println();
 #endif
 }

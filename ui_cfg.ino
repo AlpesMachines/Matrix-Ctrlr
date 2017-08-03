@@ -270,6 +270,11 @@ void UI_Display_Cfg()
           DOUT_PinSet1(DIN_ConfigMap[DIN_FILTER].dout_pin);
           break;
 
+        case MTRGCLK:
+          LCD_PrintCString(F("mTg"));
+          DOUT_PinSet1(DIN_ConfigMap[DIN_FILTER].dout_pin);
+          break;
+
         default:
           LCD_PrintCString(F("Ukn"));
           DOUT_PinSet1(DIN_ConfigMap[DIN_FILTER].dout_pin);
@@ -387,7 +392,7 @@ void UI_Display_Cfg()
       DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);   // off
       DOUT_PinSet0(DIN_ConfigMap[DIN_EDIT].dout_pin);    // off
       DOUT_PinSet0(DIN_ConfigMap[DIN_ARP].dout_pin);     // ON
-      DOUT_PinSet_Keypanel(1, 0, 0, 1, 1, 1);
+      DOUT_PinSet_Keypanel(1, 0, 1, 1, 1, 1);
       DOUT_PinSet1(DIN_ConfigMap[DIN_CFG].dout_pin);
 
       LCD_Clear();
@@ -395,8 +400,8 @@ void UI_Display_Cfg()
       lcd.setCursor(0, 1);
       lcd.print(F("Bank"));
       LCD_PrintBCD2(uBank);
-      lcd.setCursor(13, 1);
-      lcd.print(F("Gbl All"));
+      lcd.setCursor(9, 1);
+      lcd.print(F("Sys Gbl All"));
 
       break;
   }
@@ -678,8 +683,9 @@ void UI_Handle_Cfg()
       //        SetEncoderValue(&GlobalParameters[13], 1);
       //      }
 
-      else return;
-      // ceci fout la merde et ne met pas à jour en temps real les valeurs des Globalparam :
+      else 
+      return;
+      // ceci deconne et ne met pas à jour en temps réel les valeurs des Globalparam :
       //                SendGlobalParameters(INTERFACE_SERIAL); // matrix à éditer
       //                SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
 #if DEBUG
@@ -691,7 +697,7 @@ void UI_Handle_Cfg()
     app_flags.Display_DIN_Req = 1;
   }
 
-  else if (SoftPanel.Page == SOFT_PAGE3) { /// cfg page 3 //////////"BPM CLK ENC  STN xxx")///////////////////////////////////////// CFG/MISC page //////////////////
+  else if (SoftPanel.Page == SOFT_PAGE3) { /// cfg page 3 ////////////////// CFG/MISC page //////////////////
     switch (SoftPanel.Button) {
 
       case DIN_PAGE:
@@ -701,7 +707,7 @@ void UI_Handle_Cfg()
       case SOFT_EDIT_1: // bpm
         //ui_external_clk = !ui_external_clk; // prior 0.99x
         ++ui_external_clk;
-        if (ui_external_clk > TRGCLK)
+        if (ui_external_clk > MTRGCLK)
           ui_external_clk = INTCLK;
         break;
 
@@ -799,6 +805,7 @@ void UI_Handle_Cfg()
         break;
 
       case SOFT_EDIT_3:
+              SendCtrlrSystemCfg(INTERFACE_SERIAL3);
         break;
 
       case SOFT_EDIT_4:
@@ -815,11 +822,10 @@ void UI_Handle_Cfg()
           MIDI_SetBank(INTERFACE_SERIAL3, i);
           // then dump 100 patches on core out
           DumpCtrlrBank(INTERFACE_SERIAL3, i);
-          //DumpCtrlrBank(INTERFACE_SERIAL, i);
         }
         // ends with Globals
         SendGlobalParameters(INTERFACE_SERIAL3);
-        //SendGlobalParameters(INTERFACE_SERIAL);
+        SendCtrlrSystemCfg(INTERFACE_SERIAL3);
         break;
 
       case SOFT_EDIT_INC: //

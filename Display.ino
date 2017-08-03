@@ -26,7 +26,7 @@ void LCD_Display_Init(void) {
 void Display_Tick(void) {
 
   // display encoder movements
-  if (app_flags.Display_ENC_Req) 
+  if (app_flags.Display_ENC_Req)
   {
     SoftPanel_DisplayHandler();
     app_flags.Display_ENC_Req = 0; // handled
@@ -35,18 +35,18 @@ void Display_Tick(void) {
   // display analog pot movements
   if (app_flags.Display_Pot_Req && (SoftPanel.Mode == Patch))
   {
-  //		LivePanel_DisplayAin();
+    //		LivePanel_DisplayAin();
     app_flags.Display_Pot_Req = 0; // handled
   }
 
   // display buttons
   if (app_flags.Display_DIN_Req)
   {
-    // NE PAS METTRE CETTE SECTION SINON DCO2 ClIC affiché au démarrage : 
-//    if (DIN_ConfigMap[last_din_pin].group == BUTGRP_LIVE && SoftPanel.Mode == Patch )
- //     LivePanel_DisplayDin(last_din_pin);
-  //  else
-      SoftPanel_DisplayHandler ();
+    // NE PAS METTRE CETTE SECTION SINON DCO2 ClIC affiché au démarrage :
+    //    if (DIN_ConfigMap[last_din_pin].group == BUTGRP_LIVE && SoftPanel.Mode == Patch )
+    //     LivePanel_DisplayDin(last_din_pin);
+    //  else
+    SoftPanel_DisplayHandler ();
     app_flags.Display_DIN_Req = 0; // handled
   }
 }

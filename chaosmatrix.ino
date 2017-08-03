@@ -999,7 +999,7 @@ void SendPatchInit(unsigned char  interface)
 
 #if DEBUG_serialout
   // print debug sysex +
-  Serial.print(F("SendPatchInit ARD SERIAL_PORT = ")); Serial.print(interface, DEC); Serial.print(F(" SendPatchInit*SysEx[]= "));
+  Serial.print(F("SendPatchInit() ARD SERIAL_PORT = ")); Serial.print(interface, DEC); Serial.print(F(" SendPatchInit*SysEx[]= "));
   for (int i = 0; i < 275; ++i)
   {
     Serial.print(sysex[i], HEX);
@@ -1019,7 +1019,7 @@ void SendEditBuffer(unsigned char  interface)
   unsigned char i;
   unsigned char checksum = 0;
 
-  byte sysex[275]; // = { 0xf0, 0x10, 0x06, 0x0, 0, 0, 0xf7 };
+  byte sysex[275]; // = { 0xf0, 0x10, 0x06, 0x01, 0, 0, 0xf7 };
 
   if (matrix_modele == matrix_6)
   {
@@ -1093,7 +1093,7 @@ void SendEditBuffer(unsigned char  interface)
 
 #if DEBUG_serialout
   // print debug sysex +
-  Serial.print(F("SendEditBuffer ARD SERIAL_PORT = ")); Serial.print(interface, DEC); Serial.print(F(" SysEx[]= "));
+  Serial.print(F("SendEditBuffer() ARD SERIAL_PORT = ")); Serial.print(interface, DEC); Serial.print(F(" SysEx[]= "));
   for (int i = 0; i < 275; ++i)
   {
     Serial.print(sysex[i], HEX);
@@ -1112,6 +1112,7 @@ void SendEditBufferOrig(unsigned char  interface)
   unsigned char i;
   unsigned char checksum = 0;
 
+  // = { 0xf0, 0x10, 0x06, 0x0d, 0x00, [patch data 134bytes + cs], 0xf7 };
   byte sysex[275];
 
   // for matrix 1000
@@ -1163,7 +1164,7 @@ void SendEditBufferOrig(unsigned char  interface)
 
 #if DEBUG_serialout
   // print debug sysex +
-  Serial.print(F("SendEditBufferOrig ARD SERIAL_PORT = ")); Serial.print(interface, DEC); Serial.print(F(" SendEditBufferOrig SysEx[]= "));
+  Serial.print(F("SendEditBufferOrig() ARD SERIAL_PORT = ")); Serial.print(interface, DEC); Serial.print(F(" SendEditBufferOrig SysEx[]= "));
   for (int i = 0; i < 275; ++i)
   {
     Serial.print(sysex[i], HEX);
@@ -1241,11 +1242,11 @@ void SendSinglePatchData(unsigned char interface, unsigned char patch_num)
 
 #if DEBUG_serialout
   // print debug sysex
-  Serial.print(F("SendSinglePatchData interface = "));
+  Serial.print(F("SendSinglePatchData() interface = "));
   Serial.print(interface, DEC);
   Serial.print(F(" patchnumber "));
   Serial.println(patch_num, DEC);
-  Serial.println(F(" SendSinglePatchData SysEx[]= "));
+  Serial.println(F(" SendSinglePatchData() SysEx[]= "));
   for (int i = 0; i < 275; ++i)
   {
     Serial.print(sysex[i], HEX);
@@ -1256,106 +1257,6 @@ void SendSinglePatchData(unsigned char interface, unsigned char patch_num)
 #endif
 
 }
-
-/////////////////////////////////////////////////////////////////////////////
-//  Send Single Arp Data : ArpParameters[20] ---> OUI ! to save extEEPROM
-/////////////////////////////////////////////////////////////////////////////
-void SendSingleArpData(unsigned char interface, unsigned char number)
-{
-  unsigned char checksum = 0;
-
-  //  byte sysex[47]; // = { 0xf0, 0x10, 0x06, 0x09, patch num, [arp data 20 bytes + cs], 0xf7 };
-  byte sysex[143]; // = { 0xf0, 0x10, 0x06, 0x09, patch num, [arp data 20*2 bytes + seq 2x32*2 bytes + cs], 0xf7 };
-
-  // for Matrix Ctrlr
-  sysex[0] = 0xf0; // begin sysex header
-  sysex[1] = 0x10; // mfg
-  sysex[2] = 0x06; // device
-  sysex[3] = 0x09; // single arp data
-  sysex[4] = number; // destination patch number
-
-  // 20 arp bytes
-  for (unsigned char i = 0; i < 20; i++) {
-    // transmit the arp value
-    sysex[(2 * i) + 5] = ArpParameters[i] & 0x0f;
-    sysex[(2 * i) + 6] = (ArpParameters[i] >> 4) & 0x0f;
-
-    // checksum version
-    checksum += ArpParameters[i] ;
-  }
-
-  for (unsigned char j = 0; j < 32; j++) {
-    sysex[45 + (2 * j)] = sequence[j][0] & 0x0f;
-    sysex[46 + (2 * j)] = (sequence[j][0] >> 4) & 0x0f;
-
-    // checksum version
-    checksum += sequence[j][0];
-  }
-
-  for (unsigned char k = 0; k < 32; k++) {
-    sysex[77 + (2 * k)] = sequence[k][1] & 0x0f;
-    sysex[78 + (2 * k)] = (sequence[k][1] >> 4) & 0x0f;
-
-    // checksum version
-    checksum += sequence[k][1];
-  }
-
-
-  sysex[141] = checksum & 0x7f;
-  sysex[142] = 0xf7;
-
-  //
-  //  if (matrix_modele == matrix_6)
-  //  {
-  //    //send pgrm change number 0
-  //    MIDI_SendPatchProgram(interface, 0);  // send program change 0x00
-  //  }
-
-  switch (interface) {
-    case  INTERFACE_SERIAL1:
-      MIDI1.sendSysEx (sizeof(sysex), sysex, true);
-      break;
-
-    case INTERFACE_SERIAL2:
-      MIDI2.sendSysEx (sizeof(sysex), sysex, true);
-      break;
-
-    case INTERFACE_SERIAL3:
-      MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      break;
-
-#if SOFTSERIAL_ENABLED
-    case INTERFACE_SERIAL4:
-      MIDI4.sendSysEx (sizeof(sysex), sysex, true);
-      break;
-
-    case INTERFACE_SERIAL5:
-      MIDI5.sendSysEx (sizeof(sysex), sysex, true);
-      break;
-#endif
-
-    default:
-      break;
-  }
-
-#if DEBUG_serialout
-  // print debug sysex
-  Serial.print(F("SendSingleARPData interface = "));
-  Serial.print(interface, DEC);
-  Serial.print(F(" nbr "));
-  Serial.println(number, DEC);
-  Serial.println(F(" SendSingleArpData SysEx[]= "));
-  for (int i = 0; i < 101; ++i)
-  {
-    Serial.print(sysex[i], HEX);
-    Serial.print(F(" "));
-  }
-  Serial.println(F("End"));
-  Serial.println();
-#endif
-
-}
-
 /////////////////////////////////////////////////////////////////////////////
 //  Send Single UnisonDetune via sysex ---> OUI ! to save extEEPROM
 /////////////////////////////////////////////////////////////////////////////
@@ -1411,11 +1312,11 @@ void SendSingleUnison(unsigned char interface, unsigned char number)
 
 #if DEBUG_serialout
   // print debug sysex
-  Serial.print(F("SendSingleUnison interface = "));
+  Serial.print(F("SendSingleUnison() interface = "));
   Serial.print(interface, DEC);
   Serial.print(F(" nbr "));
   Serial.println(number, DEC);
-  Serial.println(F(" SendSingleUnison SysEx[]= "));
+  Serial.println(F(" SendSingleUnison() SysEx[]= "));
   for (int i = 0; i < 9; ++i)
   {
     Serial.print(sysex[i], HEX);
@@ -1425,6 +1326,94 @@ void SendSingleUnison(unsigned char interface, unsigned char number)
   Serial.println();
 #endif
 
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  Send Single Arp Data : ArpParameters[20] ---> OUI ! to save extEEPROM
+/////////////////////////////////////////////////////////////////////////////
+void SendSingleArpData(unsigned char interface, unsigned char number)
+{
+  unsigned char checksum = 0;
+  byte sysex[143]; // = { 0xf0, 0x10, 0x06, 0x09, patch num, [arp data 20*2 bytes + seq 2x32*2 bytes + cs], 0xf7 };
+
+  // for Matrix Ctrlr
+  sysex[0] = 0xf0; // begin sysex header
+  sysex[1] = 0x10; // mfg
+  sysex[2] = 0x06; // device
+  sysex[3] = 0x09; // single arp data
+  sysex[4] = number; // destination patch number
+
+  // 20 arp bytes
+  for (unsigned char i = 0; i < 20; i++) {
+    // transmit the arp value
+    sysex[(2 * i) + 5] = ArpParameters[i] & 0x0f;
+    sysex[(2 * i) + 6] = (ArpParameters[i] >> 4) & 0x0f;
+
+    // checksum version
+    checksum += ArpParameters[i] ;
+  }
+
+  for (unsigned char j = 0; j < 32; j++) {
+    sysex[45 + (2 * j)] = sequence[j][0] & 0x0f;
+    sysex[46 + (2 * j)] = (sequence[j][0] >> 4) & 0x0f;
+
+    // checksum version
+    checksum += sequence[j][0];
+  }
+
+  for (unsigned char k = 0; k < 32; k++) {
+    sysex[77 + (2 * k)] = sequence[k][1] & 0x0f;
+    sysex[78 + (2 * k)] = (sequence[k][1] >> 4) & 0x0f;
+
+    // checksum version
+    checksum += sequence[k][1];
+  }
+
+  sysex[141] = checksum & 0x7f;
+  sysex[142] = 0xf7;
+
+  switch (interface) {
+    case  INTERFACE_SERIAL1:
+      MIDI1.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+    case INTERFACE_SERIAL2:
+      MIDI2.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+    case INTERFACE_SERIAL3:
+      MIDI3.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+#if SOFTSERIAL_ENABLED
+    case INTERFACE_SERIAL4:
+      MIDI4.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+    case INTERFACE_SERIAL5:
+      MIDI5.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+#endif
+
+    default:
+      break;
+  }
+
+#if DEBUG_serialout
+  // print debug sysex
+  Serial.print(F("SendSingleARPData() interface = "));
+  Serial.print(interface, DEC);
+  Serial.print(F(" nbr "));
+  Serial.println(number, DEC);
+  Serial.println(F(" SendSingleArpData() SysEx[]= "));
+  for (int i = 0; i < 101; ++i)
+  {
+    Serial.print(sysex[i], HEX);
+    Serial.print(F(" "));
+  }
+  Serial.println(F("End"));
+  Serial.println();
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1520,6 +1509,7 @@ void SendGlobalParameters(unsigned char interface)
   }
 
 #if DEBUG_master
+  Serial.println(F("SendGlobalParameters()"));
   Serial.print(F("reading MasterParameters[ ] in EEPROM sent at interface = ")), Serial.println(interface);
   for (i = 0; i < 172; i++)
   {
@@ -1587,11 +1577,8 @@ void SendGlobalParameters(unsigned char interface)
 //////////////////////////////////////////////////////////
 void DumpCtrlrBank(unsigned char interface, unsigned char bank)
 {
-  unsigned char stamp;
-  stamp = ui_external_clk;
+  unsigned char tmp = ui_external_clk;
   ui_external_clk = true; // desactive F8 on serial port
-
-  //ui_external_clk = !ui_external_clk;
 
   // send patch 0 to patch 99 :
   for (unsigned char k = 0; k < 100; k++)
@@ -1604,16 +1591,17 @@ void DumpCtrlrBank(unsigned char interface, unsigned char bank)
     SendSingleUnison(interface, k);
     SendSinglePatchData(interface, k); // algo + send via interface
   }
-  //ui_external_clk = !ui_external_clk;
 
-  ui_external_clk = stamp; // retrieve state
-
+  ui_external_clk = tmp; // retrieve state
 }
+
 /////////////////////////////////////////////////////////////////////////////
 // save the patch in the matrix 1000 at bank and number specified
 /////////////////////////////////////////////////////////////////////////////
 void StoreEditBuffer(unsigned char interface, unsigned char bank, unsigned char num)
 {
+  // f0 10 06 0e 03 num. bank. ID. f7 - STORE EDIT BUFFER
+
   byte sysex[9]; // Matrix 1000 owner's manual page 45
 
   sysex[0] = 0xf0;
@@ -1655,6 +1643,85 @@ void StoreEditBuffer(unsigned char interface, unsigned char bank, unsigned char 
 
 
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// Send Matrix Ctrlr's specific parameters saved in the arduino board EEPROM
+// through a 20 bytes SysEx message
+/////////////////////////////////////////////////////////////////////////////
+void SendCtrlrSystemCfg(unsigned char interface)
+{
+  // f0 10 06 0f .. .. .. f7 - STORE EDIT BUFFER
+  //// adresses in internal EEPROM for midi channel, filtermode, etc :
+  //  EEPROM_MIDI_CHANNEL        0x00
+  //  EEPROM_FILTERSUSTAIN_MODE  0x01
+  //  EEPROM_LASTBANK           0x02
+  //  EEPROM_LASTPATCH         0x03
+  //  EEPROM_DEVICE           0x04
+  //  EEPROM_MATRIX_MODELE_A       0x05
+  //  EEPROM_MATRIX_MODELE_B       0x06
+  //  EEPROM_MATRIX_MODELE_C       0x07
+  //  EEPROM_MATRIX_MODELE_D       0x08
+  //  EEPROM_ENCODER_INVERTED 0x09
+  //  EEPROM_GLOBALPARAMETERS 0x10 // 172 bytes ! start address $10 , end adress $BB
+  //// lots of cells after ...
+  //  EEPROM_MTHRU_XCC 0xbc
+  //  EEPROM_EXTCLOCK 0xbd
+
+  byte sysex[20] =
+  {
+    0xf0, 0x10, 0x06, 0x0f,
+    EEPROM.read(EEPROM_MIDI_CHANNEL),
+    EEPROM.read(EEPROM_FILTERSUSTAIN_MODE),
+    EEPROM.read(EEPROM_LASTBANK),
+    EEPROM.read(EEPROM_LASTPATCH),
+    EEPROM.read(EEPROM_DEVICE),
+    EEPROM.read(EEPROM_MATRIX_MODELE_A),
+    EEPROM.read(EEPROM_MATRIX_MODELE_B),
+    EEPROM.read(EEPROM_MATRIX_MODELE_C),
+    EEPROM.read(EEPROM_MATRIX_MODELE_D),
+    EEPROM.read(EEPROM_ENCODER_INVERTED),
+    EEPROM.read(EEPROM_MTHRU_XCC), // mThru_XCc
+    0x00, // EEPROM.read(EEPROM_EXTCLOCK) -> not used
+    0x00, // reserved
+    0x00, // reserved
+    0x00, // reserved
+    0xF7
+  };
+
+  switch (interface) {
+    case  INTERFACE_SERIAL1:
+      MIDI1.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+    case INTERFACE_SERIAL2:
+      MIDI2.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+    case INTERFACE_SERIAL3:
+      MIDI3.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+#if SOFTSERIAL_ENABLED
+    case INTERFACE_SERIAL4:
+      MIDI4.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+
+    case INTERFACE_SERIAL5:
+      MIDI5.sendSysEx (sizeof(sysex), sysex, true);
+      break;
+#endif
+
+    default:
+      break;
+  }
+
+#if DEBUG_midi
+  Serial.println(F("MIDI_SendCtrlrSystemCfg() "));
+  Serial.print (F("interface = ")); Serial.println(interface, HEX);
+  Serial.println();
+#endif
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //  Converts a pots 7 bit value  to a signed 7 bit with zero at center position
 /////////////////////////////////////////////////////////////////////////////

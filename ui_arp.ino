@@ -71,301 +71,269 @@ const unsigned int arp_div[14] = { // for 24ppqn
   96, // 1:4 = ronde (dure 4 temps dans une mesure 4/4)
   144,// ronde pointée
 };
-//const unsigned char ui_ui_aSpeed[14][5] = {
-//  {"16:1"}, // quadruple croche
-//  {"12:1"},
-//  {" 8:1"}, // triple croche
-//  {" 6:1"},
-//  {" 4:1"}, // double croche
-//  {" 3:1"},
-//  {" 2:1"}, // croche
-//  {" 3:2"},
-//  {" 1:1"}, // noire
-//  {" 2:3"},
-//  {" 1:2"}, // blanche
-//  {" 3:4"},
-//  {" 1:4"}, // ronde
-//  {" o. "}, // ronde pointée
-//};
-//
-//const unsigned char ui_patchbay_limits[9][4] = {
-//  {"LD1"},
-//  {"LU1"},
-//  {"LD2"},
-//  {"LU2"},
-//  {"LD3"},
-//  {"LU3"},
-//  {"LD4"},
-//  {"LU4"},
-//  {"end"},
-//};
 
+////////// explain note in a musical way instead of unsigned char :
+const char pitchNotation0[] PROGMEM = {"C-1 "};
+const char pitchNotation1[] PROGMEM = {"C#-1"};
+const char pitchNotation2[] PROGMEM = {"D-1 "};
+const char pitchNotation3[] PROGMEM = {"D#-1"};
+const char pitchNotation4[] PROGMEM = {"E-1 "};
+const char pitchNotation5[] PROGMEM = {"F-1 "};
+const char pitchNotation6[] PROGMEM = {"F#-1"};
+const char pitchNotation7[] PROGMEM = {"G-1 "};
+const char pitchNotation8[] PROGMEM = {"G#-1"};
+const char pitchNotation9[] PROGMEM = {"A-1 "};
+const char pitchNotation10[] PROGMEM = {"A#-1"};
+const char pitchNotation11[] PROGMEM = {"B-1 "};
+const char pitchNotation12[] PROGMEM = {"C0 "};
+const char pitchNotation13[] PROGMEM = {"C#0"};
+const char pitchNotation14[] PROGMEM = {"D0 "};
+const char pitchNotation15[] PROGMEM = {"D#0"};
+const char pitchNotation16[] PROGMEM = {"E0 "};
+const char pitchNotation17[] PROGMEM = {"F0 "};
+const char pitchNotation18[] PROGMEM = {"F#0"};
+const char pitchNotation19[] PROGMEM = {"G0 "};
+const char pitchNotation20[] PROGMEM = {"G#0"};
+const char pitchNotation21[] PROGMEM = {"A0 "};
+const char pitchNotation22[] PROGMEM = {"A#0"};
+const char pitchNotation23[] PROGMEM = {"B0 "};
+const char pitchNotation24[] PROGMEM = {"C1 "};
+const char pitchNotation25[] PROGMEM = {"C#1"};
+const char pitchNotation26[] PROGMEM = {"D1 "};
+const char pitchNotation27[] PROGMEM = {"D#1"};
+const char pitchNotation28[] PROGMEM = {"E1 "};
+const char pitchNotation29[] PROGMEM = {"F1 "};
+const char pitchNotation30[] PROGMEM = {"F#1"};
+const char pitchNotation31[] PROGMEM = {"G1 "};
+const char pitchNotation32[] PROGMEM = {"G#1"};
+const char pitchNotation33[] PROGMEM = {"A1 "};
+const char pitchNotation34[] PROGMEM = {"A#1"};
+const char pitchNotation35[] PROGMEM = {"B1 "};
+const char pitchNotation36[] PROGMEM = {"C2 "};
+const char pitchNotation37[] PROGMEM = {"C#2"};
+const char pitchNotation38[] PROGMEM = {"D2 "};
+const char pitchNotation39[] PROGMEM = {"D#2"};
+const char pitchNotation40[] PROGMEM = {"E2 "};
+const char pitchNotation41[] PROGMEM = {"F2 "};
+const char pitchNotation42[] PROGMEM = {"F#2"};
+const char pitchNotation43[] PROGMEM = {"G2 "};
+const char pitchNotation44[] PROGMEM = {"G#2"};
+const char pitchNotation45[] PROGMEM = {"A2 "};
+const char pitchNotation46[] PROGMEM = {"A#2"};
+const char pitchNotation47[] PROGMEM = {"B2 "};
+const char pitchNotation48[] PROGMEM = {"C3 "};
+const char pitchNotation49[] PROGMEM = {"C#3"};
+const char pitchNotation50[] PROGMEM = {"D3 "};
+const char pitchNotation51[] PROGMEM = {"D#3"};
+const char pitchNotation52[] PROGMEM = {"E3 "};
+const char pitchNotation53[] PROGMEM = {"F3 "};
+const char pitchNotation54[] PROGMEM = {"F#3"};
+const char pitchNotation55[] PROGMEM = {"G3 "};
+const char pitchNotation56[] PROGMEM = {"G#3"};
+const char pitchNotation57[] PROGMEM = {"A3 "};
+const char pitchNotation58[] PROGMEM = {"A#3"};
+const char pitchNotation59[] PROGMEM = {"B3 "};
+const char pitchNotation60[] PROGMEM = {"C4 "};
+const char pitchNotation61[] PROGMEM = {"C#4"};
+const char pitchNotation62[] PROGMEM = {"D4 "};
+const char pitchNotation63[] PROGMEM = {"D#4"};
+const char pitchNotation64[] PROGMEM = {"E4 "};
+const char pitchNotation65[] PROGMEM = {"F4 "};
+const char pitchNotation66[] PROGMEM = {"F#4"};
+const char pitchNotation67[] PROGMEM = {"G4 "};
+const char pitchNotation68[] PROGMEM = {"G#4"};
+const char pitchNotation69[] PROGMEM = {"A4 "};
+const char pitchNotation70[] PROGMEM = {"A#4"};
+const char pitchNotation71[] PROGMEM = {"B4 "};
+const char pitchNotation72[] PROGMEM = {"C5 "};
+const char pitchNotation73[] PROGMEM = {"C#5"};
+const char pitchNotation74[] PROGMEM = {"D5 "};
+const char pitchNotation75[] PROGMEM = {"D#5"};
+const char pitchNotation76[] PROGMEM = {"E5 "};
+const char pitchNotation77[] PROGMEM = {"F5 "};
+const char pitchNotation78[] PROGMEM = {"F#5"};
+const char pitchNotation79[] PROGMEM = {"G5 "};
+const char pitchNotation80[] PROGMEM = {"G#5"};
+const char pitchNotation81[] PROGMEM = {"A5 "};
+const char pitchNotation82[] PROGMEM = {"A#5"};
+const char pitchNotation83[] PROGMEM = {"B5 "};
+const char pitchNotation84[] PROGMEM = {"C6 "};
+const char pitchNotation85[] PROGMEM = {"C#6"};
+const char pitchNotation86[] PROGMEM = {"D6 "};
+const char pitchNotation87[] PROGMEM = {"D#6"};
+const char pitchNotation88[] PROGMEM = {"E6 "};
+const char pitchNotation89[] PROGMEM = {"F6 "};
+const char pitchNotation90[] PROGMEM = {"F#6"};
+const char pitchNotation91[] PROGMEM = {"G6 "};
+const char pitchNotation92[] PROGMEM = {"G#6"};
+const char pitchNotation93[] PROGMEM = {"A6 "};
+const char pitchNotation94[] PROGMEM = {"A#6"};
+const char pitchNotation95[] PROGMEM = {"B6 "};
+const char pitchNotation96[] PROGMEM = {"C7 "};
+const char pitchNotation97[] PROGMEM = {"C#7"};
+const char pitchNotation98[] PROGMEM = {"D7 "};
+const char pitchNotation99[] PROGMEM = {"D#7"};
+const char pitchNotation100[] PROGMEM = {"E7 "};
+const char pitchNotation101[] PROGMEM = {"F7 "};
+const char pitchNotation102[] PROGMEM = {"F#7"};
+const char pitchNotation103[] PROGMEM = {"G7 "};
+const char pitchNotation104[] PROGMEM = {"G#7"};
+const char pitchNotation105[] PROGMEM = {"A7 "};
+const char pitchNotation106[] PROGMEM = {"A#7"};
+const char pitchNotation107[] PROGMEM = {"B7 "};
+const char pitchNotation108[] PROGMEM = {"C8 "};
+const char pitchNotation109[] PROGMEM = {"C#8"};
+const char pitchNotation110[] PROGMEM = {"D8 "};
+const char pitchNotation111[] PROGMEM = {"D#8"};
+const char pitchNotation112[] PROGMEM = {"E8 "};
+const char pitchNotation113[] PROGMEM = {"F8 "};
+const char pitchNotation114[] PROGMEM = {"F#8"};
+const char pitchNotation115[] PROGMEM = {"G8 "};
+const char pitchNotation116[] PROGMEM = {"G#8"};
+const char pitchNotation117[] PROGMEM = {"A8 "};
+const char pitchNotation118[] PROGMEM = {"A#8"};
+const char pitchNotation119[] PROGMEM = {"B8 "};
+const char pitchNotation120[] PROGMEM = {"C9 "};
+const char pitchNotation121[] PROGMEM = {"C#9"};
+const char pitchNotation122[] PROGMEM = {"D9 "};
+const char pitchNotation123[] PROGMEM = {"D#9"};
+const char pitchNotation124[] PROGMEM = {"E9 "};
+const char pitchNotation125[] PROGMEM = {"F9 "};
+const char pitchNotation126[] PROGMEM = {"F#9"};
+const char pitchNotation127[] PROGMEM = {"G9 "};
 
-////////// Split note in a musical way instead of unsigned char :
-const char SPLIT_Note0[] PROGMEM = {"C-1 "};
-const char SPLIT_Note1[] PROGMEM = {"C#-1"};
-const char SPLIT_Note2[] PROGMEM = {"D-1 "};
-const char SPLIT_Note3[] PROGMEM = {"D#-1"};
-const char SPLIT_Note4[] PROGMEM = {"E-1 "};
-const char SPLIT_Note5[] PROGMEM = {"F-1 "};
-const char SPLIT_Note6[] PROGMEM = {"F#-1"};
-const char SPLIT_Note7[] PROGMEM = {"G-1 "};
-const char SPLIT_Note8[] PROGMEM = {"G#-1"};
-const char SPLIT_Note9[] PROGMEM = {"A-1 "};
-const char SPLIT_Note10[] PROGMEM = {"A#-1"};
-const char SPLIT_Note11[] PROGMEM = {"B-1 "};
-const char SPLIT_Note12[] PROGMEM = {"C0 "};
-const char SPLIT_Note13[] PROGMEM = {"C#0"};
-const char SPLIT_Note14[] PROGMEM = {"D0 "};
-const char SPLIT_Note15[] PROGMEM = {"D#0"};
-const char SPLIT_Note16[] PROGMEM = {"E0 "};
-const char SPLIT_Note17[] PROGMEM = {"F0 "};
-const char SPLIT_Note18[] PROGMEM = {"F#0"};
-const char SPLIT_Note19[] PROGMEM = {"G0 "};
-const char SPLIT_Note20[] PROGMEM = {"G#0"};
-const char SPLIT_Note21[] PROGMEM = {"A0 "};
-const char SPLIT_Note22[] PROGMEM = {"A#0"};
-const char SPLIT_Note23[] PROGMEM = {"B0 "};
-const char SPLIT_Note24[] PROGMEM = {"C1 "};
-const char SPLIT_Note25[] PROGMEM = {"C#1"};
-const char SPLIT_Note26[] PROGMEM = {"D1 "};
-const char SPLIT_Note27[] PROGMEM = {"D#1"};
-const char SPLIT_Note28[] PROGMEM = {"E1 "};
-const char SPLIT_Note29[] PROGMEM = {"F1 "};
-const char SPLIT_Note30[] PROGMEM = {"F#1"};
-const char SPLIT_Note31[] PROGMEM = {"G1 "};
-const char SPLIT_Note32[] PROGMEM = {"G#1"};
-const char SPLIT_Note33[] PROGMEM = {"A1 "};
-const char SPLIT_Note34[] PROGMEM = {"A#1"};
-const char SPLIT_Note35[] PROGMEM = {"B1 "};
-const char SPLIT_Note36[] PROGMEM = {"C2 "};
-const char SPLIT_Note37[] PROGMEM = {"C#2"};
-const char SPLIT_Note38[] PROGMEM = {"D2 "};
-const char SPLIT_Note39[] PROGMEM = {"D#2"};
-const char SPLIT_Note40[] PROGMEM = {"E2 "};
-const char SPLIT_Note41[] PROGMEM = {"F2 "};
-const char SPLIT_Note42[] PROGMEM = {"F#2"};
-const char SPLIT_Note43[] PROGMEM = {"G2 "};
-const char SPLIT_Note44[] PROGMEM = {"G#2"};
-const char SPLIT_Note45[] PROGMEM = {"A2 "};
-const char SPLIT_Note46[] PROGMEM = {"A#2"};
-const char SPLIT_Note47[] PROGMEM = {"B2 "};
-const char SPLIT_Note48[] PROGMEM = {"C3 "};
-const char SPLIT_Note49[] PROGMEM = {"C#3"};
-const char SPLIT_Note50[] PROGMEM = {"D3 "};
-const char SPLIT_Note51[] PROGMEM = {"D#3"};
-const char SPLIT_Note52[] PROGMEM = {"E3 "};
-const char SPLIT_Note53[] PROGMEM = {"F3 "};
-const char SPLIT_Note54[] PROGMEM = {"F#3"};
-const char SPLIT_Note55[] PROGMEM = {"G3 "};
-const char SPLIT_Note56[] PROGMEM = {"G#3"};
-const char SPLIT_Note57[] PROGMEM = {"A3 "};
-const char SPLIT_Note58[] PROGMEM = {"A#3"};
-const char SPLIT_Note59[] PROGMEM = {"B3 "};
-const char SPLIT_Note60[] PROGMEM = {"C4 "};
-const char SPLIT_Note61[] PROGMEM = {"C#4"};
-const char SPLIT_Note62[] PROGMEM = {"D4 "};
-const char SPLIT_Note63[] PROGMEM = {"D#4"};
-const char SPLIT_Note64[] PROGMEM = {"E4 "};
-const char SPLIT_Note65[] PROGMEM = {"F4 "};
-const char SPLIT_Note66[] PROGMEM = {"F#4"};
-const char SPLIT_Note67[] PROGMEM = {"G4 "};
-const char SPLIT_Note68[] PROGMEM = {"G#4"};
-const char SPLIT_Note69[] PROGMEM = {"A4 "};
-const char SPLIT_Note70[] PROGMEM = {"A#4"};
-const char SPLIT_Note71[] PROGMEM = {"B4 "};
-const char SPLIT_Note72[] PROGMEM = {"C5 "};
-const char SPLIT_Note73[] PROGMEM = {"C#5"};
-const char SPLIT_Note74[] PROGMEM = {"D5 "};
-const char SPLIT_Note75[] PROGMEM = {"D#5"};
-const char SPLIT_Note76[] PROGMEM = {"E5 "};
-const char SPLIT_Note77[] PROGMEM = {"F5 "};
-const char SPLIT_Note78[] PROGMEM = {"F#5"};
-const char SPLIT_Note79[] PROGMEM = {"G5 "};
-const char SPLIT_Note80[] PROGMEM = {"G#5"};
-const char SPLIT_Note81[] PROGMEM = {"A5 "};
-const char SPLIT_Note82[] PROGMEM = {"A#5"};
-const char SPLIT_Note83[] PROGMEM = {"B5 "};
-const char SPLIT_Note84[] PROGMEM = {"C6 "};
-const char SPLIT_Note85[] PROGMEM = {"C#6"};
-const char SPLIT_Note86[] PROGMEM = {"D6 "};
-const char SPLIT_Note87[] PROGMEM = {"D#6"};
-const char SPLIT_Note88[] PROGMEM = {"E6 "};
-const char SPLIT_Note89[] PROGMEM = {"F6 "};
-const char SPLIT_Note90[] PROGMEM = {"F#6"};
-const char SPLIT_Note91[] PROGMEM = {"G6 "};
-const char SPLIT_Note92[] PROGMEM = {"G#6"};
-const char SPLIT_Note93[] PROGMEM = {"A6 "};
-const char SPLIT_Note94[] PROGMEM = {"A#6"};
-const char SPLIT_Note95[] PROGMEM = {"B6 "};
-const char SPLIT_Note96[] PROGMEM = {"C7 "};
-const char SPLIT_Note97[] PROGMEM = {"C#7"};
-const char SPLIT_Note98[] PROGMEM = {"D7 "};
-const char SPLIT_Note99[] PROGMEM = {"D#7"};
-const char SPLIT_Note100[] PROGMEM = {"E7 "};
-const char SPLIT_Note101[] PROGMEM = {"F7 "};
-const char SPLIT_Note102[] PROGMEM = {"F#7"};
-const char SPLIT_Note103[] PROGMEM = {"G7 "};
-const char SPLIT_Note104[] PROGMEM = {"G#7"};
-const char SPLIT_Note105[] PROGMEM = {"A7 "};
-const char SPLIT_Note106[] PROGMEM = {"A#7"};
-const char SPLIT_Note107[] PROGMEM = {"B7 "};
-const char SPLIT_Note108[] PROGMEM = {"C8 "};
-const char SPLIT_Note109[] PROGMEM = {"C#8"};
-const char SPLIT_Note110[] PROGMEM = {"D8 "};
-const char SPLIT_Note111[] PROGMEM = {"D#8"};
-const char SPLIT_Note112[] PROGMEM = {"E8 "};
-const char SPLIT_Note113[] PROGMEM = {"F8 "};
-const char SPLIT_Note114[] PROGMEM = {"F#8"};
-const char SPLIT_Note115[] PROGMEM = {"G8 "};
-const char SPLIT_Note116[] PROGMEM = {"G#8"};
-const char SPLIT_Note117[] PROGMEM = {"A8 "};
-const char SPLIT_Note118[] PROGMEM = {"A#8"};
-const char SPLIT_Note119[] PROGMEM = {"B8 "};
-const char SPLIT_Note120[] PROGMEM = {"C9 "};
-const char SPLIT_Note121[] PROGMEM = {"C#9"};
-const char SPLIT_Note122[] PROGMEM = {"D9 "};
-const char SPLIT_Note123[] PROGMEM = {"D#9"};
-const char SPLIT_Note124[] PROGMEM = {"E9 "};
-const char SPLIT_Note125[] PROGMEM = {"F9 "};
-const char SPLIT_Note126[] PROGMEM = {"F#9"};
-const char SPLIT_Note127[] PROGMEM = {"G9 "};
-
-const char * const SPLIT_Note[] PROGMEM  = // https://github.com/arduino/Arduino/wiki/1.6-Frequently-Asked-Questions  And, yes, it's really tricky even for experts!
+const char * const pitchNotation[] PROGMEM  = // https://github.com/arduino/Arduino/wiki/1.6-Frequently-Asked-Questions  And, yes, it's really tricky even for experts!
 {
-  SPLIT_Note0,
-  SPLIT_Note1,
-  SPLIT_Note2,
-  SPLIT_Note3,
-  SPLIT_Note4,
-  SPLIT_Note5,
-  SPLIT_Note6,
-  SPLIT_Note7,
-  SPLIT_Note8,
-  SPLIT_Note9,
-  SPLIT_Note10,
-  SPLIT_Note11,
-  SPLIT_Note12,
-  SPLIT_Note13,
-  SPLIT_Note14,
-  SPLIT_Note15,
-  SPLIT_Note16,
-  SPLIT_Note17,
-  SPLIT_Note18,
-  SPLIT_Note19,
-  SPLIT_Note20,
-  SPLIT_Note21,
-  SPLIT_Note22,
-  SPLIT_Note23,
-  SPLIT_Note24,
-  SPLIT_Note25,
-  SPLIT_Note26,
-  SPLIT_Note27,
-  SPLIT_Note28,
-  SPLIT_Note29,
-  SPLIT_Note30,
-  SPLIT_Note31,
-  SPLIT_Note32,
-  SPLIT_Note33,
-  SPLIT_Note34,
-  SPLIT_Note35,
-  SPLIT_Note36,
-  SPLIT_Note37,
-  SPLIT_Note38,
-  SPLIT_Note39,
-  SPLIT_Note40,
-  SPLIT_Note41,
-  SPLIT_Note42,
-  SPLIT_Note43,
-  SPLIT_Note44,
-  SPLIT_Note45,
-  SPLIT_Note46,
-  SPLIT_Note47,
-  SPLIT_Note48,
-  SPLIT_Note49,
-  SPLIT_Note50,
-  SPLIT_Note51,
-  SPLIT_Note52,
-  SPLIT_Note53,
-  SPLIT_Note54,
-  SPLIT_Note55,
-  SPLIT_Note56,
-  SPLIT_Note57,
-  SPLIT_Note58,
-  SPLIT_Note59,
-  SPLIT_Note60,
-  SPLIT_Note61,
-  SPLIT_Note62,
-  SPLIT_Note63,
-  SPLIT_Note64,
-  SPLIT_Note65,
-  SPLIT_Note66,
-  SPLIT_Note67,
-  SPLIT_Note68,
-  SPLIT_Note69,
-  SPLIT_Note70,
-  SPLIT_Note71,
-  SPLIT_Note72,
-  SPLIT_Note73,
-  SPLIT_Note74,
-  SPLIT_Note75,
-  SPLIT_Note76,
-  SPLIT_Note77,
-  SPLIT_Note78,
-  SPLIT_Note79,
-  SPLIT_Note80,
-  SPLIT_Note81,
-  SPLIT_Note82,
-  SPLIT_Note83,
-  SPLIT_Note84,
-  SPLIT_Note85,
-  SPLIT_Note86,
-  SPLIT_Note87,
-  SPLIT_Note88,
-  SPLIT_Note89,
-  SPLIT_Note90,
-  SPLIT_Note91,
-  SPLIT_Note92,
-  SPLIT_Note93,
-  SPLIT_Note94,
-  SPLIT_Note95,
-  SPLIT_Note96,
-  SPLIT_Note97,
-  SPLIT_Note98,
-  SPLIT_Note99,
-  SPLIT_Note100,
-  SPLIT_Note101,
-  SPLIT_Note102,
-  SPLIT_Note103,
-  SPLIT_Note104,
-  SPLIT_Note105,
-  SPLIT_Note106,
-  SPLIT_Note107,
-  SPLIT_Note108,
-  SPLIT_Note109,
-  SPLIT_Note110,
-  SPLIT_Note111,
-  SPLIT_Note112,
-  SPLIT_Note113,
-  SPLIT_Note114,
-  SPLIT_Note115,
-  SPLIT_Note116,
-  SPLIT_Note117,
-  SPLIT_Note118,
-  SPLIT_Note119,
-  SPLIT_Note120,
-  SPLIT_Note121,
-  SPLIT_Note122,
-  SPLIT_Note123,
-  SPLIT_Note124,
-  SPLIT_Note125,
-  SPLIT_Note126,
-  SPLIT_Note127
+  pitchNotation0,
+  pitchNotation1,
+  pitchNotation2,
+  pitchNotation3,
+  pitchNotation4,
+  pitchNotation5,
+  pitchNotation6,
+  pitchNotation7,
+  pitchNotation8,
+  pitchNotation9,
+  pitchNotation10,
+  pitchNotation11,
+  pitchNotation12,
+  pitchNotation13,
+  pitchNotation14,
+  pitchNotation15,
+  pitchNotation16,
+  pitchNotation17,
+  pitchNotation18,
+  pitchNotation19,
+  pitchNotation20,
+  pitchNotation21,
+  pitchNotation22,
+  pitchNotation23,
+  pitchNotation24,
+  pitchNotation25,
+  pitchNotation26,
+  pitchNotation27,
+  pitchNotation28,
+  pitchNotation29,
+  pitchNotation30,
+  pitchNotation31,
+  pitchNotation32,
+  pitchNotation33,
+  pitchNotation34,
+  pitchNotation35,
+  pitchNotation36,
+  pitchNotation37,
+  pitchNotation38,
+  pitchNotation39,
+  pitchNotation40,
+  pitchNotation41,
+  pitchNotation42,
+  pitchNotation43,
+  pitchNotation44,
+  pitchNotation45,
+  pitchNotation46,
+  pitchNotation47,
+  pitchNotation48,
+  pitchNotation49,
+  pitchNotation50,
+  pitchNotation51,
+  pitchNotation52,
+  pitchNotation53,
+  pitchNotation54,
+  pitchNotation55,
+  pitchNotation56,
+  pitchNotation57,
+  pitchNotation58,
+  pitchNotation59,
+  pitchNotation60,
+  pitchNotation61,
+  pitchNotation62,
+  pitchNotation63,
+  pitchNotation64,
+  pitchNotation65,
+  pitchNotation66,
+  pitchNotation67,
+  pitchNotation68,
+  pitchNotation69,
+  pitchNotation70,
+  pitchNotation71,
+  pitchNotation72,
+  pitchNotation73,
+  pitchNotation74,
+  pitchNotation75,
+  pitchNotation76,
+  pitchNotation77,
+  pitchNotation78,
+  pitchNotation79,
+  pitchNotation80,
+  pitchNotation81,
+  pitchNotation82,
+  pitchNotation83,
+  pitchNotation84,
+  pitchNotation85,
+  pitchNotation86,
+  pitchNotation87,
+  pitchNotation88,
+  pitchNotation89,
+  pitchNotation90,
+  pitchNotation91,
+  pitchNotation92,
+  pitchNotation93,
+  pitchNotation94,
+  pitchNotation95,
+  pitchNotation96,
+  pitchNotation97,
+  pitchNotation98,
+  pitchNotation99,
+  pitchNotation100,
+  pitchNotation101,
+  pitchNotation102,
+  pitchNotation103,
+  pitchNotation104,
+  pitchNotation105,
+  pitchNotation106,
+  pitchNotation107,
+  pitchNotation108,
+  pitchNotation109,
+  pitchNotation110,
+  pitchNotation111,
+  pitchNotation112,
+  pitchNotation113,
+  pitchNotation114,
+  pitchNotation115,
+  pitchNotation116,
+  pitchNotation117,
+  pitchNotation118,
+  pitchNotation119,
+  pitchNotation120,
+  pitchNotation121,
+  pitchNotation122,
+  pitchNotation123,
+  pitchNotation124,
+  pitchNotation125,
+  pitchNotation126,
+  pitchNotation127
 };
-// what to use : lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(SPLIT_Note127[ num]))));
-
-
-
+// what to use : lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(pitchNotation127[ num]))));
 
 unsigned char arp_div_index;
 unsigned char ui_patchbay_limits_index;
@@ -389,6 +357,9 @@ unsigned char ui_TrspB;
 /////////////////////////////////////////////////////////////////////////////
 void UI_Display_Arp()
 {
+  if(SoftPanel.Mode != Arp) return;
+
+  
   switch (SoftPanel.Page)
   {
     case SOFT_PAGE1:
@@ -645,7 +616,7 @@ void UI_Display_Arp()
           else if (sequence[seqRecStep - 1][1] == 128) // tie
             lcd.print(F("Tie "));
           else // note
-            lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(SPLIT_Note[sequence[seqRecStep - 1][0]]))));
+            lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(pitchNotation[sequence[seqRecStep - 1][0]]))));
 
           lcd.setCursor(18, 1);
           LCD_PrintBCD2(seqRecStep); // print step while recording
@@ -662,7 +633,7 @@ void UI_Display_Arp()
           // do nothing
         }
         else // note
-          lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(SPLIT_Note[sequence[seqPlayStep][0]]))));
+          lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(pitchNotation[sequence[seqPlayStep][0]]))));
 
         lcd.setCursor(18, 1);
         LCD_PrintBCD2(seqPlayStep); // print step while playing
@@ -723,6 +694,10 @@ void UI_Display_Arp()
 
         case TRGCLK:
           lcd.print(F("Trg"));
+          break;
+          
+        case MTRGCLK:
+          lcd.print(F("mTg"));
           break;
 
         default:
@@ -807,7 +782,7 @@ void UI_Display_Arp()
 
       lcd.setCursor(5, 1);
       //LCD_PrintBCD2(ui_aSplit);
-      lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(SPLIT_Note[ ui_aSplit]))));
+      lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(pitchNotation[ ui_aSplit]))));
 
 
       lcd.setCursor(9, 1);
@@ -867,7 +842,7 @@ void UI_Handle_Arp()
 
       case SOFT_EDIT_1:  // int/mid/s24/trig midiclock state
         ++ui_external_clk;
-        if (ui_external_clk > TRGCLK)
+        if (ui_external_clk > MTRGCLK)
           ui_external_clk = INTCLK;
         break;
 
@@ -1082,9 +1057,7 @@ void UI_Handle_Arp()
         break;
 
       case SOFT_EDIT_4: //
-        //seqOption = Shift<<7; // silence if shift = 0 , Tie if Shift = 128
-        // then, insert silent
-        //Insert_SeqRest(seqOption);
+// silence if shift = 0 , Tie if Shift = 128
         Insert_SeqRest(Shift << 7);
         break;
 

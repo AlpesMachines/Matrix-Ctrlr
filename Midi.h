@@ -1,10 +1,9 @@
 #ifndef midi_h
 #define midi_h
 
-//#define DEBUG 1 // 0 : no debug, 1 : debug
-extern boolean MIDI_Incoming;
-extern boolean MIDI_ReceivingEditBuffer;
-extern boolean MIDI_ReceivingBank;
+extern bool MIDI_Incoming;
+extern bool MIDI_ReceivingEditBuffer;
+extern bool MIDI_ReceivingBank;
 extern byte MIDI_CHANNEL;
 
 void MIDI_Init(void);
@@ -17,7 +16,7 @@ void MIDI_RequestEditBuffer(unsigned char interface, unsigned char program);
 void MIDI_RequestSinglePatch(unsigned char interface, unsigned char program);
 void MIDI_RequestMasterParameters(unsigned char interface);
 void MIDI_BankRequest(unsigned char interface, unsigned char bank_req);
-void MIDI_SendVoiceParam(unsigned char interface, unsigned char param, unsigned char value,bool midiThru);
+void MIDI_SendVoiceParam(unsigned char interface, unsigned char param, unsigned char value, bool midiThru);
 void MIDI_SendDelayedVoiceParam(unsigned char param, unsigned char value);
 void MIDI_HandleDelayedVoiceParam(unsigned char interface, bool midiThru);
 void MIDI_SendMatrixModParam(unsigned char mmbus, unsigned char mmsrc, unsigned char mmdest, unsigned char value);

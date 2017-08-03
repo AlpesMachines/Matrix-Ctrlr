@@ -11,7 +11,8 @@ void Boot()
   booting = 1;
 
   delay(200);
-  Serial.print(F("Boot v")); Serial.println(firmware);
+  Serial.print(F("Matrix Ctrlr v")); Serial.println(firmware);
+  Serial.println(F("Boot"));
 
   for (unsigned char i = 0; i < NBR_LED; ++i)
   {
@@ -64,10 +65,10 @@ void Boot()
   MIDI5.sendControlChange(123, 0, MIDI_CHANNEL + 4); // all notes off
 #endif
 
-// METTRE CES 3 lignes dans une fonction accessible depuis la page ARP afin d'initilaiser le bazar:
-//  ArpInit(); // set default arp parameters
-//  Init_aChord();
-//  Init_Seq();
+  // METTRE CES 3 lignes dans une fonction accessible depuis la page ARP afin d'initilaiser le bazar:
+  //  ArpInit(); // set default arp parameters
+  //  Init_aChord();
+  //  Init_Seq();
 
   // on est prêt à démarrer :)
   send_start = 1;

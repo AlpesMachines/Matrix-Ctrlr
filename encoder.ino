@@ -20,8 +20,8 @@ Encoder myEnc(2, 3); // encoder pin A and C. B to ground
 signed char incrementer = 0; // value sent to various functions
 long position  = -999; // track the encoder
 
-boolean encoderClic;
-boolean previousEncoderClic;
+bool encoderClic;
+bool previousEncoderClic;
 
 /////////////////////////////////////////////////////////
 // ENCODER MANAGEMENT
@@ -87,7 +87,7 @@ void encoder() // Youhouhouuuu !!!! ça marcheeee :)
     position = newPos; // update position
 
 #if DEBUG_encoder
-    Serial.print(F("encoder() "));
+    Serial.println(F("encoder() "));
     Serial.print(incrementer); Serial.print(F(" Position = ")); Serial.println(position);
     Serial.println ();
 #endif

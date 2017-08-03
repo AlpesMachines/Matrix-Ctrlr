@@ -239,7 +239,7 @@ void LCD_DisplayParamValue(unsigned char value, unsigned char valtype)
       LCD_Display7BitSigned(value);
       break;
   }
-  lcd.setCursor(3, 1); 
+  lcd.setCursor(3, 1);
   lcd.print(F(" ")); // blank space
 }
 
@@ -252,7 +252,7 @@ void LCD_DisplayParamValueDescription(const char *data)
   lcd.print(data);
 
 #if DEBUG_LCDparamvaluedescription
-  Serial.print (F("LCD_DisplayParamValueDescription ")); Serial.println(data);
+  Serial.print (F("LCD_DisplayParamValueDescription() ")); Serial.println(data);
 #endif
 }
 
@@ -265,7 +265,7 @@ void LCD_DisplayParamDescription(const char *data)
   lcd.print(data);
 
 #if DEBUG_LCDparamvaluedescription
-  Serial.print (F("LCD_DisplayParamDescription ")); Serial.println(data);
+  Serial.print (F("LCD_DisplayParamDescription() ")); Serial.println(data);
 #endif
 }
 

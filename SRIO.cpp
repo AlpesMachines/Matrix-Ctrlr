@@ -19,12 +19,12 @@ void SRIO:: Initialize()
   pinMode(_latchPinOut, OUTPUT);
   pinMode(_dataPinOut,  OUTPUT);
   pinMode(_dataPinIn,   INPUT); // INPUT_PULLUP made with 10k resistor
-// 	byte _SR[8] = {0};
+  // 	byte _SR[8] = {0};
 }
 
 uint8_t SRIO::shiftIn_SRIO()
 {
-  
+
   uint8_t i;
   //	int temp = 0;
   //	int pinState;
@@ -47,16 +47,16 @@ uint8_t SRIO::shiftIn_SRIO()
     PORTH |= 1 << 6; // ClockPin 9 high
   }
   return myDataIn;
-  
-// // run faster, but change the DIN pin allocation
-//  	byte value = 0;
-//  	for (byte i = 0; i <8; i++) {
-//  		value = value | (bitRead(PINB,5)<<(7-i));//value |  (digitalRead(6) << (7-i));
-//  		PORTH |= (1<<6);//digitalWrite(7, HIGH);
-//  		PORTH &= ~(1<<6);// digitalWrite(7, LOW);
-//  	}
-//  	return value;
-  
+
+  // // run faster, but change the DIN pin allocation
+  //  	byte value = 0;
+  //  	for (byte i = 0; i <8; i++) {
+  //  		value = value | (bitRead(PINB,5)<<(7-i));//value |  (digitalRead(6) << (7-i));
+  //  		PORTH |= (1<<6);//digitalWrite(7, HIGH);
+  //  		PORTH &= ~(1<<6);// digitalWrite(7, LOW);
+  //  	}
+  //  	return value;
+
 
 }
 
@@ -114,10 +114,10 @@ void SRIO::Led_SR_Write (byte SR_num, byte data)
   // Fonction qui envoie un octet au SR selectionnÈ
   _SR[SR_num] = data;
   PORTB &= 0 << 6;//latchPinOut 12 low
- 	shiftOut_SRIO(_SR[7]);
-	shiftOut_SRIO(_SR[6]);
-	shiftOut_SRIO(_SR[5]);
-	shiftOut_SRIO(_SR[4]);
+  shiftOut_SRIO(_SR[7]);
+  shiftOut_SRIO(_SR[6]);
+  shiftOut_SRIO(_SR[5]);
+  shiftOut_SRIO(_SR[4]);
   shiftOut_SRIO(_SR[3]);
   shiftOut_SRIO(_SR[2]);
   shiftOut_SRIO(_SR[1]);
@@ -144,8 +144,8 @@ void SRIO::Led_Pin_Write (byte Pin_num, byte flag)
   // Fonction qui envoi l'Ètat de le led  byte data;
   bitWrite(_SR[Pin_num / 8], Pin_num - (8 * (Pin_num / 8)), flag);
   PORTB &= 0 << 6;//digitalWrite(_latchPinOut, 0);
-	shiftOut_SRIO(_SR[7]);
-	shiftOut_SRIO(_SR[6]);
+  shiftOut_SRIO(_SR[7]);
+  shiftOut_SRIO(_SR[6]);
   shiftOut_SRIO(_SR[5]);
   shiftOut_SRIO(_SR[4]);
   shiftOut_SRIO(_SR[3]);
@@ -177,7 +177,7 @@ byte SRIO::Button_SR_Read (byte SR_num)
 
 byte SRIO::Button_Pin_Read (byte Pin_num) {
   // fonction qui permet de tester une PIN, renvoie 1 ou 0
-  boolean flag = 0;
+  bool flag = 0;
   //	digitalWrite(_latchPinIn, 1);
   //	digitalWrite(_latchPinIn, 0); // CHANGED for 74hc165
   //	delayMicroseconds(2);
@@ -193,13 +193,13 @@ byte SRIO::Button_Pin_Read (byte Pin_num) {
   _data[6] = shiftIn_SRIO();
   _data[7] = shiftIn_SRIO();
   digitalWrite(_latchPinIn, 0); // CHANGED for 74hc165
-      if (bitRead (_data[Pin_num/8], Pin_num-(8*(Pin_num/8)) ))
-  //if (bitRead (_data[Pin_num >> 3], Pin_num - ( (Pin_num >> 3) << 3) )) 
+  if (bitRead (_data[Pin_num / 8], Pin_num - (8 * (Pin_num / 8)) ))
+    //if (bitRead (_data[Pin_num >> 3], Pin_num - ( (Pin_num >> 3) << 3) ))
   {
     //		flag = 1;
     flag = 0; // CHANGED -> RELEASED = 0
   }
-  else 
+  else
   {
     //		flag = 0;
     flag = 1; // CHANGED -> PRESSED = 1

@@ -2,9 +2,6 @@
 #define arp_h
 
 // STANDALONE ARPEGGIATOR
-
-//#define active_arp_on  1
-//#define active_arp_off  0
 #define EXT_MIDI_TRIG 0x0f // = channel 16, whatever is the event
 #define EXT_CV_TRIG 0x01 // trig for the arp and seq on jack J1 (+5V DC 1 ms pulse)
 

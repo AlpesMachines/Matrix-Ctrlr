@@ -1,11 +1,11 @@
 
 
 
-boolean triggerInput;
-boolean previousTriggerInput;
+bool triggerInput;
+bool previousTriggerInput;
 
-boolean analogClock;
-boolean previousAnalogClock;
+bool analogClock;
+bool previousAnalogClock;
 
 
 /////////////////////////////////////////////////////////

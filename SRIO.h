@@ -1,7 +1,7 @@
+
 #ifndef SRIO_h
 #define SRIO_h
 #include "Arduino.h"
-
 
 #define _latchPinOut 12
 #define _dataPinOut 13
@@ -30,5 +30,5 @@ class SRIO
 
 extern SRIO SR;
 
-#endif // Fin si
+#endif 
 

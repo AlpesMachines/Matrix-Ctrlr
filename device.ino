@@ -40,7 +40,7 @@ void Device_Init()
   if (matrix_modele == matrix_6) MIDI_EnterRemoteEditMode(INTERFACE_SERIAL);
 
 #if DEBUG_device
-  Serial.println(F("Device_Init"));
+  Serial.println(F("Device_Init()"));
   Serial.print(F("ROM read addr ")); Serial.print(EEPROM_DEVICE); Serial.print(F(" is device = ")); Serial.println(device, HEX);
   Serial.println();
 #endif
@@ -57,7 +57,7 @@ void Matrix_Modele_Init(void)
   matrix_model.D = EEPROM.read(EEPROM_MATRIX_MODELE_D);
 
 #if DEBUG_device
-  Serial.println(F("Matrix_Modele_Init"));
+  Serial.println(F("Matrix_Modele_Init()"));
   Serial.println();
 #endif
 }
@@ -153,7 +153,7 @@ void Device_Select(unsigned char pin)
   //	SendEditBuffer();
 
 
- //  ChooseEditBufferABCD(device, 1); // define which editbuffer to use >> euhh ???
+  //  ChooseEditBufferABCD(device, 1); // define which editbuffer to use >> euhh ???
 
   // maj des LEDs
   UpdateDinStates();
@@ -168,10 +168,10 @@ void Device_Select(unsigned char pin)
 void Show_Selected_Device(unsigned char device)
 {
   //  unsigned char i;
-//  unsigned char EditBufferA [134];
-//  unsigned char EditBufferB [134];
-//  unsigned char EditBufferC [134];
-//  unsigned char EditBufferD [134];
+  //  unsigned char EditBufferA [134];
+  //  unsigned char EditBufferB [134];
+  //  unsigned char EditBufferC [134];
+  //  unsigned char EditBufferD [134];
 
   switch (device) {
     case Matrix_Device_A: //
@@ -181,12 +181,12 @@ void Show_Selected_Device(unsigned char device)
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_D].dout_pin);
 
       matrix_modele = matrix_model.A;
-//      //stock the editbuffer
-//      for (unsigned char i = 0; i < 134; ++i)
-//      {
-//        EditBufferB[i] = EditBuffer[i];
-//        EditBuffer[i] = EditBufferA[i];
-//      }
+      //      //stock the editbuffer
+      //      for (unsigned char i = 0; i < 134; ++i)
+      //      {
+      //        EditBufferB[i] = EditBuffer[i];
+      //        EditBuffer[i] = EditBufferA[i];
+      //      }
       break;
 
     case Matrix_Device_B: //
@@ -196,12 +196,12 @@ void Show_Selected_Device(unsigned char device)
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_D].dout_pin);
 
       matrix_modele = matrix_model.B;
-//      // stock the editbuffer
-//      for (unsigned char i = 0; i < 134; ++i)
-//      {
-//        EditBufferA[i] = EditBuffer[i];
-//        EditBuffer[i] = EditBufferB[i];
-//      }
+      //      // stock the editbuffer
+      //      for (unsigned char i = 0; i < 134; ++i)
+      //      {
+      //        EditBufferA[i] = EditBuffer[i];
+      //        EditBuffer[i] = EditBufferB[i];
+      //      }
       break;
 
     case Matrix_Device_C: //
@@ -210,12 +210,12 @@ void Show_Selected_Device(unsigned char device)
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_B].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_D].dout_pin);
       matrix_modele = matrix_model.C;
-//      // stock the editbuffer
-//      for (unsigned char i = 0; i < 134; ++i)
-//      {
-//        EditBufferC[i] = EditBuffer[i];
-//        EditBuffer[i] = EditBufferC[i];
-//      }
+      //      // stock the editbuffer
+      //      for (unsigned char i = 0; i < 134; ++i)
+      //      {
+      //        EditBufferC[i] = EditBuffer[i];
+      //        EditBuffer[i] = EditBufferC[i];
+      //      }
       break;
 
     case Matrix_Device_D: //
@@ -224,12 +224,12 @@ void Show_Selected_Device(unsigned char device)
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_B].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_C].dout_pin);
       matrix_modele = matrix_model.D;
-//      // stock the editbuffer
-//      for (unsigned char i = 0; i < 134; ++i)
-//      {
-//        EditBufferD[i] = EditBuffer[i];
-//        EditBuffer[i] = EditBufferD[i];
-//      }
+      //      // stock the editbuffer
+      //      for (unsigned char i = 0; i < 134; ++i)
+      //      {
+      //        EditBufferD[i] = EditBuffer[i];
+      //        EditBuffer[i] = EditBufferD[i];
+      //      }
       break;
 
   }

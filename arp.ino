@@ -12,29 +12,18 @@
 
 */
 
-//#include <MIDI.h>
-//#include <midi_Defs.h>
-//#include <midi_Message.h>
-////#include <midi_Namespace.h>
-//#include <midi_Settings.h>
 #include <avr/pgmspace.h>
 
 #include "memo.h"
 #include "ui_patch.h"
 #include "ui_arp.h"
 #include "seq.h"
-
-//#include <cmios.h>
-//#include "main.h"
 #include "arp.h"
 #include "ui_arp.h"
-//#include "mclock.h"
-//#include "midi.h"
 #include "din.h"
 #include "device.h"
 #include "define.h"
 #include "chaosmatrix.h"
-
 
 ////////////////////////////////////
 // Globals
@@ -102,8 +91,8 @@ const unsigned char Default_ArpParameters[20][3] PROGMEM = {
   {3, 1, 23}, //  arpgate
   {0, 0, 3},  //  ui_aOctave 8va
   {0, 0, 0},  // trigger CV, NOT IMPLEMENTED YET
-  {false, false, true}, // act arp
-  {false, false, true}, // act seq
+  {false, false, true}, // active arp
+  {false, false, true}, // active seq
   {3, 1, 48}, // seq speed max could be 96 (2mes)
   {0, 0, 32}, // seqLength
 };
@@ -196,8 +185,7 @@ void ArpInit(void)
   // copy default array
   for (unsigned char k = 0; k < 20; ++k)
   {
-    //    ArpParameters[k] = pgm_read_byte_near (Default_ArpParameters + k); // [k] instead of +k
-    ArpParameters[k] = pgm_read_byte_near (&Default_ArpParameters[k][0]); // [k] instead of +k
+    ArpParameters[k] = pgm_read_byte_near(&Default_ArpParameters[k][0]); // [k] instead of +k
   }
 
   // place values into various var
@@ -224,7 +212,7 @@ void ArpInit(void)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-// fill with 0 the arpegio chord
+// fill the arpegio chord with null
 /////////////////////////////////////////////////////////////////////////////////////
 void Init_aChord(void)
 {
@@ -237,11 +225,6 @@ void Init_aChord(void)
       aChord[i][j] = 0;
     }
   }
-  //  aGate = 6;
-  //  aOctave = 0;
-  //  aMltp = 1;
-  //  //arpN = aStep = 0;
-
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -252,28 +235,26 @@ void Active_Arp(unsigned char state)
   switch (state)
   {
     case true: // = 1
-      //      MCLOCK_DoPlay();
       send_stop = false;
       send_start = true; // = MCLOCKDoplay
       router_arp_tag = true;
       active_arp = true;
-#if DEBUG_ARP
-      Serial.println(F("Active_Arp(TRUE)"));
-#endif
       break;
 
     case false: // = 0
-      //      MCLOCK_DoStop();
       send_start = false;
       send_stop = true;
       router_arp_tag = false;
       active_arp = false;
-#if DEBUG_ARP
-      Serial.println(F("Active_Arp(FALSE)"));
-#endif
+      break;
+
+    default:
       break;
   }
-
+#if DEBUG_ARP
+  Serial.print(F("Active_Arp() =  "));
+  Serial.println(active_arp, DEC);
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -366,6 +347,7 @@ void Update_Arp(unsigned char pitch, unsigned char velocity, unsigned char chann
         break;
     }
 #if DEBUG_ARPN
+    Serial.println(F("Update_Arp()"));
     Serial.print(F("arpN = ")); Serial.println(arpN, DEC); Serial.println();
 #endif
   }
@@ -382,7 +364,6 @@ void Play_Arp(byte pitch, byte velocity, byte channel, bool trigger)
   {
     switch (trigger)
     {
-
       case 0 : // NoteOff
         if (arpN == 0) // commented in 0.99h
         {
@@ -427,7 +408,6 @@ void Play_Arp(byte pitch, byte velocity, byte channel, bool trigger)
 void Sort_aChord(unsigned char typ, unsigned char stepmax, unsigned char transpose)
 {
   //  byte swap[2];
-
   // https://openclassrooms.com/forum/sujet/ordonner-tableau-tableau-en-c
   // http://www.commentcamarche.net/forum/affich-22003423-langage-c-classement-ordre-croissant-decroi
 
@@ -446,13 +426,6 @@ void Sort_aChord(unsigned char typ, unsigned char stepmax, unsigned char transpo
       {
         if (aChordSorted[i][0] > aChordSorted[j][0]) // from lowest to highest
         {
-          //          swap[0] = aChordSorted[i][0];
-          //          swap[1] = aChordSorted[i][1];
-          //          aChordSorted[i][0] = aChordSorted[j][0];
-          //          aChordSorted[i][1] = aChordSorted[j][1];
-          //          aChordSorted[j][0] = swap[0];
-          //          aChordSorted[j][1] = swap[1];
-
           // http://www.vipan.com/htdocs/bitwisehelp.html (faster, no swaptmp)
           aChordSorted[i][0] ^= aChordSorted[j][0];
           aChordSorted[i][1] ^= aChordSorted[j][1];
@@ -488,39 +461,25 @@ void ARP2(void)
     if (aTik == (0 + aGroove * weakTap))
     {
       // update parameters :
-      //    aGroove = ui_aGroove;
+      // aGroove = ui_aGroove;
       aDiv = arp_div_index;
       aGate = ui_aGate;
       aOctave = ui_aOctave;
       aMltp = ui_aMltp;
       aPattern = ui_aMotif;
       TrspA = ui_TrspA;
-      // define max aStep
-      aStepMax = arpN * (aOctave + 1) * aMltp;
+      aStepMax = arpN * (aOctave + 1) * aMltp; // define max aStep
       if (aStepMax < 0) aStepMax = 0;
 
 
 #if DEBUG_ARPN
+      Serial.println(F("ARP2()"));
       Serial.print("aStepMax = "); Serial.println(aStepMax);
 #endif
 
       // sort aChord
       Sort_aChord(aPattern, aStepMax, TrspA);
       // set the step
-      //ARPMODE2(aPattern, aStepMax); // NOT HERE ! you will miss first step0 by directly going to step1
-
-      //   PREVIOUS CODE :
-      //      // what to play ? aChordPlay !
-      //      // to modulate by pattern : TO DO
-      //      for (unsigned char j = 0; j <= aOctave; ++j) {
-      //        for (unsigned char k = 1; k <= aMltp ; ++k) { // nbr of repeat
-      //          for (unsigned char i = 0; i < arpN; ++i) {
-      //            aChordPlay[(arpN * j * aMltp) + (i * aMltp + (k - 1))][0] = aChord[i][0] + 12 * j; // k-1 parce que k commence à 1
-      //            aChordPlay[(arpN * j * aMltp) + (i * aMltp + (k - 1))][1] = aChord[i][1];
-      //          }
-      //        }
-      //      }
-
       // what to play ? aChordPlay ! new version with aChordsorted (0.99i)
       // to modulate by pattern : TO DO
       for (unsigned char j = 0; j <= aOctave; ++j) {
@@ -532,6 +491,7 @@ void ARP2(void)
         }
       }
 #if DEBUG_ARP2CHORD
+      Serial.println(F("ARP2()"));
       Serial.println("aChordPlay :");
       for (unsigned char j = 0; j <= aOctave; ++j) {
         for (unsigned char k = 1; k <= aMltp ; ++k) { // nbr of repeat
@@ -550,20 +510,16 @@ void ARP2(void)
       }
 
       // notice last note to kill at the very end:
-      //lastNote = true;
       lastNote[0] = aChordPlay[aStep][0];
       lastNote[1] = aChordPlay[aStep][1];
       lastNote[2] = MIDI_CHANNEL;
       lastNote[3] = true; // remind you to kill last note if necessary
 
-
-
 #if DEBUG_ARP2
+    Serial.println(F("ARP2()"));
       Serial.print(F("Note On : ")); Serial.print(aChord[aStep][0], DEC); Serial.print(F(" ")); Serial.print(aChord[aStep][1], DEC); Serial.print(F(" ch: ")); Serial.println(MIDI_CHANNEL, DEC);
 #endif
     }
-
-
 
     ///////////////////////////////////////////
     // gate is ending
@@ -584,15 +540,16 @@ void ARP2(void)
 
 
 #if DEBUG_ARP2
+    Serial.println(F("ARP2()"));
       Serial.print(F("Note Off : ")); Serial.print(aChordPlay[aStep][0], DEC); Serial.print(F(" ")); Serial.print(aChordPlay[aStep][1], DEC); Serial.print(F(" ch: ")); Serial.println(MIDI_CHANNEL, DEC);
 #endif
 
 #if DEBUG_ARP2STEP
+    Serial.println(F("ARP2()"));
       Serial.print(F("aStep = ")); Serial.println(aStep, DEC);
 #endif
 
     }
-
 
     ///////////////////////////////////////////
     // time to pass to next note of Chord and define next step (end of loop)
@@ -605,11 +562,6 @@ void ARP2(void)
       Serial.print(F("aTik==aDiv./ arpN = ")); Serial.println(arpN, DEC);
 #endif
 
-      // what is next aStep ? ++aStep pour le moment (playorder)
-      // ++aStep;
-      // if (aStep >= aStepMax)
-      //  aStep = 0; // si on dépasse le dernier élement on revient au premier
-
       ARPMODE2(aPattern, aStepMax);
 
 #if DEBUG_ARP2STEP
@@ -617,9 +569,7 @@ void ARP2(void)
 #endif
 
       return;
-
     }
-
 
     ///////////////////////////////////////////
     // increment tiks, and loop if necessary DON'T CHANGE THIS STEP PLACEMENT 0.99h or mute note
@@ -631,7 +581,6 @@ void ARP2(void)
       aTik = 0;
       active_arp = false; // commmentr 0.99l
     }
-
   }
   else
   {
@@ -670,8 +619,6 @@ void ARP2(void)
     Serial.print(F("kill last note")); Serial.println();
 #endif
   }
-
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -686,26 +633,21 @@ void ARP3(bool trig)
     if (trig == true)
     {
       // update parameters :
-      //    aGroove = ui_aGroove;
       aDiv = arp_div_index = 0;
-      //aGate = ui_aGate;
       aOctave = ui_aOctave;
       aMltp = ui_aMltp;
       aPattern = ui_aMotif;
       TrspA = ui_TrspA;
-      // define max aStep
       aStepMax = arpN * (aOctave + 1) * aMltp;
       if (aStepMax < 0) aStepMax = 0;
 
-
 #if DEBUG_ARPN
+    Serial.println(F("ARP3()"));
       Serial.print("aStepMax = "); Serial.println(aStepMax);
 #endif
 
       // sort aChord
       Sort_aChord(aPattern, aStepMax, TrspA);
-      // set the step
-      //ARPMODE2(aPattern, aStepMax); // NOT HERE ! you will miss first step0 by directly going to step1
 
       // what to play ? aChordPlay ! new version with aChordsorted (0.99i)
       // to modulate by pattern : TO DO
@@ -774,9 +716,6 @@ void ARP3(bool trig)
       Serial.print(F("aStep = ")); Serial.println(aStep, DEC);
 #endif
 
-
-
-
       ///////////////////////////////////////////
       // time to pass to next note of Chord and define next step (end of loop)
 
@@ -787,8 +726,6 @@ void ARP3(bool trig)
 #endif
 
       return;
-
-
     }
 
     ///////////////////////////////////////////
@@ -801,7 +738,6 @@ void ARP3(bool trig)
       //aTik = 0;
       active_arp = false; // commmentr 0.99l
     }
-
   }
   else
   {
@@ -840,9 +776,8 @@ void ARP3(bool trig)
     Serial.print(F("kill last note")); Serial.println();
 #endif
   }
-
-
 }
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Hold captured Notes off
 /////////////////////////////////////////////////////////////////////////////////////
@@ -865,28 +800,6 @@ void Release_aChordLatch(bool state)
   unsigned char i = 0; // our counter
 
   if (state) // if it's true : switch state, release the array and then reset the counter
-    //  {
-    //    //ui_aHold = false;
-    //    if (arpN)
-    //    {
-    //      for (unsigned char i = latchCounter; i == 0 ; --i)
-    //      {
-    //        Update_Arp( aChordLatch[i][0], aChordLatch[i][1], aChordLatch[i][2], 3);
-    //        Play_Arp( aChordLatch[i][0],  aChordLatch[i][1],  aChordLatch[i][2], 3);
-    //        // --latchCounter;
-    //      }
-    //      latchCounter = 0; // reset
-    //    }
-    //    else
-    //    {
-    //      for (unsigned char i = latchCounter; i == 0 ; --i)
-    //      {
-    //        MIDI1.sendNoteOff( aChordLatch[i][0], aChordLatch[i][1], aChordLatch[i][2] );
-    //        // --latchCounter;
-    //      }
-    //      latchCounter = 0; // reset
-    //    }
-    //  }
   {
     //ui_aHold = false;
     if (router_arp_tag)
@@ -1136,7 +1049,4 @@ void ARPMODE2(unsigned char type, unsigned char stepmax)
     }
   }
 }
-
-
-
 

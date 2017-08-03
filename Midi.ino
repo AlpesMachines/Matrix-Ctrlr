@@ -7,12 +7,11 @@
 #include "ui_patch.h"
 #include <EEPROM.h>
 
-boolean MIDI_Incoming;
-boolean MIDI_ReceivingEditBuffer;
-boolean MIDI_ReceivingBank;
+bool MIDI_Incoming;
+bool MIDI_ReceivingEditBuffer;
+bool MIDI_ReceivingBank;
 byte MIDI_CHANNEL;
-//unsigned char program_request_onebyone ; // program request 1by1
-boolean buffer_received;
+bool buffer_received;
 
 unsigned int encoder_send_counter;
 unsigned char mmod_in_queue;
@@ -40,7 +39,7 @@ void MIDI_Init()
 
   //  load saved midi channel
   MIDI_CHANNEL = EEPROM.read(EEPROM_MIDI_CHANNEL);
-  if (MIDI_CHANNEL > 16)
+  if (MIDI_CHANNEL > 16 || MIDI_CHANNEL == 0 )
   {
     MIDI_CHANNEL = 1;
   }
@@ -58,32 +57,6 @@ void MIDI_SendSysex(unsigned char interface, byte* sysex)
 {
   // CETTE FONCTION NE MARCHE PAS !
 
-  //  switch (interface) {
-  //    case  INTERFACE_SERIAL1:
-  //      MIDI1.sendSysEx (sizeof(sysex), sysex, true);
-  //      break;
-  //
-  //    case INTERFACE_SERIAL2:
-  //      MIDI2.sendSysEx (sizeof(sysex), sysex, true);
-  //      break;
-  //
-  //    case INTERFACE_SERIAL3:
-  //      MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-  //      break;
-  //
-  //#if SOFTSERIAL_ENABLED
-  //    case INTERFACE_SERIAL4:
-  //      MIDI4.sendSysEx (sizeof(sysex), sysex, true);
-  //      break;
-  //
-  //    case INTERFACE_SERIAL5:
-  //      MIDI5.sendSysEx (sizeof(sysex), sysex, true);
-  //      break;
-  //#endif
-  //
-  //    default:
-  //      break;
-  //  }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -98,7 +71,6 @@ void MIDI_SendPatchBank(unsigned char interface, unsigned char bank)
   Serial.print(F("MIDI_SendPatchBank_ ")); Serial.print (F("bank = ")); Serial.println(bank, DEC);
   Serial.println();
 #endif
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -107,7 +79,6 @@ void MIDI_SendPatchBank(unsigned char interface, unsigned char bank)
 void MIDI_SendPatchProgram(unsigned char interface, unsigned char program)
 {
   switch (interface) {
-
     case  INTERFACE_SERIAL1:
       MIDI1.sendProgramChange(program, MIDI_CHANNEL);
       break;
@@ -152,7 +123,6 @@ void MIDI_SendPatchNumber(unsigned char interface, unsigned char bank, unsigned 
   // http://www.music-software-development.com/midi-tutorial.html
 
   switch (interface) {
-
     case  INTERFACE_SERIAL1:
       MIDI1.sendControlChange (0x00, bank, MIDI_CHANNEL);
       MIDI1.sendControlChange (0x20, 0, MIDI_CHANNEL);
@@ -188,26 +158,21 @@ void MIDI_SendPatchNumber(unsigned char interface, unsigned char bank, unsigned 
     default:
       break;
   }
-  // TO DO
+
 #if DEBUG_midi
   Serial.print(F("MIDI_SendPatchNumber_ ")); Serial.print (F("bank = ")); Serial.print(bank, DEC); Serial.print (F(" program = ")); Serial.println(program, DEC);
   Serial.println();
 #endif
-
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //  Send request a single patch from the current bank
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_RequestSinglePatch(unsigned char interface, unsigned char number)
 {
-  MIDI_ReceivingEditBuffer = 1;
-
-  //  ProgramNumberReq = number;
   // Request data <type> = 0x01 : a single patch from the current bank
-
   byte sysex[7] = { 0xf0, 0x10, 0x06, 0x04, 0x01, number, 0xF7};
+  MIDI_ReceivingEditBuffer = 1;
 
   switch (interface) {
     case  INTERFACE_SERIAL1:
@@ -247,8 +212,6 @@ void MIDI_RequestSinglePatch(unsigned char interface, unsigned char number)
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_RequestGP(unsigned char interface)
 {
-  //  MIDI_ReceivingEditBuffer = 1;
-
   static byte sysex[7] = { 0xf0, 0x10, 0x06, 0x04, 0x03, 0x00, 0xF7};
 
   switch (interface) {
@@ -289,11 +252,9 @@ void MIDI_RequestGP(unsigned char interface)
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_RequestEditBuffer(unsigned char interface, unsigned char number)
 {
+  byte sysex[7] = { 0xf0, 0x10, 0x06, 0x04, 0x04, number, 0xF7};
   MIDI_ReceivingEditBuffer = 1;
 
-  //  ProgramNumberReq = program;
-
-  byte sysex[7] = { 0xf0, 0x10, 0x06, 0x04, 0x04, number, 0xF7};
   switch (interface) {
     case  INTERFACE_SERIAL1:
       MIDI1.sendSysEx (sizeof(sysex), sysex, true);
@@ -334,6 +295,7 @@ void MIDI_RequestEditBuffer(unsigned char interface, unsigned char number)
 void MIDI_EnterRemoteEditMode(unsigned char interface)
 {
   static byte sysex[] = {0xf0, 0x10, 0x06, 0x05, 0xf7};
+
   switch (interface) {
     case  INTERFACE_SERIAL1:
       MIDI1.sendSysEx (sizeof(sysex), sysex, true);
@@ -373,11 +335,10 @@ void MIDI_EnterRemoteEditMode(unsigned char interface)
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_BankRequest(unsigned char interface, unsigned char bank_req)
 {
-  MIDI_ReceivingBank = 1;
-
   static byte sysex_setbank[] = { 0xf0, 0x10, 0x06, 0x0a, bank_req, 0xF7};
   static byte sysex_request[] = { 0xf0, 0x10, 0x06, 0x04, 0x00, 0x00, 0xF7};
   static byte sysex_delock[] = { 0xf0, 0x10, 0x06, 0x0c, 0xF7};
+  MIDI_ReceivingBank = 1;
 
   switch (interface) {
     case  INTERFACE_SERIAL1:
@@ -430,7 +391,6 @@ void MIDI_SendDelayedVoiceParam(unsigned char param, unsigned char value)
 {
   last_delayed_enc_value = value;
   last_delayed_enc_param = param;
-
   encoder_send_counter = 0;
   param_in_queue = 1;
 
@@ -456,9 +416,6 @@ void MIDI_HandleDelayedVoiceParam(unsigned char interface, bool midiThru)
 
   if (encoder_send_counter > 300)   // delay about a 3rd second 5120
   {
-    // if matrix6 sendEditBuffer();
-    //else
-
     switch (interface)
     {
       case  INTERFACE_SERIAL1:
@@ -487,12 +444,12 @@ void MIDI_HandleDelayedVoiceParam(unsigned char interface, bool midiThru)
         break;
     }
     update_editbuffer(last_delayed_enc_param, last_delayed_enc_value);
-
     encoder_send_counter = 0;
     param_in_queue = 0;
 
     // send CC to DAW
-    // filtrer les CC reconnus par le m1000 et les mettre sur un autre CC de façon à pouvoir recupérer les automations du DAW dans handleControlChange() & les CC affectants réellement le son
+    // filtrer les CC reconnus par le m1000 et les mettre sur un autre CC de façon à pouvoir recupérer
+    // les automations du DAW dans handleControlChange() & les CC affectants réellement le son
     if (midiThru)
       // MIDI3.sendControlChange( last_delayed_enc_param, last_delayed_enc_value, MIDI_CHANNEL + interface - 1);
       // singlePatchDataFormat[][]
@@ -650,7 +607,6 @@ void MIDI_SendVoiceParam(unsigned char interface, unsigned char param, unsigned 
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_HandleMatrixModTransmitDelay(unsigned char interface)
 {
-
   byte sysex[] = {0xf0, 0x10, 0x06, 0x0b, last_mmbus, last_mmsrc, last_mmval, last_mmdest, 0xf7};
 
   if (!mmod_in_queue)
@@ -668,7 +624,6 @@ void MIDI_HandleMatrixModTransmitDelay(unsigned char interface)
       switch (interface) {
         case  INTERFACE_SERIAL1:
           MIDI1.sendSysEx (sizeof(sysex), sysex, true);
-
           break;
 
         case INTERFACE_SERIAL2:
@@ -778,7 +733,7 @@ void MIDI_SendSustainBuffer(unsigned char value)
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_Send_BreathController(unsigned char interface, unsigned char value)
 {
-  //    MIOS_MIDI_TxBufferPut(0x02); // Control change : breath controller CC02
+  // Control change : breath controller CC02
 
   switch (interface) {
     case INTERFACE_SERIAL1:
@@ -845,7 +800,6 @@ void MIDI_Send_UNISONDETUNE(unsigned char interface, unsigned char value)
 
     default:
       break;
-
   }
 }
 
@@ -884,7 +838,6 @@ void MIDI_SetBank(unsigned char interface, unsigned char bank)
       break;
   }
 }
-
 
 
 

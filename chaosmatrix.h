@@ -9,9 +9,7 @@
 #define TIMER_PRESCALER 3
 #define TIMER_TICKS 32000
 #define LED_BLINK_SPEED 15
-#define SYNC_BLINK_SPEED 7 
-
-
+#define SYNC_BLINK_SPEED 7
 
 #define BIT0 0
 #define BIT1 1
@@ -29,60 +27,6 @@
 #define KBDMODE_REAROB 3
 #define DEFAULT_KBD_MODE KBDMODE_REASSIGN
 
-//#define CHAR_DOWN   6
-//#define CHAR_UP     7
-// http://www.electronic-engineering.ch/microchip/datasheets/lcd/charset.gif
-#define CHAR_DOWN   B01111111 // ASCII left arrow
-#define CHAR_UP     B01111110 // ASCII right arrow
-
-///////////////////////////////////////////////////////////////////////////////////////////
-// Method retained to store patches (int or ext EEPROM
-///////////////////////////////////////////////////////////////////////////////////////////
-#define PATCH_USE_BANKSTICK     1 // if 24LC512 set 1, else 0 and use internal eeprom 4KB
-#define ext_EEPROM_PAGING       1 // read/write 24LC512 using paging method 
-/*
-  #define uBank_max_intEEPROM 0 // defined to 0 for internal EEPROM
-  #define uPatch_max_intEEPROM 29 // max 30 patches (0 ... 29)
-*/
-///////////////////////////////////////////////////////////////////////////////////////////
-// Setting max bank and max patch :
-///////////////////////////////////////////////////////////////////////////////////////////
-// use 24LC512 and paging method to store patches
-//#if (PATCH_USE_BANKSTICK && ext_EEPROM_PAGING)
-#define uBank_max           9 // 4 if paging, as 512 patches in total at MAX (000 ... 499), 12 slots are lost
-#define uPatch_max          99 // defined to 999 for 4 x 24LC512
-//#endif
-/*
-  // use 24LC512 and NOT paging method to store patches
-  #if ((PATCH_USE_BANKSTICK == 1) && (ext_EEPROM_PAGING == 0))
-  #define uBank_max           8 // define to 8 for 2x 24LC512 , as 900 patches in total at MAX (000 ... 899)
-  #define uPatch_max          99 // define to 99 for 2x 24LC512
-
-  // we use internal EEPROM to store patches :
-  #else
-  #define uBank_max           uBank_max_intEEPROM
-  #define uPatch_max          uPatch_max_intEEPROM
-  #endif
-*/
-
-
-// adresses in internal EEPROM for midi channel, filtermode, and various stuff :
-#define EEPROM_MIDI_CHANNEL        0x00
-#define EEPROM_FILTERSUSTAIN_MODE  0x01
-
-#define EEPROM_LASTBANK			     0x02
-#define EEPROM_LASTPATCH		     0x03
-#define EEPROM_DEVICE			      0x04
-
-#define EEPROM_MATRIX_MODELE_A    	 0x05
-#define EEPROM_MATRIX_MODELE_B  	   0x06
-#define EEPROM_MATRIX_MODELE_C  	   0x07
-#define EEPROM_MATRIX_MODELE_D  	   0x08
-#define EEPROM_ENCODER_INVERTED 0x09
-#define EEPROM_GLOBALPARAMETERS 0x10 // 172 bytes ! start address $10 , end adress $BB
-// lots of cells after ...
-#define EEPROM_MTHRU_XCC 0xbc
-#define EEPROM_EXTCLOCK 0xbd
 
 /*
     Oberheim Matrix 1000 sysex parameter numbers
