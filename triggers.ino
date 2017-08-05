@@ -14,7 +14,6 @@ bool previousAnalogClock;
 void Triggers()
 {
   /////// state machine : get info ///////////////////////////////
-
   // clock pulse from analog oscillator
   if (digitalRead(ANALOGCLOCK_Pin) == HIGH)
   {
@@ -34,13 +33,10 @@ void Triggers()
   {
     triggerInput = true;
   }
-
-
+  
 
   // state machine : launch player ///////////////////////////////
   // http://www.doepfer.de/faq/gen_faq.htm#Sync
-
-
   //////// case SYNC24 ////////////////////////////////////////////////
   if ((ui_external_clk == S24CLK) && (previousAnalogClock != analogClock)) // same behaviour as midi msg 0xF8
   {
@@ -63,7 +59,6 @@ void Triggers()
         DOUT_PinSet(DOUT_ACTIVITY2, 1);
 
       MIDI3.sendRealTime(Clock); // send a midi clock on core out
-      // MIDI1.sendRealTime(Clock); // to delete once tests ok
       ARP2(); // we always call ARP2()
       SEQ(); // we always call seq()
 
@@ -77,7 +72,6 @@ void Triggers()
   //////// case ROLAND TRIGGER ////////////////////////////////////////////////
   if ((ui_external_clk == TRGCLK) && (previousTriggerInput != triggerInput))
   {
-
     // rules to trig a noteOn or a noteOff :
     if (previousTriggerInput == true && triggerInput == false)
     {
@@ -89,9 +83,8 @@ void Triggers()
       SEQ2(true);
       // display it is a trig On event (like a midi in event) :
       trigger = true;
+      DOUT_PinSet(DOUT_ACTIVITY2, trigger); // tempo led
     }
-
-
     else if (previousTriggerInput == false && triggerInput == true)
     {
 #if DEBUG_TRIG
@@ -100,11 +93,12 @@ void Triggers()
 
       ARP3(false);
       SEQ2(false);
+      DOUT_PinSet(DOUT_ACTIVITY2, trigger); // tempo led
     }
-
-
     else
     {
+      // nop
+      
 #if DEBUG_TRIG
       Serial.println(F("TRIG pending"));
 #endif
@@ -114,13 +108,7 @@ void Triggers()
     if (trigger)
       Serial.println(F("trigger!"));
 #endif
-
-
-
   }
-
-
-
 
 #if DEBUG_TRIG2
   if (previousAnalogClock != analogClock)
@@ -134,8 +122,6 @@ void Triggers()
     Serial.print(F("triggerInput = "));
     Serial.println(triggerInput, DEC);
   }
-
-
 #endif
 
   // save the states for next loop

@@ -14,6 +14,7 @@ unsigned char banksaved;
 unsigned char programsaved;
 unsigned char saved;
 //static unsigned char cursor;
+unsigned char ascii;
 
 /*
   EDIT PAGE 1
@@ -44,6 +45,15 @@ void UI_Display_Edit (void)
   unsigned char i;
 
   switch (SoftPanel.Page) {
+#if DEBUG_LCD
+    case SOFT_PAGE4:
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print(ascii, DEC);
+      lcd.setCursor(0, 0);
+      lcd.print((char)ascii);
+      break;
+#endif
 
     case SOFT_PAGE1:
       DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);			// off
@@ -69,20 +79,9 @@ void UI_Display_Edit (void)
     case SOFT_PAGE3: // save patch to matrix1000 memory
 
       if (SoftPanel.IsNewPage) {
-        //        LCD_Clear();
-        //        LCD_PrintCString(F("OSC BEND MODW PORTA")); // ????????? d'où ça sort ?
-
         DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);			// off
         DOUT_PinSet1(DIN_ConfigMap[DIN_EDIT].dout_pin); 			// off
-
-        //        DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin); 	// off
-        //        DOUT_PinSet0(DIN_ConfigMap[DIN_FILTER].dout_pin); 		    // off
-        //        DOUT_PinSet0(DIN_ConfigMap[DIN_ENVELOPES].dout_pin); 	    // off
-        //        DOUT_PinSet0(DIN_ConfigMap[DIN_KEYBOARD].dout_pin); 		// off
-        //        DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX].dout_pin); 		    // off
-        //        DOUT_PinSet1(DIN_ConfigMap[DIN_PAGE].dout_pin); 		    // on
         DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 1);
-
         DOUT_PinSet0(DIN_ConfigMap[DIN_CFG].dout_pin);     // off
 
         LCD_Clear();
@@ -148,11 +147,6 @@ void UI_Display_Edit (void)
       LCD_PrintCString(F(" "));
       LCD_PrintBCD1(uBank);
       LCD_PrintBCD2(uPatch);
-//      // place a zero here for values below 10 (bank & patch) :
-//      if (uBank < 10) {
-//        LCD_CursorSet(2 + LCD_Offset);
-//        LCD_PrintCString(F("0"));
-//      }
 
       if (uPatch < 10) {
         LCD_CursorSet(3 + LCD_Offset);
@@ -168,8 +162,8 @@ void UI_Display_Edit (void)
 
       //cursor
       //  LCD_CursorSet(cursor - 9 + LCD_Offset);
-//              lcd.setCursor(11+cursor, 0); // MARCHE PAS
-//              lcd.cursor(); lcd.blink();
+      //              lcd.setCursor(11+cursor, 0); // MARCHE PAS
+      //              lcd.cursor(); lcd.blink();
       // lcd.noCursor();
       //MIOS_LCD_Cmd(0x80 + cursor + 9 + LCD_Offset);
       //MIOS_LCD_Cmd(0x0e);
@@ -179,13 +173,12 @@ void UI_Display_Edit (void)
       LCD_CursorSet(65 + LCD_Offset);
       LCD_PrintChar(CHAR_DOWN);
       LCD_CursorSet(69 + LCD_Offset);
-//      LCD_PrintCString(F(">"));
+      //      LCD_PrintCString(F(">"));
       LCD_PrintChar(CHAR_UP);
 
       LCD_CursorSet(71 + 5 + LCD_Offset);
       LCD_PrintCString(F("EditName"));
       break;
-      //}
   }
 }
 
@@ -254,6 +247,20 @@ void UI_Handle_Edit(void)
     if (cursor > 7)
       cursor = 0;
   }
+
+  else if  (SoftPanel.Page == SOFT_PAGE4)////////////////////////////////////// PAGE4///////////////// provisoire pour test lcd ascii
+  {
+    ascii += SoftPanel.EncoderValue;
+
+    switch (SoftPanel.Button)
+    {
+      case DIN_PAGE:
+        SoftPanel.Page = SOFT_PAGE1;
+        break;
+
+      default: break;
+    }
+  }
   else
   { //////////////////////////////////////////////////////////////////  PAGE 3 /////////
 
@@ -262,6 +269,9 @@ void UI_Handle_Edit(void)
       case DIN_PAGE:
         if (!RefreshSoftPanel)
           SoftPanel.Page = SOFT_PAGE1;
+#if DEBUG_LCD
+        SoftPanel.Page = SOFT_PAGE4; // retour debut
+#endif
         break;
 
       case SOFT_EDIT_1:

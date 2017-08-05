@@ -23,11 +23,6 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
     // update split point: done in NoteOn
     SetAB = ui_SetAB;
     aSplit = ui_aSplit;
-    //    TrspA = ui_TrspA;
-    //    TrspB = ui_TrspB;
-    //    pitchA = pitch + ((TrspA << 2) + (TrspA << 3) - 36); // 12*x = 4*x+8*x = x<<2 + x<<3
-    //    pitchB = pitch + ((TrspB << 2) + (TrspB << 3) - 36);
-
 
     // holds notesOff or pass thru:
     // if (ui_aHold) // previous version
@@ -65,15 +60,20 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
         {
           // play notesOff from the sequence following midi clock and gate time and pattern and speed :
           // TO DO : it' done in SEQ() of seq.ino
-
-          seqTrig = false; // stop trigging the sequence
-          // send last note off of when we stopped the sequence : that must be done here
-          // sends parameters to the Seq.ino
-          Play_Seq(pitch, velocity, channel, false);
-          // reset the event step count of Sequence : can be an option
-          // reset seqPushedKey :
-          seqPushedKey = 255;
-
+          if (ui_toggleSeq)
+          {
+            return;
+          }
+          else
+          {
+            seqTrig = false; // stop trigging the sequence
+            // send last note off of when we stopped the sequence : that must be done here
+            // sends parameters to the Seq.ino
+            Play_Seq(pitch, velocity, channel, false);
+            // reset the event step count of Sequence : can be an option
+            // reset seqPushedKey :
+            seqPushedKey = 255;
+          }
         }
 
         if (ui_seqPlay && seqMonoMode && (pitch != seqPushedKey)) // availability to play others notes while seq is running on the same keyboard
@@ -118,15 +118,20 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
         {
           // play notesOff from the sequence following midi clock and gate time and pattern and speed :
           // TO DO : it' done in SEQ() of seq.ino
-
-          seqTrig = false; // stop trigging the sequence
-          // send last note off of when we stopped the sequence : that must be done here
-          // sends parameters to the Seq.ino
-          Play_Seq(pitch, velocity, channel, false);
-          // reset the event step count of Sequence : can be an option
-          // reset seqPushedKey :
-          seqPushedKey = 255;
-
+          if (ui_toggleSeq)
+          {
+            return;
+          }
+          else
+          {
+            seqTrig = false; // stop trigging the sequence
+            // send last note off of when we stopped the sequence : that must be done here
+            // sends parameters to the Seq.ino
+            Play_Seq(pitch, velocity, channel, false);
+            // reset the event step count of Sequence : can be an option
+            // reset seqPushedKey :
+            seqPushedKey = 255;
+          }
         }
 
         if (ui_seqPlay && seqMonoMode && (pitch != seqPushedKey)) // availability to play others notes while seq is running on the same keyboard
@@ -167,6 +172,7 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
   {
     ARP3(true);
     SEQ2(true);
+    DOUT_PinSet(DOUT_ACTIVITY2, false); // tempo led
   }
 }
 
@@ -336,6 +342,7 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
   {
     ARP3(false);
     SEQ2(false);
+    DOUT_PinSet(DOUT_ACTIVITY2, true); // tempo led
   }
 }
 

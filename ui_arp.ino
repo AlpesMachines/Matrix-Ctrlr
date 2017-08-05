@@ -1,11 +1,9 @@
-//#include <cmios.h>
+ 
 #include "chaosmatrix.h"
 #include "softpanel.h"
 #include "ui_arp.h"
 #include "din.h"
-//#include "main.h"
 #include "lcd.h"
-//#include "mclock.h"
 #include "arp.h"
 #include "memo.h"
 #include "seq.h"
@@ -14,47 +12,8 @@
 #define BPM_min 20 // more than 0
 #define ui_aGate_Max 1024
 #define aMltp_MAX 4
-/*
-  // array to coorespon ui_aSpeed and musical beat denominations
-  const unsigned char arp_div[14] = { // for 24ppqn
-  0,  // 64:4 = 16:1 = quadruple croche (16 plays per 1black)
-  2,  // 12:1  = quadruple croche pointée
-  3,  // 32:4 = 8:1 = triple croche
-  4,  // 6:1 = triple croche pointée
-  6,  // 16:4 = 4:1 = double croche
-  8,  // 3:1 = 3 play per 1 black
-  12, // 8:4 = 2:1 = croche
-  16, // 3:2 = croche pointée
-  24, // 1:1 = noire (24 ppqn)
-  36, // 2:3 = noire pointée
-  48, // 1:2 = blanche
-  72, // 3:4 blanche pointée (dure 3 temps dans une mesure 4/4)
-  96, // 1:4 = ronde (dure 4 temps dans une mesure 4/4)
-  144,
-  };
 
-*/
-
-
-//// array to coorespon ui_aSpeed and musical beat denominations
-//const unsigned int arp_div[14] = { // for 96ppqn
-//  0,  // 64:4 = 16:1 = quadruple croche (16 plays per 1black)
-//  8,  // 12:1  = quadruple croche pointée
-//  12, // 32:4 = 8:1 = triple croche
-//  16, // 6:1 = triple croche pointée
-//  24, // 16:4 = 4:1 = double croche
-//  32, // 3:1 = 3 play per 1 black
-//  48, // 8:4 = 2:1 = croche
-//  64, // 3:2 = croche pointée
-//  96, // 1:1 = noire (24 ppqn)
-//  144, // 2:3 = noire pointée
-//  196, // 1:2 = blanche
-//  288, // 3:4 blanche pointée (dure 3 temps dans une mesure 4/4)
-//  384, // 1:4 = ronde (dure 4 temps dans une mesure 4/4)
-//  556,// ronde pointée
-//};
-
-// array to coorespon ui_aSpeed and musical beat denominations
+// array to correspond ui_aSpeed and musical beat denominations
 const unsigned int arp_div[14] = { // for 24ppqn
   0,  // 64:4 = 16:1 = quadruple croche (16 plays per 1black)
   2,  // 12:1  = quadruple croche pointée
@@ -202,8 +161,9 @@ const char pitchNotation125[] PROGMEM = {"F9 "};
 const char pitchNotation126[] PROGMEM = {"F#9"};
 const char pitchNotation127[] PROGMEM = {"G9 "};
 
-const char * const pitchNotation[] PROGMEM  = // https://github.com/arduino/Arduino/wiki/1.6-Frequently-Asked-Questions  And, yes, it's really tricky even for experts!
-{
+// https://github.com/arduino/Arduino/wiki/1.6-Frequently-Asked-Questions  And, yes, it's really tricky even for experts!
+
+const char * const pitchNotation[] PROGMEM  = {
   pitchNotation0,
   pitchNotation1,
   pitchNotation2,
@@ -342,6 +302,7 @@ unsigned char enc_value; // general purpose value for test
 unsigned char arp_on; // launch clockbox (PLAY/STOP)
 
 bool ui_SetAB;
+bool ui_toggleSeq;
 unsigned char ui_aSplit;
 unsigned char ui_TrspA;
 unsigned char ui_TrspB;
@@ -357,9 +318,9 @@ unsigned char ui_TrspB;
 /////////////////////////////////////////////////////////////////////////////
 void UI_Display_Arp()
 {
-  if(SoftPanel.Mode != Arp) return;
+  if (SoftPanel.Mode != Arp) return;
 
-  
+
   switch (SoftPanel.Page)
   {
     case SOFT_PAGE1:
@@ -504,10 +465,10 @@ void UI_Display_Arp()
       lcd.setCursor(9, 1);
       lcd.print(F("x"));
       LCD_PrintBCD1(ui_aMltp);
-      //      if (ui_aMltp > 1)
-      //        DOUT_PinSet1(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);   // on
-      //      else
-      //        DOUT_PinSet0(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);   // off
+      if (ui_aMltp)
+        DOUT_PinSet1(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);   // on
+      else
+        DOUT_PinSet0(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);   // off
 
       // groove
       lcd.setCursor(13, 1);
@@ -538,11 +499,10 @@ void UI_Display_Arp()
 
       switch (seqSpeed)
       {
-                
         case 0:
           lcd.print(F("trg"));
           break;
-        
+
         case 1:
           lcd.print(F("1/6"));
           break;
@@ -587,7 +547,6 @@ void UI_Display_Arp()
           LCD_PrintBCD3(seqSpeed);
           break;
       }
-      //      LCD_PrintBCD3(seqSpeed); //seqSpeed
       DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);    // led off
 
       lcd.setCursor(4, 1);
@@ -595,8 +554,15 @@ void UI_Display_Arp()
       else lcd.print(F(" . "));
 
       lcd.setCursor(8, 1);
-      if (ui_seqPlay) lcd.print(F(" > "));
-      else lcd.print(F(" . "));
+      if (ui_seqPlay)
+        lcd.print(F(" > "));
+      else
+        lcd.print(F(" . "));
+      if (ui_toggleSeq)
+        lcd.print(F("t"));
+      else
+        lcd.print(F(" "));
+
 
       if (ui_seqRec)
       {
@@ -609,22 +575,23 @@ void UI_Display_Arp()
         }
         else
         {
-          lcd.setCursor(13, 1); // print seq note name e.g C#3 under R/T
-          //lcd.print(sequence[seqRecStep - 1][0]);
+          // print seq pitch e.g C#3,rest,tie under R/T
+          lcd.setCursor(13, 1);
           if (sequence[seqRecStep - 1][1] == 0) // rest
             lcd.print(F("Rest"));
           else if (sequence[seqRecStep - 1][1] == 128) // tie
             lcd.print(F("Tie "));
-          else // note
+          else // pitch
             lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(pitchNotation[sequence[seqRecStep - 1][0]]))));
-
+          // print step while recording
           lcd.setCursor(18, 1);
-          LCD_PrintBCD2(seqRecStep); // print step while recording
+          LCD_PrintBCD2(seqRecStep);
         }
       }
 
       if ( ui_seqPlay)
       {
+        // print seq pitch e.g C#3,rest,tie under R/T
         lcd.setCursor(13, 1);
         if (sequence[seqPlayStep][1] == 0) // rest
           lcd.print(F("    "));
@@ -632,11 +599,11 @@ void UI_Display_Arp()
         {
           // do nothing
         }
-        else // note
+        else // pitch
           lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(pitchNotation[sequence[seqPlayStep][0]]))));
-
+        // print step while playing
         lcd.setCursor(18, 1);
-        LCD_PrintBCD2(seqPlayStep); // print step while playing
+        LCD_PrintBCD2(seqPlayStep);
       }
       break;
 
@@ -695,7 +662,7 @@ void UI_Display_Arp()
         case TRGCLK:
           lcd.print(F("Trg"));
           break;
-          
+
         case MTRGCLK:
           lcd.print(F("mTg"));
           break;
@@ -809,13 +776,30 @@ void UI_Handle_Arp()
   switch (SoftPanel.Button)
   {
     case SOFT_EDIT_F1:
-      router_arp_tag = !router_arp_tag;
-      if (router_arp_tag == 0) active_arp = false;
+      if (Shift)
+      {
+                if (ui_aHold) 
+                Release_aChordLatch(ui_aHold);
+        ui_aHold = !ui_aHold;
+      }
+      else
+      {
+        router_arp_tag = !router_arp_tag;
+        if (router_arp_tag == 0)
+          active_arp = false;
+      }
       break;
 
     case SOFT_EDIT_F2:
-      ui_seqPlay = !ui_seqPlay;
-      seqTick = 0;
+      if (Shift)
+      {
+        ui_toggleSeq = !ui_toggleSeq;
+      }
+      else
+      {
+        ui_seqPlay = !ui_seqPlay;
+        seqTick = 0;
+      }
       break;
 
     case DIN_ARP:
@@ -827,7 +811,7 @@ void UI_Handle_Arp()
   if (SoftPanel.Page == SOFT_PAGE3) ////////////////// arp page : arp setup //////////////
   {
     // encoder : set BPM :: WORK :)
-    if (ui_external_clk==INTCLK) bpm += SoftPanel.EncoderValue;
+    if (ui_external_clk == INTCLK) bpm += SoftPanel.EncoderValue;
     // range bpm :
     if (bpm < BPM_min)
       bpm = BPM_min;
@@ -862,7 +846,6 @@ void UI_Handle_Arp()
       case SOFT_EDIT_5:
         if (ui_aHold) Release_aChordLatch(ui_aHold);
         ui_aHold = !ui_aHold;
-        //ui_aHold = !ui_aHold;
         break;
 
       case SOFT_EDIT_INC:
@@ -1057,7 +1040,7 @@ void UI_Handle_Arp()
         break;
 
       case SOFT_EDIT_4: //
-// silence if shift = 0 , Tie if Shift = 128
+        // silence if shift = 0 , Tie if Shift = 128
         Insert_SeqRest(Shift << 7);
         break;
 

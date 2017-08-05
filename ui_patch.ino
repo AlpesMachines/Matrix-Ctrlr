@@ -267,13 +267,30 @@ void UI_Handle_Patch(void)
     switch (SoftPanel.Button)
     {
       case SOFT_EDIT_F1:
-        router_arp_tag = !router_arp_tag;
-        if (router_arp_tag == 0) active_arp = false;
+        if (Shift)
+        {
+          if (ui_aHold)
+            Release_aChordLatch(ui_aHold);
+          ui_aHold = !ui_aHold;
+        }
+        else
+        {
+          router_arp_tag = !router_arp_tag;
+          if (router_arp_tag == 0)
+            active_arp = false;
+        }
         break;
 
       case SOFT_EDIT_F2:
-        ui_seqPlay = !ui_seqPlay;
-        seqTick = 0;
+        if (Shift)
+        {
+          ui_toggleSeq = !ui_toggleSeq;
+        }
+        else
+        {
+          ui_seqPlay = !ui_seqPlay;
+          seqTick = 0;
+        }
         break;
     }
 
@@ -305,11 +322,21 @@ void UI_Handle_Patch(void)
         break;
 
       case SOFT_EDIT_2: // init patch
-        InitEditBuffer();
-        SendEditBuffer(INTERFACE_SERIAL);
-        //SoftPanel.Selected_MatrixBus = MMOD_BUS1;
-        // send editbuffer to core out
-        SendEditBuffer(INTERFACE_SERIAL3);
+        if (Shift)
+        {
+          InitEditBuffer();
+          WizardEditBuffer();
+          SendEditBuffer(INTERFACE_SERIAL);
+          SendEditBuffer(INTERFACE_SERIAL3);
+        }
+        else
+        {
+          InitEditBuffer();
+          SendEditBuffer(INTERFACE_SERIAL);
+          //SoftPanel.Selected_MatrixBus = MMOD_BUS1;
+          // send editbuffer to core out
+          SendEditBuffer(INTERFACE_SERIAL3);
+        }
         break;
 
       case SOFT_EDIT_1: // set & request patch from the Matrix1000
@@ -377,7 +404,7 @@ void UI_Handle_Patch(void)
       case SOFT_EDIT_ENC_CLIC: // encoder clic : load patch
         Read_Patch_From_BS(uBank, uPatch); // read into BS
         SendEditBuffer(INTERFACE_SERIAL);
-        MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetune); // send Unison detune value 
+        MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetune); // send Unison detune value
         ArpLoad(); // load arp parameters
         //    Store_LastBankPatch_to_EEPROM(uBank, uPatch); // save patch number in eeprom : mauvaise idée ça va vite user l'eeprom
         //SoftPanel.Selected_MatrixBus = MMOD_BUS1;
@@ -385,7 +412,7 @@ void UI_Handle_Patch(void)
         MIDI_SendPatchNumber(INTERFACE_SERIAL3, uBank, uPatch);// send Bank et Patch number to Core  Midi out
         SendEditBuffer(INTERFACE_SERIAL3); // send editbuffer to core out
         UI_Display_Patch();
-        
+
 #if DEBUG_ENC
         Serial.println(F("SOFT_EDIT_ENC_CLIC load patch"));
         // if (encoderClic) Serial.println(F("SOFT_EDIT_ENC_CLIC=1"));
@@ -597,7 +624,7 @@ void UI_Handle_Patch(void)
       default:
         break;
     }
-  }  
+  }
   else //////////////////////////////////////////////// PAGE 5 /////////////////////////
   {
     switch (SoftPanel.Button) {

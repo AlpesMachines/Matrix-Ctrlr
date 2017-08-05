@@ -787,6 +787,138 @@ const unsigned char DefaultEditBuffer[134] PROGMEM =
   0,  	// EB_MODBUS9_DESTINATION 	133
 
 };
+///////////////////////////////////////////////////////////////
+// EditBuffer chart used to generate random Editbuffer[]
+//////////////////////////////////////////////////////////////
+const unsigned char singleDataFormatEB[126][5] PROGMEM =
+{ // byte, name (same as byte),default, min, max
+  {8, EB_KEYBOARD_MODE, 3, 0, 3},
+  {9, EB_OSC1_FREQ, 12, 0, 63},
+  {10, EB_OSC1_WAVESHAPE, 0, 0, 63},
+  {11, EB_OSC1_PULSEWIDTH, 0, 0, 63},
+  {12, EB_OSC1_LEVERMOD, 3, 0, 3},
+  {13, EB_OSC1_WAVEFORM, 3, 0, 3},
+  {14, EB_OSC2_FREQ, 12, 0, 63},
+  {15, EB_OSC2_WAVESHAPE, 0, 0, 63},
+  {16, EB_OSC2_PULSEWIDTH, 0, 0, 63},
+  {17, EB_OSC2_LEVERMOD, 3, 0, 3},
+  {18, EB_OSC2_WAVEFORM, 3, 0, 3},
+  {19, EB_OSC2_DETUNE, 0, 0, 63},
+  {20, EB_MIX, 31, 0, 63},
+  {21, EB_OSC1_KEYBOARDMOD, 1, 0, 3},
+  {22, EB_OSC1_CLICK, 0, 0, 1},
+  {23, EB_OSC2_KEYBOARDMOD, 1, 0, 3},
+  {24, EB_OSC2_CLICK, 0, 0, 1},
+  {25, EB_OSC_SYNCMODE, 0, 0, 3},
+  {26, EB_FILTER_FREQ, 127, 0, 127},
+  {27, EB_FILTER_RESONANCE, 0, 0, 63},
+  {28, EB_FILTER_LEVERMOD, 0, 0, 3},
+  {29, EB_FILTER_KEYBOARDMOD, 0, 0, 3},
+  {30, EB_FILTER_FM_AMOUNT, 0, 0, 63},
+  {31, EB_VCA1_AMOUNT, 63, 0, 63},
+  {32, EB_PORTAMENTO_RATE, 0, 0, 63},
+  {33, EB_PORTAMENTO_MODE, 0, 0, 3},
+  {34, EB_PORTAMENTO_LEGATOENABLE, 0, 0, 1},
+  {35, EB_LFO1_SPEED, 0, 0, 63},
+  {36, EB_LFO1_TRIGGERMODE, 0, 0, 3},
+  {37, EB_LFO1_LAGENABLE, 0, 0, 1},
+  {38, EB_LFO1_WAVESHAPE, 0, 0, 6},
+  {39, EB_LFO1_RETRIGGERPOINT, 0, 0, 31},
+  {40, EB_LFO1_SAMPLEDSOURCE, 3, 0, 20},
+  {41, EB_LFO1_AMPLITUDE, 31, 0, 63},
+  {42, EB_LFO2_SPEED, 0, 0, 63},
+  {43, EB_LFO2_TRIGGERMODE, 0, 0, 3},
+  {44, EB_LFO2_LAGENABLE, 0, 0, 1},
+  {45, EB_LFO2_WAVESHAPE, 0, 0, 6},
+  {46, EB_LFO2_RETRIGGERPOINT, 0, 0, 32},
+  {47, EB_LFO2_SAMPLEDSOURCE, 3, 0, 20},
+  {48, EB_LFO2_AMPLITUDE, 31, 0, 63},
+  {49, EB_ENV1_TRIGGERMODE, 0, 0, 3},
+  {50, EB_ENV1_DELAY, 0, 0, 63},
+  {51, EB_ENV1_ATTACK, 0, 0, 63},
+  {52, EB_ENV1_DECAY, 63, 0, 63},
+  {53, EB_ENV1_SUSTAIN, 0, 0, 63},
+  {54, EB_ENV1_RELEASE, 10, 0, 63},
+  {55, EB_ENV1_AMPLITUDE, 63, 0, 63},
+  {56, EB_ENV1_LFOTRIGGERMODE, 0, 0, 1},
+  {57, EB_ENV1_RELEASEMODE, 0, 0, 1},
+  {58, EB_ENV2_TRIGGERMODE, 0, 0, 3},
+  {59, EB_ENV2_DELAY, 0, 0, 63},
+  {60, EB_ENV2_ATTACK, 0, 0, 63},
+  {61, EB_ENV2_DECAY, 63, 0, 63},
+  {62, EB_ENV2_SUSTAIN, 63, 0, 63},
+  {63, EB_ENV2_RELEASE, 10, 0, 63},
+  {64, EB_ENV2_AMPLITUDE, 63, 0, 63},
+  {65, EB_ENV2_LFOTRIGGERMODE, 0, 0, 3},
+  {66, EB_ENV2_RELEASEMODE, 0, 0, 3},
+  {67, EB_ENV3_TRIGGERMODE, 0, 0, 3},
+  {68, EB_ENV3_DELAY, 0, 0, 63},
+  {69, EB_ENV3_ATTACK, 0, 0, 63},
+  {70, EB_ENV3_DECAY, 63, 0, 63},
+  {71, EB_ENV3_SUSTAIN, 0, 0, 63},
+  {72, EB_ENV3_RELEASE, 10, 0, 63},
+  {73, EB_ENV3_AMPLITUDE, 63, 0, 63},
+  {74, EB_ENV3_LFOTRIGGERMODE, 0, 0, 3},
+  {75, EB_ENV3_RELEASEMODE, 0, 0, 3},
+  {76, EB_TRACK_INPUT, 4, 0, 20},
+  {77, EB_TRACK_POINT1, 1, 0, 63},
+  {78, EB_TRACK_POINT2, 15, 0, 63},
+  {79, EB_TRACK_POINT3, 30, 0, 63},
+  {80, EB_TRACK_POINT4, 46, 0, 63},
+  {81, EB_TRACK_POINT5, 63, 0, 63},
+  {82, EB_RAMP1_RATE, 31, 0, 63},
+  {83, EB_RAMP1_MODE, 0, 0, 3},
+  {84, EB_RAMP2_RATE, 50, 0, 63},
+  {85, EB_RAMP2_MODE, 0, 0, 3},
+  {86, EB_OSC1_FREQBYLFO1AMOUNT, 0, 0, 127},
+  {87, EB_OSC1_PWBYLFO2AMOUNT, 0, 0, 127},
+  {88, EB_OSC2_FREQBYLFO1AMOUNT, 0, 0, 127},
+  {89, EB_OSC2_PWBYLFO2AMOUNT, 0, 0, 127},
+  {90, EB_FILTER_FREQBYENV1AMOUNT, 1, 0, 127},
+  {91, EB_FILTER_FREQBYPRESSURE, 0, 0, 127},
+  {92, EB_VCA1_AMPBYVELOCITY, 63, 0, 127},
+  {93, EB_VCA2_AMPBYENV2, 63, 0, 127},
+  {94, EB_ENV1_AMPBYVELO, 0, 0, 127},
+  {95, EB_ENV2_AMPBYVELO, 0, 0, 127},
+  {96, EB_ENV3_AMPBYVELO, 0, 0, 127},
+  {97, EB_LFO1_AMPMODULATION, 0, 0, 127},
+  {98, EB_LFO2_AMPMODULATION, 0, 0, 127},
+  {99, EB_PORTAMENTO_SPEEDBYVELOCITY, 0, 0, 127},
+  {100, EB_FILTER_FMBYENV3, 0, 0, 127},
+  {101, EB_FILTER_FMBYPRESSURE, 0, 0, 127},
+  {102, EB_LFO1_SPEEDMODULATION, 0, 0, 127},
+  {103, EB_LFO2_SPEEDMODULATION, 0, 0, 127},
+  {104, EB_MODBUS0_SOURCE, 0, 0, 20},
+  {105, EB_MODBUS0_AMOUNT, 0, 0, 127},
+  {106, EB_MODBUS0_DESTINATION, 0, 0, 32},
+  {107, EB_MODBUS1_SOURCE, 0, 0, 20},
+  {108, EB_MODBUS1_AMOUNT, 0, 0, 127},
+  {109, EB_MODBUS1_DESTINATION, 0, 0, 32},
+  {110, EB_MODBUS2_SOURCE, 0, 0, 20},
+  {111, EB_MODBUS2_AMOUNT, 0, 0, 127},
+  {112, EB_MODBUS2_DESTINATION, 0, 0, 32},
+  {113, EB_MODBUS3_SOURCE, 0, 0, 20},
+  {114, EB_MODBUS3_AMOUNT, 0, 0, 127},
+  {115, EB_MODBUS3_DESTINATION, 0, 0, 32},
+  {116, EB_MODBUS4_SOURCE, 0, 0, 20},
+  {117, EB_MODBUS4_AMOUNT, 0, 0, 127},
+  {118, EB_MODBUS4_DESTINATION, 0, 0, 32},
+  {119, EB_MODBUS5_SOURCE, 0, 0, 20},
+  {120, EB_MODBUS5_AMOUNT, 0, 0, 127},
+  {121, EB_MODBUS5_DESTINATION, 0, 0, 32},
+  {122, EB_MODBUS6_SOURCE, 0, 0, 20},
+  {123, EB_MODBUS6_AMOUNT, 0, 0, 127},
+  {124, EB_MODBUS6_DESTINATION, 0, 0, 32},
+  {125, EB_MODBUS7_SOURCE, 0, 0, 20},
+  {126, EB_MODBUS7_AMOUNT, 0, 0, 127},
+  {127, EB_MODBUS7_DESTINATION, 0, 0, 32},
+  {128, EB_MODBUS8_SOURCE, 0, 0, 20},
+  {129, EB_MODBUS8_AMOUNT, 0, 0, 127},
+  {130, EB_MODBUS8_DESTINATION, 0, 0, 32},
+  {131, EB_MODBUS9_SOURCE, 0, 0, 20},
+  {132, EB_MODBUS9_AMOUNT, 0, 0, 127},
+  {133, EB_MODBUS9_DESTINATION, 0, 0, 32}
+};
 
 /////////////////////////////////////////////////////////////////////////////
 //  default MasterParameters (stored in FLASHRAM)
@@ -1719,6 +1851,32 @@ void SendCtrlrSystemCfg(unsigned char interface)
   Serial.println(F("MIDI_SendCtrlrSystemCfg() "));
   Serial.print (F("interface = ")); Serial.println(interface, HEX);
   Serial.println();
+#endif
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Create a random patch
+/////////////////////////////////////////////////////////////////////////////
+void WizardEditBuffer(void)
+{
+  // "WIZZARD!" patch name
+  EditBuffer[0] = 0x57;      
+  EditBuffer[1] = 0x49;
+  EditBuffer[2] = 0x5a;
+  EditBuffer[3] = 0x5a;
+  EditBuffer[4] = 0x41;
+  EditBuffer[5] = 0x52;
+  EditBuffer[6] = 0x44;
+  EditBuffer[7] = 0x21;
+  
+  for (unsigned char i = 0; i < 126; ++i)
+  {
+    // random(min,max) min inclusive, max exclusive, so +1 to include, return a long
+    EditBuffer[i + 8] = (byte)random(pgm_read_byte_near(&singleDataFormatEB[i][3]), pgm_read_byte_near(&singleDataFormatEB[i][4]));
+  }
+
+#if DEBUG_midi
+  Serial.println(F("WizardEditBuffer()"));
 #endif
 }
 

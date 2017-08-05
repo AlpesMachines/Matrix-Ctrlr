@@ -253,7 +253,8 @@ void LivePanel_BlinkLFOs(void)
   static unsigned char lfo2_blinkcounter;
 
   // lfo 1
-  if (lfo1_blinkcounter < 62 - EditBuffer[EB_LFO1_SPEED]) {
+  if (lfo1_blinkcounter < 62 - EditBuffer[EB_LFO1_SPEED])
+  {
     lfo1_blinkcounter++;
   }
   else
@@ -263,7 +264,8 @@ void LivePanel_BlinkLFOs(void)
   }
 
   // lfo 2
-  if (lfo2_blinkcounter < 62 - EditBuffer[EB_LFO2_SPEED]) {
+  if (lfo2_blinkcounter < 62 - EditBuffer[EB_LFO2_SPEED])
+  {
     lfo2_blinkcounter++;
   }
   else
@@ -280,6 +282,7 @@ void LivePanel_BlinkLEDs(void)
 {
   static unsigned char led_blinkcounter;
   static unsigned char sync_blinkcounter;
+  static unsigned char F1F2_blinkcounter;
   static bool blink;
 
   // Is there a MIDI message incoming ?
@@ -337,23 +340,19 @@ void LivePanel_BlinkLEDs(void)
   }
 
   // blink the LEDs below at the same speed
-  if (led_blinkcounter > LED_BLINK_SPEED) {
-    blink = !blink;
-
+  if (led_blinkcounter > LED_BLINK_SPEED)
+  {
     if (EditBuffer[EB_OSC2_WAVEFORM] > 3)
     {
       DOUT_PinSet(DOUT_DCO2_PULSE, (DOUT_PinGet(DOUT_DCO2_PULSE) == DIN_STATE_ON) ? DIN_STATE_OFF : DIN_STATE_ON);
       DOUT_PinSet(DOUT_DCO2_WAVE, (DOUT_PinGet(DOUT_DCO2_WAVE) == DIN_STATE_ON) ? DIN_STATE_OFF : DIN_STATE_ON);
-      //      DOUT_PinSet(DOUT_DCO2_PULSE, blink);
-      //      DOUT_PinSet(DOUT_DCO2_WAVE, blink);
     }
 
-    // blink if sequenciate or arpegiate
+    // blink ARP led if sequenciate or arpegiate
     if (ui_seqPlay || router_arp_tag)
     {
       DOUT_PinSet(DOUT_ARP, (DOUT_PinGet(DOUT_ARP) == DIN_STATE_ON) ? DIN_STATE_OFF : DIN_STATE_ON);
     }
-    //  else DOUT_PinSet(DOUT_ARP, DIN_STATE_OFF);
 
     led_blinkcounter = 0;
   }
@@ -367,9 +366,43 @@ void LivePanel_BlinkLEDs(void)
     {
       DOUT_PinSet(DOUT_OSC_SYNC, (DOUT_PinGet(DOUT_OSC_SYNC) == DIN_STATE_ON) ? DIN_STATE_OFF : DIN_STATE_ON);
     }
+
     sync_blinkcounter = 0;
   }
   ++sync_blinkcounter;
+
+
+  if (F1F2_blinkcounter > (arp_div_index)) // arp_div_index instead of F1F2_BLINK_SPEED
+  {
+    blink = !blink;
+
+    // blink F1 led if arp play & Hold
+    if (router_arp_tag && !ui_aHold)
+    {
+      DOUT_PinSet(DOUT_F1, DIN_STATE_ON);
+    }
+    else if (router_arp_tag && ui_aHold)
+    {
+      DOUT_PinSet(DOUT_F1, blink);
+    }
+    else
+      DOUT_PinSet(DOUT_F1, DIN_STATE_OFF);
+
+    // blink F2 led if seqplay & toggle
+    if (ui_seqPlay && !ui_toggleSeq)
+    {
+      DOUT_PinSet(DOUT_F2, DIN_STATE_ON);
+    }
+    else if (ui_seqPlay && ui_toggleSeq)
+    {
+      DOUT_PinSet(DOUT_F2, blink);
+    }
+    else
+      DOUT_PinSet(DOUT_F2, DIN_STATE_OFF);
+
+    F1F2_blinkcounter = 0;
+  }
+  ++F1F2_blinkcounter;
 }
 
 

@@ -8,8 +8,9 @@
 */
 #define TIMER_PRESCALER 3
 #define TIMER_TICKS 32000
-#define LED_BLINK_SPEED 15
+#define LED_BLINK_SPEED 16
 #define SYNC_BLINK_SPEED 7
+#define F1F2_BLINK_SPEED 8
 
 #define BIT0 0
 #define BIT1 1
