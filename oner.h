@@ -17,8 +17,6 @@
 #define Z_HIGH 3
 #define Z_TCH 4
 
-
-
 extern const unsigned char defaultZONE[4][5] ;
 
 // var

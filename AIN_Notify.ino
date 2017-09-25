@@ -1,7 +1,6 @@
 #include "lcd.h"
 #include "pots.h"
 
-
 ///////////////////////////////////////////////////////////
 // Globales variables
 // 10 bits : int type necessary
@@ -102,10 +101,6 @@ void AIN_NotifyChange() {
             lcd.setCursor(0, 1);
             lcd.print(F(" "));
             lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(PotDescription[i]))));
-            //            lcd.setCursor(9, 1);
-            //            lcd.print(F(" ain:"));
-            //            LCD_PrintBCD2(i);
-            //lcd.print(F(" "));
             LCD_PrintBCD3(Analog_Mapped[i]);
           }
         }

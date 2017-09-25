@@ -1,11 +1,9 @@
-//#include <cmios.h>
+ 
 #include "chaosmatrix.h"
 #include "softpanel.h"
 #include "lcd.h"
 #include "din.h"
 #include "midi.h"
-//#include "patchnames.h"
-//#include "memo.h"
 #include "device.h"
 #include <EEPROM.h>
 
@@ -15,9 +13,6 @@ unsigned char ProgramNumberReq;
 unsigned char BankNumberReq;
 unsigned char BankNumberDump;
 
-//unsigned char tmpEditBuffer[134];
-//unsigned char tmpArpParameters[20];
-//unsigned char tmpSequence[32][2];
 // not enough memory so a single 128 bytes buffer for copy/paste :
 unsigned char copyBuffer[136];
 static bool copy, paste;
@@ -226,12 +221,6 @@ void UI_Display_Patch (void)
       DOUT_PinSet1(DIN_ConfigMap[DIN_PATCH].dout_pin);    // on
       DOUT_PinSet1(DIN_ConfigMap[DIN_PAGE].dout_pin);     // on
       DOUT_PinSet0(DIN_ConfigMap[DIN_EDIT].dout_pin);     // off
-      //      DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin); // off
-      //      DOUT_PinSet0(DIN_ConfigMap[DIN_FILTER].dout_pin);     // off
-      //      DOUT_PinSet0(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);  // off
-      //      DOUT_PinSet0(DIN_ConfigMap[DIN_KEYBOARD].dout_pin);   // off
-      //      DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX].dout_pin);     // off
-      //      DOUT_PinSet0(DIN_ConfigMap[DIN_CFG].dout_pin);     // off
 
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -315,9 +304,6 @@ void UI_Handle_Patch(void)
         Store_LastBankPatch_to_EEPROM(device, uBank[device], uPatch[device]); // save device & patch numbers in eeprom
         //Read_Patch_From_BS(device, uBank[device], uPatch[device]); // reload what's just been saved
         UpdateDinStates(); // mise à jour des Leds
-        //ArpParameters_Load(device);
-
-        //EEPROM.update(EEPROM_DEVICE, device); // done previously
         // send EditBuffer[device] to core out for copy/past in MidiMonitor.app if necessary
         SendEditBuffer(device, INTERFACE_SERIAL3);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetune[device]);
@@ -327,8 +313,6 @@ void UI_Handle_Patch(void)
         if (Shift)
           WizardEditBuffer(device, 6);
 
-        //Read_Patch_From_BS(uBank[device], uPatch[device]);
-        //SoftPanel.Selected_MatrixBus = MMOD_BUS1; // useless
         if (localControl)
         {
           SendEditBuffer(device, INTERFACE_SERIAL);
@@ -352,7 +336,6 @@ void UI_Handle_Patch(void)
       case SOFT_EDIT_2: // init patch in EditBuffer
         InitEditBuffer();
         ARP_GLOBAL_INIT(device);
-        //SoftPanel.Selected_MatrixBus = MMOD_BUS1; // useless
         if (localControl)
         {
           SendEditBuffer(device, INTERFACE_SERIAL);
@@ -383,13 +366,11 @@ void UI_Handle_Patch(void)
           Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
           UpdateDinStates(); // mise à jour des Leds
           SendEditBuffer(device, INTERFACE_SERIAL);  // send edit buffer :)
-          // send Unison detune value TO DO :
+          // send Unison detune value :
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetune[device]);
           // load arp parameters
           ArpParameters_Load(device);
-          //ARP_GLOBAL_INIT(device);
-          //		Store_LastBankPatch_to_EEPROM(uBank[device], uPatch[device]); // save patch number in eeprom : mauvaise idée ça va vite user l'eeprom
-          //SoftPanel.Selected_MatrixBus = MMOD_BUS1;
+    
           // send EditBuffer[device] to core out
           SendEditBuffer(device, INTERFACE_SERIAL3);
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL3, UnisonDetune[device]);
@@ -419,8 +400,6 @@ void UI_Handle_Patch(void)
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetune[device]);
           // load arp parameters
           ArpParameters_Load(device);
-          //		Store_LastBankPatch_to_EEPROM(uBank[device], uPatch[device]); // save patch number in eeprom : mauvaise idée ça va vite user l'eeprom
-          //SoftPanel.Selected_MatrixBus = MMOD_BUS1;
           // send EditBuffer[device] to core out
           SendEditBuffer(device, INTERFACE_SERIAL3);
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL3, UnisonDetune[device]);
@@ -448,9 +427,6 @@ void UI_Handle_Patch(void)
           SendEditBuffer(device, INTERFACE_SERIAL);
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetune[device]); // send Unison detune value
           ArpParameters_Load(device); // load arp parameters
-          //   ARP_GLOBAL_INIT(device);
-          //    Store_LastBankPatch_to_EEPROM(uBank[device], uPatch[device]); // save patch number in eeprom : mauvaise idée ça va vite user l'eeprom
-          //SoftPanel.Selected_MatrixBus = MMOD_BUS1;
           SendEditBuffer(device, INTERFACE_SERIAL3); // send  to core out
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL3, UnisonDetune[device]);
           UI_Display_Patch(); // to update patch name on display
@@ -568,8 +544,6 @@ void UI_Handle_Patch(void)
         {
           // and ask corresponding Matrix patch using a SysEx msg
           MIDI_SetBank(INTERFACE_SERIAL, BankNumber);
-          //          MIDI_SendPatchProgram(INTERFACE_SERIAL, ProgramNumber); // OK 0.96
-          //          MIDI_RequestEditBuffer[device](INTERFACE_SERIAL, ProgramNumber); // OK 0.96
           MIDI_RequestSinglePatch(INTERFACE_SERIAL, ProgramNumber);
 
         }
@@ -591,8 +565,6 @@ void UI_Handle_Patch(void)
         else
         {
           MIDI_SetBank(INTERFACE_SERIAL, BankNumber);
-          //          MIDI_SendPatchProgram(INTERFACE_SERIAL, ProgramNumber); // OK 0.96
-          //          MIDI_RequestEditBuffer[device](INTERFACE_SERIAL, ProgramNumber);// OK 0.96
           MIDI_RequestSinglePatch(INTERFACE_SERIAL, ProgramNumber); // 0.99 marche tres bien ne pas changer
         }
         break;

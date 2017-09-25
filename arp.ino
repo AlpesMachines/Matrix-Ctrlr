@@ -1,12 +1,7 @@
-
-
 /*
-  // STANDALONE ARPEGGIATOR v0.1 - bill@parishq.net
-  //
-  //
-  // julien voirin janvier 2014 julien.voirin@free.fr
-  //                            http://4colors.free.fr
-  //
+  // Arpegiator 
+  // created by Alpes Machines 2016
+  // for Matrix Ctrlr embedded
   //
   //
 
@@ -124,12 +119,6 @@ void ArpParameters_Load(unsigned char device)
       else
         ArpParametersOrig[k]  = ArpParametersOrig[k]; // leave unchanged (useful line for later, like random or smtg)
     }
-
-    //  // cpy ArpPaamOrig into ArpParam[device] : -> done in ReadPatch_from_BS()
-    //  for (unsigned char k = 0; k < 20; ++k)
-    //  {
-    //    ArpParameters[device][k] = ArpParametersOrig[k];
-    //  }
 
     //initialise achord
     Init_aChord();
@@ -256,21 +245,14 @@ void ARP_GLOBAL_INIT(unsigned char device)
   if (device != Matrix_Device_A)
     return; // quit
 
-  // vider la pile :
-  ARP2();
-//
-//  for (unsigned char i = 0; i < arpN; ++i)
-//  {
-//    MIDI1.sendNoteOff(aChord[i][0], aChord[i][1], MIDI_CHANNEL);
-//  }
+  ARP2(); // does empty the stack
+
   Init_aChord();
 
   arpN = aStepMax = aStep = 0;
   ArpParameters_Init(device); // set default arp parameters
 
   Init_Seq();
-
-  //MIDI1.sendControlChange(123, 0, MIDI_CHANNEL); // all notes off msg
 
 }
 
@@ -348,8 +330,6 @@ void Update_Arp(unsigned char pitch, unsigned char velocity, unsigned char chann
         }
         else
         {
-          //        --arpN; // "there are null elements in the chord (arpN = 0)"
-          //        if (arpN < 0) arpN = 0;
           // remove element from aChord
           for (unsigned char i = 0; i <= arpN; i++) // we compare all the pitch of the arp to the pitch of the Note Off in order to find which to remove
           {
@@ -393,8 +373,6 @@ void Update_Arp(unsigned char pitch, unsigned char velocity, unsigned char chann
         break;
 
       case 3: // HOLD Notes released (act like notesOff events)
-        //      --arpN; // "there are null elements in the chord (arpN = 0)"
-        //      if (arpN < 0) arpN = 0;
         // remove element from aChord
         for (unsigned char i = 0; i <= arpN; i++) // we compare all the pitch of the arp to the pitch of the Note Off in order to find which to remove
         {
@@ -477,7 +455,6 @@ void Play_Arp(byte pitch, byte velocity, byte channel, bool trigger)
 /////////////////////////////////////////////////////////////////////////////////////
 void Sort_aChord(unsigned char typ, unsigned char stepmax, unsigned char transpose)
 {
-  //  byte swap[2];
   // https://openclassrooms.com/forum/sujet/ordonner-tableau-tableau-en-c
   // http://www.commentcamarche.net/forum/affich-22003423-langage-c-classement-ordre-croissant-decroi
 
@@ -748,13 +725,10 @@ void ARP3(bool trig)
       }
 
       // notice last note to kill at the very end:
-      //lastNote = true;
       lastNote[0] = aChordPlay[aStep][0];
       lastNote[1] = aChordPlay[aStep][1];
       lastNote[2] = MIDI_CHANNEL;
       lastNote[3] = true; // remind you to kill last note if necessary
-
-
 
 #if DEBUG_ARP2
       Serial.print(F("Note On : ")); Serial.print(aChord[aStep][0], DEC); Serial.print(F(" ")); Serial.print(aChord[aStep][1], DEC); Serial.print(F(" ch: ")); Serial.println(MIDI_CHANNEL, DEC);
@@ -871,7 +845,6 @@ void Release_aChordLatch(bool state)
 
   if (state) // if it's true : switch state, release the array and then reset the counter
   {
-    //ui_aHold = false;
     if (router_arp_tag)
     {
       while (i < latchCounter)

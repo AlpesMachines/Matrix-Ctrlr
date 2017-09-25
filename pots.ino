@@ -1,47 +1,5 @@
 #include "pots.h"
-/*
-  const pots PotConfigMap[NBR_POT] =
-  { // in order : from ain_pin = 0 to ain_pin = 31
 
-  // description        parameter              min  max   valtype  update_interval
-  {  "DCO1 WAVE SHAPE ", SX_OSC1_WAVESHAPE,         0,   63, UNSIGNED6, 2}, //osc1 ain_pin = 0
-  {  "DCO2 FREQ       ", SX_OSC2_FREQ,              0,  63, UNSIGNED6, 1},
-  {  "DCO1 F/LFO1     ", SX_OSC1_FREQBYLFO1AMOUNT,  0,  127, SIGNED7,   5}, //osc1
-  {  "DCO1 PW         ", SX_OSC1_PULSEWIDTH,        0,   63, UNSIGNED6, 2},//osc1
-  {  "ENV1 DELAY      ", SX_ENV1_DELAY,             0,  63, UNSIGNED6, 1},
-  {  "DCO2 PW /LFO2   ", SX_OSC2_PWBYLFO2AMOUNT,    0,  127, SIGNED7, 1},
-  {  "DCO MIX         ", SX_MIX,         	          0,   63, MIXBALANCE, 1},
-  {  "DCO1 PW /LFO2   ", SX_OSC1_PWBYLFO2AMOUNT,     0,  127, SIGNED7, 1},
-
-  {  "DCO2 PW         ", SX_OSC2_PULSEWIDTH,       0,   63, UNSIGNED6, 2}, // osc2
-  {  "DCO2 WAVE SHAPE ", SX_OSC2_WAVESHAPE,	       0,   63, UNSIGNED6, 2}, // osc2
-  {  "DCO2 F/LFO1     ", SX_OSC2_FREQBYLFO1AMOUNT, 1,  127, SIGNED7,   5}, // making it positive only // osc2
-  {  "DCO2 DETUNE     ", SX_OSC2_DETUNE,            1,   63, SIGNED6,   2}, // osc2
-  {  "ENV2 ATTACK     ", SX_ENV2_ATTACK,   	       0,   63, UNSIGNED6, 1}, // env2 // du bas
-  {  "ENV1 ATTACK     ", SX_ENV1_ATTACK, 	         0,   63, UNSIGNED6, 1}, // attack du dessus
-  {  "ENV2 DECAY      ", SX_ENV2_DECAY,  	         0,   63, UNSIGNED6, 1}, // env2
-  {  "ENV1 DECAY      ", SX_ENV1_DECAY,  	         0,   63, UNSIGNED6, 1}, // du dessus
-
-  {  "ENV2 RELEASE    ", SX_ENV2_RELEASE,	         0,   63, UNSIGNED6, 1}, // env2 // du bas
-  {  "ENV1 SUSTAIN    ", SX_ENV1_SUSTAIN,	          0,   63, UNSIGNED6, 1}, // this pot transmits a copy of the entire edit buffer // du dessus
-  {  "ENV2 SUSTAIN    ", SX_ENV2_SUSTAIN,	          0,   63, UNSIGNED6, 1}, // env2// du bas
-  {  "ENV1 RELEASE    ", SX_ENV1_RELEASE,	        0,   63, UNSIGNED6, 1}, // du dessus
-  {  "LFO1 SPEED      ", SX_LFO1_SPEED,             0,   63, UNSIGNED6, 1},// lfo1
-  {  "LFO1 AMP        ", SX_LFO1_AMPLITUDE,         0,   63, UNSIGNED6, 1},
-  {  "LFO2 SPEED      ", SX_LFO2_SPEED,	          0,   63, UNSIGNED6, 1},
-  {  "LFO2 AMP        ", SX_LFO2_AMPLITUDE,       0,   63, UNSIGNED6, 1},
-
-  {  "VCF F/ENV1      ", SX_FILTER_FREQBYENV1AMOUNT, 0, 127, SIGNED7,   5}, // env1=param 22,
-  {  "VCF RES         ", SX_FILTER_RESONANCE,	    0,   63, UNSIGNED6, 1},
-  {  "DCO1 FREQ       ", SX_OSC1_FREQ,            0,  63, UNSIGNED6, 1},
-  {  "FMOD/PRS        ", SX_FILTER_FMBYPRESSURE,  0,  127, SIGNED7,   5},
-  {  "AIN 28          ", 0,                       0,  127, UNSIGNED7, 1},
-  {  "VCF FREQ        ", SX_FILTER_FREQ,	        0,  127, UNSIGNED7, 2},
-  {  "ENV2 DELAY      ", SX_ENV2_DELAY,     0,  63, UNSIGNED6, 1},
-  {  "VCF FM          ", SX_FILTER_FM_AMOUNT,	    0,   63, UNSIGNED6, 1} // ain_pin = 31
-
-  };
-*/
 const char PotDescription0[]PROGMEM = "VCF F /ENV1     "; // ain_pin 0
 const char PotDescription1[]PROGMEM = "VCF RESO        ";
 const char PotDescription2[]PROGMEM = "DCO1 F /LFO1    "; // code à implémenter en Control change
@@ -116,8 +74,6 @@ const char PotDescription60[]PROGMEM = "ENV3 DECAY      ";
 const char PotDescription61[]PROGMEM = "LFO2 AMP /RAMP2 ";
 const char PotDescription62[]PROGMEM = "ENV3 RELEASE    ";
 const char PotDescription63[]PROGMEM = "LFO2 SPEED /KBD ";
-
-
 
 const char * const PotDescription[] PROGMEM =
 {

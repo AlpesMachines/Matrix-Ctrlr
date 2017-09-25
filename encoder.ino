@@ -77,7 +77,6 @@ void encoder() // Youhouhouuuu !!!! ça marcheeee :)
       }
     }
 
-
     if (incrementer != 0) { // we only send +1 or 1 value, null is useless
       // NB : using Shift button we could set a new value to SMOOTHING_ENCODER to increment faster
       SoftPanel_Handler (-1, incrementer); // no pin

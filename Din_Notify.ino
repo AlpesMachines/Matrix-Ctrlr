@@ -5,16 +5,12 @@
 #include "chaosmatrix.h"
 #include "pots.h"
 
-
-//
 static bool button_state[NBR_BUTTON]; // button state
 static bool old_button_state[NBR_BUTTON];
 static unsigned char butt;
 
-
 static byte din_pin;
 static byte din_pin_value;
-
 
 ///////////////////////////////////////////////////////////
 // lecture des tact switch (digital)
@@ -73,11 +69,6 @@ void ReadDigital(void)
 ////////////////////////////////////////////////////////////
 void DIN_NotifyChange(void)
 {
-  //unsigned char a;
-
-  //  //Loop as many as connected buttons
-  //  for (a = 0; a < NBR_BUTTON; a++)
-  //  {
   if (button_state[butt] != old_button_state[butt]) { // has Button state changed ?
     // Don't forget to hold the state of the button for next time :
     old_button_state[butt] = button_state[butt];
@@ -324,6 +315,7 @@ void DIN_NotifyChange(void)
 void TestMode(void)
 {
   inTest = true;
+  
   for (unsigned char i = 0; i < NBR_LED; ++i)
   {
     SR.Led_Pin_Write(i, 0); // éteint toutes les LEDS

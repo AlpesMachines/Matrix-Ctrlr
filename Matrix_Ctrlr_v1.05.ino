@@ -92,7 +92,7 @@ bool appflag_updateDisplay;
 #define DEBUG_TRIG2 0
 #define DEBUG_LCD 0
 #define DEBUG_factory 0
-#define DEBUG_wizz 1
+#define DEBUG_wizz 0
 
 #define RX1_pin 19
 #define ANALOG_INPUTS_ACTIVE 1 // set to 0 for defective unit (accident coffre 206)
@@ -416,7 +416,6 @@ void loop() {
   if (DIGITAL_INPUTS_ACTIVE)
     ReadDigital();
 
-
   //-------------------------------------------------------//
   //SAMPLING, TESTING THRESHOLD AND SENDS MIDI//
   //-------------------------------------------------------//
@@ -440,9 +439,6 @@ void loop() {
   //READING TRIGGER (ext CV Gate)
   //------------------------------------------------------//
   Triggers();
-
-
-
 
   //-------------------------------------------------------//
   //RECALL INIT//
@@ -475,12 +471,6 @@ void timer1Isr()
   LivePanel_BlinkLFOs();
 }
 
-//void timer3Isr()
-//{
-//  tempoClock();
-//
-//}
-
 /////////////////////////////////////////////////////////////////////////////
 // This function is called in the mainloop when nothing else is to do
 /////////////////////////////////////////////////////////////////////////////
@@ -496,8 +486,8 @@ void Tick(void)
 
 /////////////////////////////////////////////////////////////////////////////
 // This function reboot arduino board (RISKY)
-/////////////////////////////////////////////////////////////////////////////
 // https://arduino103.blogspot.fr/2013/06/comment-un-reset-darduino-par-logiciel.html
+/////////////////////////////////////////////////////////////////////////////
 void software_Reboot()
 {
   // reboot system :
@@ -509,12 +499,10 @@ void software_Reboot()
   lcd.setCursor(0, 0);
   lcd.print(F(" --SYSTEM REBOOT-- "));
 
-
   wdt_enable(WDTO_1S);
 
   while (1)
   {
-
   }
 }
 

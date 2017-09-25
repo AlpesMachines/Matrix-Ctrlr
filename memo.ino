@@ -2,7 +2,7 @@
    memo.ino
    Manage read/write into external/internal EEPROM 24LC512 Microchip
 
-   Created by Julien VOIRIN on 07/02/11.
+   Created by Julien VOIRIN on 07/02/11. on midibox plateform
    Copyright 2017 Alpes Machines. All rights reserved.
 
 */
@@ -30,52 +30,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // the patch structure (could also be located somewhere else, depending on
 // where and how you are storing values in RAM)
-//unsigned char patch_structure[134];
-//unsigned char unisondetune_structure[1];
-//unsigned char arp_structure[20];
-//unsigned char seq_structure[64];
-//unsigned char patch_structure[219]; //RAM 134+1+20+64=219
 unsigned char dataPage[128]; // ext EEPROM
-/*
-  /////////////////////////////////////////////////////////////////////////////
-  // This function returns a byte from structure in RAM
-  /////////////////////////////////////////////////////////////////////////////
-  unsigned char PATCH_ReadByte(unsigned char addr)
-  {
-  return patch_structure[addr];
-  }
-  unsigned char UNISONDETUNE_ReadByte(unsigned char addr)
-  {
-  return unisondetune_structure[addr];
-  }
-  unsigned char ARP_ReadByte(unsigned char addr)
-  {
-  return arp_structure[addr];
-  }
-  unsigned char SEQ_ReadByte(unsigned char addr)
-  {
-  return seq_structure[addr];
-  }
-  /////////////////////////////////////////////////////////////////////////////
-  // This function writes a byte into structure in RAM
-  /////////////////////////////////////////////////////////////////////////////
-  void PATCH_WriteByte(unsigned char addr, unsigned char bite)
-  {
-  patch_structure[addr] = bite;
-  }
-  void UNISONDETUNE_WriteByte(unsigned char addr, unsigned char bite)
-  {
-  unisondetune_structure[addr] = bite;
-  }
-  void ARP_WriteByte(unsigned char addr, unsigned char bite)
-  {
-  arp_structure[addr] = bite;
-  }
-  void SEQ_WriteByte(unsigned char addr, unsigned char bite)
-  {
-  seq_structure[addr] = bite;
-  }
-*/
+
 /////////////////////////////////////////////////////////
 // This function read a patch stored into BS
 // This function loads the patch structure from EEPROM/BankStick
@@ -137,9 +93,6 @@ unsigned char PATCH_Load(unsigned char bank, unsigned char patch)
   return 1;
 
 }
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // This function stores the patch structure into EEPROM/BankStick
@@ -373,8 +326,6 @@ void Write_Patch_To_BS(unsigned char device, unsigned char bank, unsigned char p
   for ( j = 0; j < 134; j++)
     EditBufferOrig[j] = EditBuffer[device][j];
 
-
-
   // unison detune
 #if GliGliON
   UnisonDetuneOrig = UnisonDetune[device];
@@ -456,22 +407,9 @@ void Write_Bank_To_BS(unsigned char device, unsigned char bank, unsigned char pa
   // when GET, set this section. Using a tag like MIDI_REceivingBank wouldn't work
   // when uploading bank from computer :
   // INIT, to load the default into Orig, then dump Matrix6 sysex bank from the computer
-  // If dumping Matrix Ctrlr bank, don't INIT. in order : arp, unison, seq, patch
-  /*
-    // default unison detune
-    UnisonDetuneOrig = 0;
+  // If dumping Matrix Ctrlr bank, don't INIT.
+  // in order : arp, unison, seq, patch
 
-    // arp parameters default
-    for ( j = 0; j < 20; j++)
-      ArpParametersOrig[j] = pgm_read_byte_near (&Default_ArpParameters[j][0]);
-
-    //sequence default (Carpenter)
-    for ( j = 0; j < 32; j++)
-    {
-      sequenceOrig[2 * j + 0] = pgm_read_byte_near (&Default_Sequence[3][32][0]);
-      sequenceOrig[2 * j + 1] = pgm_read_byte_near (&Default_Sequence[3][32][1]);
-    }
-  */
   PATCH_Store(bank, patch, PAGING);
 
   //          for (unsigned char i = 0; i < 128; i++)
@@ -490,7 +428,6 @@ void Write_Bank_To_BS(unsigned char device, unsigned char bank, unsigned char pa
 ////////////////////////////////////////////////////////////////////////////
 void Write_Bank_To_BS2(unsigned char device, unsigned char bank, unsigned char patch)
 {
-
   for (unsigned char i = 8; i < 134; i++)
     dataPage[i - 8] = EditBuffer[device][i]; // data of EditBuffer[device]
 
@@ -498,7 +435,6 @@ void Write_Bank_To_BS2(unsigned char device, unsigned char bank, unsigned char p
     mem_1.writePage(patch + (bank * 100), dataPage );
   else
     mem_3.writePage(patch +  ((bank - 5) * 100), dataPage );
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -515,7 +451,7 @@ void Write_Default_Patchname(unsigned char device, unsigned char bank, unsigned 
   {
 
     /*
-         // patch name chars 0-7
+      // patch name chars 0-7
       0x4f, // O
       0x42, // B
       0x45, // E
@@ -950,10 +886,8 @@ unsigned char Check_IntEEPROM_Format(void)
   {
     Serial.println(F("Check_IntEEPROM_Format()/ match !"));
     return 0;
-
   }
 }
-
 
 //////////////////////////////////////////////////////////////////
 // Check external 24xx512 eeproms have been formatted
@@ -969,19 +903,9 @@ unsigned char Check_ExtEEPROM_Format(unsigned char eeprom)
       mem_1.readPage(511, dataPage);
       break;
 
-    case 1:
-      //mem_2.readPage(511, dataPage);
-      break;
-
     case 2:
       Serial.print(F("mem_3 / "));
       mem_3.readPage(511, dataPage);
-
-      break;
-
-    case 3:
-      //mem_4.readPage(511, dataPage);
-
       break;
 
     default:

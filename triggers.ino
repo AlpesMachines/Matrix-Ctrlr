@@ -1,6 +1,4 @@
 
-
-
 bool triggerInput;
 bool previousTriggerInput;
 
@@ -34,7 +32,6 @@ void Triggers()
     triggerInput = true;
   }
   
-
   // state machine : launch player ///////////////////////////////
   // http://www.doepfer.de/faq/gen_faq.htm#Sync
   //////// case SYNC24 ////////////////////////////////////////////////
@@ -128,3 +125,4 @@ void Triggers()
   previousTriggerInput = triggerInput;
   previousAnalogClock = analogClock;
 }
+

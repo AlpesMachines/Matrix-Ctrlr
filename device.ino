@@ -9,8 +9,6 @@
 //#include "memo.h"
 #include <EEPROM.h>
 
-
-
 //matrix_model_t matrix_model;
 bool matrix_model_A;
 bool matrix_model_B;
@@ -43,14 +41,6 @@ void Device_Init(unsigned char device)
     MIDI_EnterRemoteEditMode(INTERFACE_SERIAL);
     
   Show_Selected_Device(device);
-
-//  SendEditBuffer(device);
-//  
-//  //  ChooseEditBufferOrig(device);
-//  //  CopyEditBufferOrigToEditBuffer(device);
-//  UpdateDinStates();
-
-
 
 #if DEBUG_device
   Serial.print(F("Device_Init() "));
@@ -233,7 +223,6 @@ void ChooseEditBufferOrig(unsigned char device)
 #endif
 
   Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
-  //CopyEditBufferOrigToEditBuffer(device);
 }
 
 void ChooseUnisonDetuneOrig(unsigned char device)

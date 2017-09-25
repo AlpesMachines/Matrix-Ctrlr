@@ -3,12 +3,6 @@
   http://www.synthzone.com/midi/oberheim/Matrix6/
 
 
-
-
-
-
-
-
   Oberheim Matrix 6/6R MIDI/SYSEX
   Introduction
   This document describes the MIDI implementation of the Matrix-6 6-Voice

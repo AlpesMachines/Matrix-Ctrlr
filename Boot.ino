@@ -168,7 +168,6 @@ void Boot(void)
   SoftPanel_Init();
   UpdateDinStates();
 
-
   Serial.println(F("End of Boot.")); Serial.println();
 
 }

@@ -1,18 +1,6 @@
 #ifndef pots_h
 #define pots_h
-/*
-  typedef struct {
-  const  char description[17];
-  const unsigned char param;
-  const unsigned char Min;
-  const unsigned char Max;
-  const unsigned char valtype;
-  const unsigned char update_interval;
-  } pots;
 
-
-  extern const pots PotConfigMap[NBR_POT];
-*/
 typedef struct {
 //  const  char description[17];
   const unsigned char param;

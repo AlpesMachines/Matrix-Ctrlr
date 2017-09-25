@@ -2,7 +2,7 @@
     memo.h
 
 
-    Created by Julien VOIRIN on 07/02/11.
+    Created by Julien VOIRIN on 07/02/11. on midibox plateform
     Copyright 2011 __MyCompanyName__. All rights reserved.
 
 */

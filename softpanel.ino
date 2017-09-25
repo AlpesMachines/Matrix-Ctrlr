@@ -4,18 +4,8 @@
 #include "chaosmatrix.h"
 #include "midi.h"
 #include "softpanel.h"
-//#include "encoders.h"
 #include "memo.h"
 #include "EEPROM.h"
-
-//#include "ui_envelopes.h"
-//#include "ui_oscillators.h"
-//#include "ui_filter.h"
-//#include "ui_keyboard.h"
-//#include "ui_matrix.h"
-//#include "ui_patch.h"
-//#include "ui_edit.h"
-//#include "ui_arp.h"
 
 SoftPanel_t SoftPanel;
 enum PanelMode_t getpanelmode();
@@ -67,7 +57,6 @@ void SoftPanel_Init()
 /////////////////////////////////////////////////////////////////////////////
 void SoftPanel_DisplayHandler()
 {
-
   if (SoftPanel.Mode != SoftPanel.LastMode || SoftPanel.LastPage != SoftPanel.Page || RefreshSoftPanel)
   {
     SoftPanel.IsNewPage = 1;
@@ -120,9 +109,7 @@ void SoftPanel_DisplayHandler()
   SoftPanel.LastMode = SoftPanel.Mode;
   SoftPanel.LastPage = SoftPanel.Page;
   SoftPanel.IsNewPage = 0;
-
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //  Sends MIDI and updates EditBuffer[device]
@@ -240,13 +227,11 @@ void set_panelmode_led()
   }
 }
 
-
 /////////////////////////////////////////////////////////////////////////////
 //  These buttons keep track of which displayed paramter will be edited by the encoder
 /////////////////////////////////////////////////////////////////////////////
 void scan_edit_buttons()
 {
-
   switch (SoftPanel.Button)
   {
     case SOFT_EDIT_1:
@@ -291,8 +276,8 @@ void scan_edit_buttons()
 
     default:
       break;
-
   }
+  
 #if(DEBUG_softpanel)
   Serial.print(F("scan_edit_buttons()/ SoftPanel.EditButton : ")); Serial.println(SoftPanel.EditButton, DEC);
 #endif
@@ -322,13 +307,6 @@ enum PanelMode_t getpanelmode()
     case DIN_CFG:
       mode = Cfg;
       break;
-
-//        case DIN_MATRIX_A:
-//        case DIN_MATRIX_B:
-//        case DIN_MATRIX_C:
-//        case DIN_MATRIX_D:
-//          mode = Device;
-//          break;
 
     default:
       break;

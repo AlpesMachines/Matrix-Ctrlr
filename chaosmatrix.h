@@ -323,12 +323,7 @@
 #define SIGNED7     3
 #define MIXBALANCE  4
 
-
-
-
-
 //extern const unsigned char DefaultEditBuffer[134];
-
 
 extern unsigned char EditBuffer[4][134]; // was 134 bytes originally, now 4x134
 extern unsigned char EditBufferOrig[134]; // for the compare function

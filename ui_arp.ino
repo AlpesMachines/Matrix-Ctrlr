@@ -310,11 +310,7 @@ unsigned char ui_TrspB;
 
 
 /////////////////////////////////////////////////////////////////////////////
-//  Display Arp pages,
-// page 1
-// page 2
-// page 3
-// page 4
+//  Display Arp pages,// page 1// page 2// page 3// page 4
 /////////////////////////////////////////////////////////////////////////////
 void UI_Display_Arp()
 {
@@ -556,7 +552,6 @@ void UI_Display_Arp()
         DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);    // led off
 
 
-
       lcd.setCursor(4, 1);
       if (ui_seqRec)
       {
@@ -686,7 +681,6 @@ void UI_Display_Arp()
         DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
       else
         DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
-
 
 
       lcd.setCursor(4, 1); // activate the arp router
@@ -949,7 +943,6 @@ void UI_Handle_Arp()
         ui_aSpeedGateGrooveLimits();
         if (ui_aOctave > 5)
           ui_aOctave = 1;
-
     }
     // rules :
     if (arp_div_index == 255) arp_div_index = 0;
@@ -1143,13 +1136,6 @@ void ui_aSpeedGateGrooveLimits()
   if (arp_div_index > 254) arp_div_index = 254;
   if (arp_div_index == 255) arp_div_index = 0;
 
-  //  if (ui_aGate > ui_aSpeed) ui_aGate = ui_aSpeed; //= ui_aSpeed - 1
-  //  if (ui_aGate == 0) ui_aGate = 1;
-  //  if (ui_aGate > 144) ui_aGate = 144;
-  //
-  //  if (ui_aGroove >= (ui_aGate - 1)) ui_aGroove = ui_aGate - 1;
-  //  if (ui_aGroove == 255) ui_aGroove = 0;
-
 #if DEBUG_ARP
   Serial.println(F("ui_aSpeedGateGrooveLimits() happened"));
 #endif
@@ -1168,7 +1154,6 @@ void Reset_UI_ARP(void)
     Release_aChordLatch(true);
 
   ui_aHold = false;
-  //arpN = 0;
 
   Active_Arp(false);
 
@@ -1178,11 +1163,6 @@ void Reset_UI_ARP(void)
   ui_toggleSeq = false;
   seqTick = 0;
   ui_seqPlay = ui_seqRec = false;
-
-  //Init_aChord();
-  //Init_Seq();
-
-  //arpN = 0;
 
 }
 
@@ -1203,12 +1183,6 @@ char SetEncoderValueARP(unsigned char *value, unsigned char max)
     if (arp_div_index < 1) arp_div_index = 1;
     if (arp_div_index > 254) arp_div_index = 254;
 
-    //    if (ui_aGate > ui_aSpeed) ui_aGate = ui_aSpeed - 1;
-    //    if (ui_aGate == 0) ui_aGate = 1;
-    //    if (ui_aGate > 144) ui_aGate = 144;
-    //
-    //    if (ui_aGroove >= (ui_aGate - 1)) ui_aGroove = ui_aGate - 1;
-    //    if (ui_aGroove == 255) ui_aGroove = 0;
     return 1;
   }
   else
@@ -1224,20 +1198,12 @@ int SetEncoderValue2ARP(unsigned int *value, unsigned int max)
   if ((*value > 0 && *value < max) || (*value == 0 && SoftPanel.EncoderValue == 1) || (*value == max && SoftPanel.EncoderValue < 0))
   {
     *value += SoftPanel.EncoderValue;
-    //    if (Shift)
-    //      *value = *value + 9;
 
     ui_aSpeed = arp_div[arp_div_index];
 
     if (arp_div_index > 13) arp_div_index = 0;
     if (arp_div_index == 255) arp_div_index = 13;
 
-    //    if (ui_aGate > ui_aSpeed) ui_aGate = ui_aSpeed - 1;
-    //    if (ui_aGate == 0) ui_aGate = 1;
-    //    if (ui_aGate > 144) ui_aGate = 144;
-    //
-    //    if (ui_aGroove >= (ui_aGate - 1)) ui_aGroove = ui_aGate - 1;
-    //    if (ui_aGroove == 255) ui_aGroove = 0;
     return 1;
   }
   else

@@ -916,14 +916,5 @@ void SEQ2(bool trig)
 #endif
     }
   }
-
-  //  // increment the tick of seq
-  //  ++seqTick;
-  //
-  //  // loop reset :
-  //  if (seqTick == (sGate + sGate)) // modulé par ui_aSpeed (=24) arp_div[arp_div_index] // non ! on fixe la durée de note et le reset se fera au double. travailler sur les gates plutot
-  //  {
-  //    seqTick = 0;
-  //  }
-
 }
+

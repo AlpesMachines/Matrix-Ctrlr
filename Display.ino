@@ -1,5 +1,4 @@
 #include "Display.h"
-
 #include "define.h"
 #include "pots.h"
 #include "softpanel.h"

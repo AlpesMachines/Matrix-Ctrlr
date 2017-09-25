@@ -242,10 +242,7 @@ void UI_Display_Cfg()
         case 1: lcd.print(F("B:Range  rCH tCH Trp")); break;
         case 2: lcd.print(F("C:Range  rCH tCH Trp")); break;
         case 3: lcd.print(F("D:Range  rCH tCH Trp")); break;
-          // case 0: lcd.print(F("rCH LoA TrpA HiA tCH")); break;
-          //        case 1: lcd.print(F("rCH LoB TrpB HiB tCH")); break;
-          //        case 2: lcd.print(F("rCH LoC TrpC HiC tCH")); break;
-          //        case 3: lcd.print(F("rCH LoD TrpD HiD tCH")); break;
+
       }
 
       //2nd line
@@ -667,7 +664,6 @@ void UI_Handle_Cfg()
         SetEncoderValue(&MIDI_CHANNEL, 16);
       }
     }
-
   }
 
   else if (SoftPanel.Page == SOFT_PAGE21)  // cfg page 21 //////////////////////////////////////////////////// CFG/MID Page 2 //////////////////
@@ -724,10 +720,6 @@ void UI_Handle_Cfg()
       if (SoftPanel.EditButton == Edit4) {
         SetEncoderValue(&GlobalParameters[20], 120);
       }
-      //      if (SoftPanel.EditButton == Edit5) {
-      //        SetEncoderValue(&GlobalParameters[13], 1);
-      //      }
-
       else
         return;
       // ceci deconne et ne met pas à jour en temps réel les valeurs des Globalparam :
@@ -816,7 +808,6 @@ void UI_Handle_Cfg()
       else
         return;
 
-
 #if DEBUG
       // do stuff
 #endif
@@ -865,23 +856,8 @@ void UI_Handle_Cfg()
     }
     // encoder : set toto
     // toto += SoftPanel.EncoderValue;
-    if (SoftPanel.EncoderValue != 0) {
-      //      if (SoftPanel.EditButton == Edit1) {
-      //        SetEncoderValue(&ZONE[Z_TRANSPOSE_1], 10);
-      //      }
-      //      if (SoftPanel.EditButton == Edit2) {
-      //        SetEncoderValue(&ZONE[Z_TRANSPOSE_2], 10);
-      //      }
-      //      if (SoftPanel.EditButton == Edit3) {
-      //        SetEncoderValue(&ZONE[Z_TRANSPOSE_3], 10);
-      //      }
-      //      if (SoftPanel.EditButton == Edit4) {
-      //        SetEncoderValue(&ZONE[Z_TRANSPOSE_4], 10);
-      //      }
-      //    }
-      //      else
-      //        return;
-
+    if (SoftPanel.EncoderValue != 0)
+    {
 #if DEBUG
       // do stuff
 #endif
@@ -890,7 +866,6 @@ void UI_Handle_Cfg()
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
   }
-
   else if (SoftPanel.Page == SOFT_PAGE3) { /// cfg page 3 ////////////////// CFG/MISC page //////////////////
     switch (SoftPanel.Button)
     {
@@ -956,26 +931,7 @@ void UI_Handle_Cfg()
         SoftPanel.Page = SOFT_PAGE1;
         break;
 
-      case SOFT_EDIT_1: //
-        // do  stuff
-        break;
-
-      case SOFT_EDIT_2: //
-        break;
-
-      case SOFT_EDIT_3:
-        break;
-
-      case SOFT_EDIT_4: //
-        break;
-
-      case SOFT_EDIT_5: //
-        break;
-
-      case SOFT_EDIT_INC: //
-        break;
-
-      case SOFT_EDIT_DEC: //
+      default:
         break;
     }
     // encoder : set toto
@@ -1022,12 +978,6 @@ void UI_Handle_Cfg()
       case SOFT_EDIT_5: //
         encoder_inverted = !encoder_inverted;
         EEPROM.update(EEPROM_ENCODER_INVERTED, encoder_inverted);
-        break;
-
-      case SOFT_EDIT_INC: //
-        break;
-
-      case SOFT_EDIT_DEC: //
         break;
 
       default:
@@ -1083,10 +1033,7 @@ void UI_Handle_Cfg()
         SendCtrlrSystemCfg(INTERFACE_SERIAL3);
         break;
 
-      case SOFT_EDIT_INC: //
-        break;
-
-      case SOFT_EDIT_DEC: //
+      default:
         break;
     }
     // encoder : set toto
@@ -1100,8 +1047,5 @@ void UI_Handle_Cfg()
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
   }
-
 }
-
-
 

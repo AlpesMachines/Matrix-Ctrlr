@@ -380,14 +380,13 @@ void UI_Handle_Oscillators()
             MIDI_SendVoiceParam(INTERFACE_SERIAL, param, EditBuffer[device][EB_LfoMap[SoftPanel.Selected_LFO].RetriggerPoint], true);
 
             break;
+            
           default:
             break;
         }
       }
-
       break;
   }
-
 }
 
 

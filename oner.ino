@@ -6,18 +6,6 @@
 // ZONE : Split a single channel into 4 channels with Limits LM_Z
 // (could be assigned to ui_variables)
 ///////////////////////////////////////////////////////////
-// those defines could be assigned to user variables :
-//#define Z_ACTIVE 0
-//#define Z_MIDI_CHANNEL 1
-//#define Z_LM1 2 // midi note number (pitch)
-//#define Z_LM2 3
-//#define Z_LM3 4
-//#define Z_TRANSPOSE_1 5 // in semitons. Here : +3 octaves
-//#define Z_TRANSPOSE_2 6
-//#define Z_TRANSPOSE_3 7
-//#define Z_TRANSPOSE_4 8
-//#define Z_TRANSPOSE_MIDDLE 5 // 5 octav x 12 semitons = 60
-
 const unsigned char defaultZONE[4][5] PROGMEM =
 { //rCH, Lo, transpose, Hi, tCH
   {1, 0, 5, 127, 1}, // zone A
@@ -109,7 +97,6 @@ void ZONE_Save(void)
   }
 
   EEPROM.update(EEPROM_Z_ACTIVE, zActive);
-  //return ;
 }
 
 ///////////////////////////////////////////////////////////

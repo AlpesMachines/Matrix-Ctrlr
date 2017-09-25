@@ -29,12 +29,6 @@ const envelopemap_t EB_EnvelopeMap[NUM_ENVS] =
   {EB_ENV3_TRIGGERMODE, EB_ENV3_DELAY, EB_ENV3_ATTACK, EB_ENV3_DECAY, EB_ENV3_SUSTAIN, EB_ENV3_RELEASE, EB_ENV3_AMPLITUDE, EB_ENV3_LFOTRIGGERMODE, EB_ENV3_RELEASEMODE, EB_ENV3_AMPBYVELO },
 };
 
-//extern const envelopemap_t EB_EnvelopeMap[NUM_ENVS];
-//void handle_envelopes(void);
-//void handle_envelopes_page1(void);
-//void handle_envelopes_page2(void);
-//void handle_envelopes_page3(void);
-
 /*
     ENVELOPES PAGE 1
     []  []   [ ]  []  []
