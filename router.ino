@@ -97,7 +97,7 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
 #endif
       }
       else // normal behaviour : play notes thru
-        MIDI1.sendNoteOff(pitch, velocity, channel); // ***
+        //MIDI1.sendNoteOff(pitch, velocity, channel); // ***
       return;
 
     }
@@ -155,7 +155,7 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
 #endif
       }
       else // normal behaviour : play notes thru
-        MIDI1.sendNoteOff(pitch, velocity, channel); // ***
+        //MIDI1.sendNoteOff(pitch, velocity, channel); // *** double noteoff dans midimonitor donc commentaire necessaire (voir*** plus haut)
       return;
     }
   }
