@@ -385,7 +385,7 @@ void MIDI_SendDelayedVoiceParam(unsigned char param, unsigned char value)
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_HandleDelayedVoiceParam(unsigned char interface, bool midiThru)
 {
-  /*
+
   byte sysex[] = {0xf0, 0x10, 0x06, 0x06, last_delayed_enc_param, last_delayed_enc_value, 0xf7};
 
   if (!param_in_queue)
@@ -428,7 +428,7 @@ void MIDI_HandleDelayedVoiceParam(unsigned char interface, bool midiThru)
       default:
         break;
     }
-   //    update_EditBuffer(device, last_delayed_enc_param, last_delayed_enc_value);
+    //    update_EditBuffer(device, last_delayed_enc_param, last_delayed_enc_value);
     encoder_send_counter = 0;
     param_in_queue = 0;
 
@@ -450,39 +450,7 @@ void MIDI_HandleDelayedVoiceParam(unsigned char interface, bool midiThru)
 #if DEBUG_midi
   Serial.print(F("MIDI_HandleMatrixModTransmitDelay()/")); Serial.print (F(" interface = ")); Serial.println(interface, HEX);
 #endif
-*/
-  
-  
-  // byte sysex[] = {0xf0, 0x10, 0x06, 0x06, last_delayed_enc_param, last_delayed_enc_value, 0xf7};
 
-  if (!param_in_queue)
-    return;
-
-  if (encoder_send_counter > 300)   // delay about a 3rd second 5120
-  {
-    switch (interface)
-    {
-
-
-      default:
-        break;
-    }
-    //    update_EditBuffer(device, last_delayed_enc_param, last_delayed_enc_value);
-    encoder_send_counter = 0;
-    param_in_queue = 0;
-
-    
-  }
-
-  encoder_send_counter++;
-
-#if DEBUG_matrix
-  Serial.print(F("inside MIDI_HandleMatrixModTransmitDelay(), encoder_send_counter = ")); Serial.println(encoder_send_counter);
-#endif
-
-#if DEBUG_midi
-  Serial.print(F("MIDI_HandleMatrixModTransmitDelay()/")); Serial.print (F(" interface = ")); Serial.println(interface, HEX);
-#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -501,17 +469,17 @@ void MIDI_SendVoiceParam(unsigned char interface, unsigned char param, unsigned 
   // don't send the same message twice in a row
   if (param != lastparam || value != lastvalue)
   {
-//    //update_EditBuffer(device, param, value);
-//    switch (interface)
-//    {
-//      case  INTERFACE_SERIAL1: update_EditBuffer(Matrix_Device_A, param, value); break;
-//      case  INTERFACE_SERIAL2: update_EditBuffer(Matrix_Device_B, param, value); break;
-//#if SOFTSERIAL_ENABLED
-//      case  INTERFACE_SERIAL4: update_EditBuffer(Matrix_Device_C, param, value); break;
-//      case  INTERFACE_SERIAL5: update_EditBuffer(Matrix_Device_D, param, value); break;
-//#endif
-//      default: break;
-//    }
+    //    //update_EditBuffer(device, param, value);
+    //    switch (interface)
+    //    {
+    //      case  INTERFACE_SERIAL1: update_EditBuffer(Matrix_Device_A, param, value); break;
+    //      case  INTERFACE_SERIAL2: update_EditBuffer(Matrix_Device_B, param, value); break;
+    //#if SOFTSERIAL_ENABLED
+    //      case  INTERFACE_SERIAL4: update_EditBuffer(Matrix_Device_C, param, value); break;
+    //      case  INTERFACE_SERIAL5: update_EditBuffer(Matrix_Device_D, param, value); break;
+    //#endif
+    //      default: break;
+    //    }
 #if DEBUG_matrix
     Serial.println(F("inside MIDI_SendVoiceParam()"));
 #endif
@@ -701,8 +669,11 @@ void MIDI_HandleMatrixModTransmitDelay(unsigned char interface)
     MIDI3.sendSysEx (sizeof(sysex), sysex, true); // first the sysex
     //MIDI3.sendControlChange ( 110 + last_mmbus, last_mmval, MIDI_CHANNEL + interface - 1); // 10 buses -> 119 OK then a CC
     // send a Cc corresponding to sysex. on CORE out. message is based on interface_serial: OK 1.02a 28/8/17
-    switch (interface)
-    {
+    // 27/09/17 using those CC will conflict with singlePatchDataFormatX[] when XCc
+    // let comment until a new solution is found :
+    /*
+      switch (interface)
+      {
       case INTERFACE_SERIAL1:
         MIDI3.sendControlChange ( 110 + last_mmbus, last_mmval, MIDI_CHANNEL);
         break;
@@ -719,7 +690,8 @@ void MIDI_HandleMatrixModTransmitDelay(unsigned char interface)
         MIDI3.sendControlChange ( 110 + last_mmbus, last_mmval, MIDI_CHANNEL + 3);
         break;
       default: break;
-    }
+      }
+    */
     encoder_send_counter = 0;
     mmod_in_queue = 0;
   }

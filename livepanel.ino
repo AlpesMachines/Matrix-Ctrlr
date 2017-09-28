@@ -422,7 +422,11 @@ void LivePanel_HandleAin(unsigned char pin , unsigned char pin_value)
 
   update_EditBuffer(device, param, value); //mis a jour dans la fct suivante
 
-  MIDI_SendVoiceParam(INTERFACE_SERIAL, param, value, mThru_XCc);
+  if (param == SX_PORTAMENTO_SPEEDBYVELOCITY) // Alt Pot PORTA/VELO is sloooooow
+    MIDI_SendDelayedVoiceParam(param, value);
+  else
+    MIDI_SendVoiceParam(INTERFACE_SERIAL, param, value, mThru_XCc);
+
   LivePanel_DisplayAin(pin, value);
 
   // filter sustain is bugged, handle it here, and return
