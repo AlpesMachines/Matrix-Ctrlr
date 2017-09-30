@@ -28,6 +28,113 @@
 #define KBDMODE_REAROB 3
 #define DEFAULT_KBD_MODE KBDMODE_REASSIGN
 
+#define CC_PATCHNAME0   255
+#define CC_PATCHNAME1   255
+#define CC_PATCHNAME2   255
+#define CC_PATCHNAME3   255
+#define CC_PATCHNAME4   255
+#define CC_PATCHNAME5   255
+#define CC_PATCHNAME6   255
+#define CC_PATCHNAME7   255
+#define CC_KEYBOARD_MODE  8
+#define CC_OSC1_FREQ      9
+#define CC_OSC1_WAVESHAPE   10
+#define CC_OSC1_PULSEWIDTH    11
+#define CC_OSC1_LEVERMOD    12
+#define CC_OSC1_WAVEFORM    13
+#define CC_OSC2_FREQ      14
+#define CC_OSC2_WAVESHAPE   15
+#define CC_OSC2_PULSEWIDTH    16
+#define CC_OSC2_LEVERMOD    17
+#define CC_OSC2_WAVEFORM    18
+#define CC_OSC2_DETUNE      19
+#define CC_MIX        20
+#define CC_OSC1_KEYBOARDMOD   21
+#define CC_OSC1_CLICK     22
+#define CC_OSC2_KEYBOARDMOD   23
+#define CC_OSC2_CLICK     24
+#define CC_OSC_SYNCMODE     25
+#define CC_FILTER_FREQ      26
+#define CC_FILTER_RESONANCE   27
+#define CC_FILTER_LEVERMOD    28
+#define CC_FILTER_KEYBOARDMOD         29
+#define CC_FILTER_FM_AMOUNT   30
+#define CC_VCA1_AMOUNT   111   
+#define CC_PORTAMENTO_RATE    112
+#define CC_PORTAMENTO_MODE    33
+#define CC_PORTAMENTO_LEGATOENABLE  34
+#define CC_LFO1_SPEED     35
+#define CC_LFO1_TRIGGERMODE   36
+#define CC_LFO1_LAGENABLE   37
+#define CC_LFO1_WAVESHAPE   38
+#define CC_LFO1_RETRIGGERPOINT          39
+#define CC_LFO1_SAMPLEDSOURCE         40
+#define CC_LFO1_AMPLITUDE   41
+#define CC_LFO2_SPEED     42
+#define CC_LFO2_TRIGGERMODE   43
+#define CC_LFO2_LAGENABLE   44
+#define CC_LFO2_WAVESHAPE   45
+#define CC_LFO2_RETRIGGERPOINT          46
+#define CC_LFO2_SAMPLEDSOURCE         47
+#define CC_LFO2_AMPLITUDE   48
+#define CC_ENV1_TRIGGERMODE   49
+#define CC_ENV1_DELAY     50
+#define CC_ENV1_ATTACK      51
+#define CC_ENV1_DECAY     52
+#define CC_ENV1_SUSTAIN     53
+#define CC_ENV1_RELEASE     54
+#define CC_ENV1_AMPLITUDE   55
+#define CC_ENV1_LFOTRIGGERMODE          56
+#define CC_ENV1_RELEASEMODE   57
+#define CC_ENV2_TRIGGERMODE   58
+#define CC_ENV2_DELAY     59
+#define CC_ENV2_ATTACK      60
+#define CC_ENV2_DECAY     61
+#define CC_ENV2_SUSTAIN     62
+#define CC_ENV2_RELEASE     63
+#define CC_ENV2_AMPLITUDE   110
+#define CC_ENV2_LFOTRIGGERMODE          65
+#define CC_ENV2_RELEASEMODE   66
+#define CC_ENV3_TRIGGERMODE   67
+#define CC_ENV3_DELAY     68
+#define CC_ENV3_ATTACK      69
+#define CC_ENV3_DECAY     70
+#define CC_ENV3_SUSTAIN     71
+#define CC_ENV3_RELEASE     72
+#define CC_ENV3_AMPLITUDE   73
+#define CC_ENV3_LFOTRIGGERMODE          74
+#define CC_ENV3_RELEASEMODE   75
+#define CC_TRACK_INPUT      76
+#define CC_TRACK_POINT1     77
+#define CC_TRACK_POINT2     78
+#define CC_TRACK_POINT3     79
+#define CC_TRACK_POINT4     80
+#define CC_TRACK_POINT5     81
+#define CC_RAMP1_RATE     82
+#define CC_RAMP1_MODE     83
+#define CC_RAMP2_RATE     84
+#define CC_RAMP2_MODE     85
+#define CC_OSC1_FREQBYLFO1AMOUNT         86
+#define CC_OSC1_PWBYLFO2AMOUNT          87
+#define CC_OSC2_FREQBYLFO1AMOUNT         88
+#define CC_OSC2_PWBYLFO2AMOUNT          89
+#define CC_FILTER_FREQBYENV1AMOUNT       90
+#define CC_FILTER_FREQBYPRESSURE         91
+#define CC_VCA1_AMPBYVELOCITY         92
+#define CC_VCA2_AMPBYENV2   93
+#define CC_ENV1_AMPBYVELO   113
+#define CC_ENV2_AMPBYVELO   95
+#define CC_ENV3_AMPBYVELO   109
+#define CC_LFO1_AMPMODULATION    108   // ramp1
+#define CC_LFO2_AMPMODULATION    107      // ramp2
+#define CC_PORTAMENTO_SPEEDBYVELOCITY   106
+#define CC_FILTER_FMBYENV3    105
+#define CC_FILTER_FMBYPRESSURE          104
+#define CC_LFO1_SPEEDMODULATION         102 // pressure
+#define CC_LFO2_SPEEDMODULATION         103 // keyboard tracking
+
+// Gligli OS116 additional parameter :
+#define CC_UNISON_DETUNE  94
 
 /*
     Oberheim Matrix 1000 sysex parameter numbers

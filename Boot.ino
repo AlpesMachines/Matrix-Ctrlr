@@ -37,7 +37,7 @@ void Boot(void)
 
 
   /////////////////////// check formatting ////////////////////////
-  
+
   // check 24LC512 as blank or formatted before previously
   if (Check_ExtEEPROM_Format(0) || Check_ExtEEPROM_Format(2))
     FORMAT_Memory(3);
@@ -46,7 +46,7 @@ void Boot(void)
   if ( Check_IntEEPROM_Format())
     FORMAT_Memory(4);
 
-    // automatically reboot if Formatting necessary
+  // automatically reboot if Formatting necessary
 
 
   /////////////////////// recall system config ////////////////////////
@@ -146,13 +146,12 @@ void Boot(void)
   lcd.setCursor(0, 1);
   lcd.print(F("-- all notes off --"));
 
-  // all notes off
-  MIDI1.sendControlChange(123, 0, MIDI_CHANNEL); //(tout le monde se tait)
-  MIDI2.sendControlChange(123, 0, MIDI_CHANNEL + 1); // all notes off
-  MIDI3.sendControlChange(123, 0, MIDI_CHANNEL + 2); // all notes off
+  // all notes off for Devices
+  MIDI1.sendControlChange(123, 0, MIDI_CHANNEL);
+  MIDI2.sendControlChange(123, 0, MIDI_CHANNEL + 1);
 #if SOFTSERIAL_ENABLED
-  MIDI4.sendControlChange(123, 0, MIDI_CHANNEL + 3); // all notes off
-  MIDI5.sendControlChange(123, 0, MIDI_CHANNEL + 4); // all notes off
+  MIDI4.sendControlChange(123, 0, MIDI_CHANNEL + 2);
+  MIDI5.sendControlChange(123, 0, MIDI_CHANNEL + 3);
 #endif
 
   // METTRE CES 3 lignes dans une fonction accessible depuis la page ARP afin d'initilaiser ARP&SEQ : done above
@@ -161,12 +160,13 @@ void Boot(void)
   //  Init_Seq();
 
   delay(200);
-  // on est prêt à démarrer :)
-  send_start = 1;
 
   // load softpanel (default display)
   SoftPanel_Init();
   UpdateDinStates();
+
+  // on est prêt à démarrer :)
+  send_start = send_tick = true;
 
   Serial.println(F("End of Boot.")); Serial.println();
 

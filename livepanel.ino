@@ -618,6 +618,8 @@ void update_EditBuffer(unsigned char device, unsigned char param, unsigned char 
     case SX_LFO1_SPEEDMODULATION  : EditBuffer[device][EB_LFO1_SPEEDMODULATION  ] = value; lastbyteindex = EB_LFO1_SPEEDMODULATION  ; break;
     case SX_LFO2_SPEEDMODULATION  : EditBuffer[device][EB_LFO2_SPEEDMODULATION  ] = value; lastbyteindex = EB_LFO2_SPEEDMODULATION  ; break;
     case SX_UNISON_DETUNE         : UnisonDetune[device]                          = value; lastbyteindex = EB_UNISON_DETUNE         ; break;
+
+    // Matrix Modulation is missing because is doesn't have SX_ parameters despite it has EB_
   }
 }
 

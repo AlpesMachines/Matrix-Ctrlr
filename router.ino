@@ -453,9 +453,6 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
         if (channel == MIDI_CHANNEL + 1)
           MIDI2.sendControlChange(94, value, channel);
 
-        //if(channel == MIDI_CHANNEL+8)
-        //     MIDI3.sendControlChange(controlNumber,value,channel);
-
 #if SOFTSERIAL_ENABLED
         if (channel == MIDI_CHANNEL + 2)
           MIDI4.sendControlChange(94, value, channel);
@@ -468,31 +465,31 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
       default:
         if (channel == MIDI_CHANNEL && mThru_XCc) // case A
         {
-          MIDI_SendVoiceParam(INTERFACE_SERIAL1, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][1]), value, false);
-          update_EditBuffer(Matrix_Device_A, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][1]), value); 
+          MIDI_SendVoiceParam(INTERFACE_SERIAL1, Translate_CC_SX(controlNumber), value, false);
+          update_EditBuffer(Matrix_Device_A, Translate_CC_SX(controlNumber), value); 
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 1) && mThru_XCc) // case B
         {
-          MIDI_SendVoiceParam(INTERFACE_SERIAL2, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][1]), value, false);
-          update_EditBuffer(Matrix_Device_B, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][3]), value);
+          MIDI_SendVoiceParam(INTERFACE_SERIAL2, Translate_CC_SX(controlNumber), value, false);
+          update_EditBuffer(Matrix_Device_B, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 2) && mThru_XCc) // case C
         {
-          MIDI_SendVoiceParam(INTERFACE_SERIAL4, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][1]), value, false);
-          update_EditBuffer(Matrix_Device_C, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][3]), value);
+          MIDI_SendVoiceParam(INTERFACE_SERIAL4, Translate_CC_SX(controlNumber), value, false);
+          update_EditBuffer(Matrix_Device_C, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 3) && mThru_XCc) // case D
         {
-          MIDI_SendVoiceParam(INTERFACE_SERIAL5, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][1]), value, false);
-          update_EditBuffer(Matrix_Device_D, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][3]), value);
+          MIDI_SendVoiceParam(INTERFACE_SERIAL5, Translate_CC_SX(controlNumber), value, false);
+          update_EditBuffer(Matrix_Device_D, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else
         { // echo (optional)
-          //MIDI_SendVoiceParam(INTERFACE_SERIAL3, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][2]), value, false);
+          if(localControl) MIDI3.sendControlChange(controlNumber,value,channel);
         }
         // legacy code :
         //        MIDI_SendVoiceParam(channel - MIDI_CHANNEL + 1, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][2]), value, false); // WORKING !!! 0.99r

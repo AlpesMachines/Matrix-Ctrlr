@@ -209,7 +209,7 @@ void UI_Handle_Filter()
     if (SoftPanel.Button == DIN_PAGE)
       SoftPanel.Page = SOFT_PAGE3;
 
-    if (SoftPanel.Button == SOFT_EDIT_5 && send_vcaenvelope == 1)
+    if (SoftPanel.Button == SOFT_EDIT_5 && send_vcaenvelope == 1 && FilterSustainMode != FILTER_ENV_MODE_BUGGED)
     {
       SendEditBuffer(device, INTERFACE_SERIAL);
       send_vcaenvelope = 0;
@@ -240,6 +240,7 @@ void UI_Handle_Filter()
           SetEncoder7Signed(&EditBuffer[device][EB_VCA2_AMPBYENV2]);
           param = SX_VCA2_AMPBYENV2;
           value = EditBuffer[device][EB_VCA2_AMPBYENV2];
+          MIDI_SendDelayedVoiceParam(param, value);
           send_vcaenvelope = 1; // can't send this as a single sysex... bugged. prompt user to send entire buffer instead
           break;
 
