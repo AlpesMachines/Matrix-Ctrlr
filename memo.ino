@@ -44,14 +44,14 @@ unsigned char PATCH_Load(unsigned char bank, unsigned char patch)
   if (bank < 5)
   {
 #if DEBUG_eeprom
-    Serial.print(F("Patch Load()/ (extEEPROM)/ paging / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F(", mem_12"));
+    Serial.print(F("Patch Load()/ (extEEPROM)/ paging / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F(", mem_02"));
 #endif
 
-    mem_1.readPage(patch + (bank * 100), dataPage); // mem1 page addr = 0 ... 511
+    mem_0.readPage(patch + (bank * 100), dataPage); // mem1 page addr = 0 ... 511
     for (i = 8; i < 134; i++)
       EditBufferOrig[i] = dataPage[i - 8]; // data of EditBufferOrig
 
-    mem_2.readPage(patch + (bank * 100), dataPage); // mem2 page addr = 0 ... 511
+    mem_1.readPage(patch + (bank * 100), dataPage); // mem2 page addr = 0 ... 511
     for (i = 0; i < 8; i++)
       EditBufferOrig[i] = dataPage[i]; // patchname of EditBufferOrig
 
@@ -69,14 +69,14 @@ unsigned char PATCH_Load(unsigned char bank, unsigned char patch)
   else
   {
 #if DEBUG_eeprom
-    Serial.print(F("Patch Load()/ (extEEPROM)/ paging / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F(", mem_34"));
+    Serial.print(F("Patch Load()/ (extEEPROM)/ paging / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F(", mem_24"));
 #endif
 
-    mem_3.readPage(patch + ((bank - 5) * 100), dataPage); // page addr = 0 ... 511
+    mem_2.readPage(patch + ((bank - 5) * 100), dataPage); // page addr = 0 ... 511
     for (i = 8; i < 134; i++)
       EditBufferOrig[i] = dataPage[i - 8]; // data
 
-    mem_4.readPage(patch + ((bank - 5) * 100), dataPage);
+    mem_3.readPage(patch + ((bank - 5) * 100), dataPage);
     for (i = 0; i < 8; i++)
       EditBufferOrig[i] = dataPage[i]; // patchname
 
@@ -112,9 +112,10 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
     if (bank < 5)
     {
       for (i = 8; i < 134; i++)
-        dataPage[i - 8] = EditBufferOrig[i]; // data of EditBuffer[device]
+        dataPage[i - 8] = EditBufferOrig[i]; // tone of EditBuffer[device]
+      dataPage[126] = dataPage[127] = 0; // free bytes
 
-      mem_1.writePage(patch + (bank * 100), dataPage );
+      mem_0.writePage(patch + (bank * 100), dataPage );
 
       for (i = 0; i < 8; i++)
         dataPage[i] = EditBufferOrig[i]; // patchname of EditBuffer[device]
@@ -129,19 +130,20 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
         dataPage[i + 29 + 32] = sequenceOrig[i][1];
       }
 
-      mem_2.writePage(patch + (bank * 100), dataPage );
+      mem_1.writePage(patch + (bank * 100), dataPage );
 
 #if DEBUG_eeprom
-      Serial.print(F("Patch Store()/ extEEPROM paging FAST / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F("/ mem_12"));
+      Serial.print(F("Patch Store()/ extEEPROM paging FAST / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F("/ mem_02"));
 #endif
 
     }
     else
     {
       for (i = 8; i < 134; i++)
-        dataPage[i - 8] = EditBufferOrig[i]; // data
+        dataPage[i - 8] = EditBufferOrig[i]; // tone
+      dataPage[126] = dataPage[127] = 0; // free bytes
 
-      mem_3.writePage(patch + ((bank - 5) * 100), dataPage );
+      mem_2.writePage(patch + ((bank - 5) * 100), dataPage );
 
       for (i = 0; i < 8; i++)
         dataPage[i] = EditBufferOrig[i]; // name
@@ -156,10 +158,10 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
         dataPage[i + 29 + 32] = sequenceOrig[i][1];
       }
 
-      mem_4.writePage(patch + ((bank - 5) * 100), dataPage );
+      mem_3.writePage(patch + ((bank - 5) * 100), dataPage );
 
 #if DEBUG_eeprom
-      Serial.print(F("Patch Store()/ extEEPROM/ paging FAST / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F("/ mem_34"));
+      Serial.print(F("Patch Store()/ extEEPROM/ paging FAST / offset = ")); Serial.print(patch + (bank * 100), DEC); Serial.println(F("/ mem_24"));
 #endif
 
     }
@@ -174,10 +176,10 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
         dataPage[i - 8] = EditBufferOrig[i]; // data of EditBuffer[device]
 
       for (i = 0; i < 128; i++)
-        mem_1.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
+        mem_0.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
 
 #if DEBUG_eeprom
-      Serial.print(F("Patch StoreBYTE() extEEPROM mem_1 offset = ")); Serial.println(bank * 100 * 128 + patch * 128 , DEC);
+      Serial.print(F("Patch StoreBYTE() extEEPROM mem_0 offset = ")); Serial.println(bank * 100 * 128 + patch * 128 , DEC);
 #endif
 
       for (i = 0; i < 8; i++)
@@ -194,10 +196,10 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
       }
 
       for (i = 0; i < 128; i++)
-        mem_2.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
+        mem_1.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
 
 #if DEBUG_eeprom
-      Serial.print(F("Patch StoreBYTE() extEEPROM mem_2 offset = ")); Serial.println(bank * 100 * 128 + patch * 128 , DEC);
+      Serial.print(F("Patch StoreBYTE() extEEPROM mem_1 offset = ")); Serial.println(bank * 100 * 128 + patch * 128 , DEC);
 #endif
 
     }
@@ -207,10 +209,10 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
         dataPage[i - 8] = EditBufferOrig[i]; // patch data
 
       for (i = 0; i < 128; i++)
-        mem_3.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
+        mem_2.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
 
 #if DEBUG_eeprom
-      Serial.print(F("Patch StoreBYTE() extEEPROM mem_3 offset = ")); Serial.println(bank * 100 * 128 + patch * 128  , DEC);
+      Serial.print(F("Patch StoreBYTE() extEEPROM mem_2 offset = ")); Serial.println(bank * 100 * 128 + patch * 128  , DEC);
 #endif
 
       for (i = 0; i < 8; i++)
@@ -227,10 +229,10 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
       }
 
       for (i = 0; i < 128; i++)
-        mem_4.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
+        mem_3.writeByte(bank * 100 * 128 + patch * 128 + i, dataPage[i] );
 
 #if DEBUG_eeprom
-      Serial.print(F("Patch StoreBYTE() extEEPROM mem_4 offset = ")); Serial.println(bank * 100 * 128 + patch * 128 , DEC);
+      Serial.print(F("Patch StoreBYTE() extEEPROM mem_3 offset = ")); Serial.println(bank * 100 * 128 + patch * 128 , DEC);
 #endif
     }
 
@@ -415,7 +417,7 @@ void Write_Bank_To_BS(unsigned char device, unsigned char bank, unsigned char pa
   //          for (unsigned char i = 0; i < 128; i++)
   //        dataPage[i] = EditBuffer[device][i+8]; // data of EditBuffer[device]
   //
-  //      mem_1.writePage(patch + (bank * 100), dataPage );
+  //      mem_0.writePage(patch + (bank * 100), dataPage );
 
 #if DEBUG_eeprom
   Serial.print(F("END OF Write_Bank_To_BS()/ device = ")); Serial.print(device + 0x0a, HEX); Serial.print(F("/ bank = ")); Serial.print(bank, DEC); Serial.print(F("/ patch = ")); Serial.println(patch, DEC);
@@ -432,9 +434,9 @@ void Write_Bank_To_BS2(unsigned char device, unsigned char bank, unsigned char p
     dataPage[i - 8] = EditBuffer[device][i]; // data of EditBuffer[device]
 
   if (bank < 5)
-    mem_1.writePage(patch + (bank * 100), dataPage );
+    mem_0.writePage(patch + (bank * 100), dataPage );
   else
-    mem_3.writePage(patch +  ((bank - 5) * 100), dataPage );
+    mem_2.writePage(patch +  ((bank - 5) * 100), dataPage );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -449,26 +451,14 @@ void Write_Default_Patchname(unsigned char device, unsigned char bank, unsigned 
   // name indicating bank and patch "Patch000" using 8 characters, 100x iterative
   for (unsigned char i = 0; i < 100; i++)
   {
-
-    /*
-      // patch name chars 0-7
-      0x4f, // O
-      0x42, // B
-      0x45, // E
-      0x52, // R
-      0x48, // H
-      0x45, // E
-      0x49, // I
-      0x4d, // M
-    */
-    // patchname "MTRX-000"
-    dataPage[0] = 77; // 'M'
-    dataPage[1] = 84; // 'T'
-    dataPage[2] = 82; // 'R'
-    dataPage[3] = 88; // 'X'
-    dataPage[4] = 45; // '-'
-    dataPage[5] = bankrequest + 48;
-    dataPage[6] = d + 48;
+    // patchname is "BNKx: yz" from Matrix1000 (where x = bank number, y = dozen et z = units)
+    dataPage[0] = 66; // 'B'
+    dataPage[1] = 78; // 'N'
+    dataPage[2] = 75; // 'K'
+    dataPage[3] = bankrequest + 48; 
+    dataPage[4] = 58; // ':'
+    dataPage[5] = 32; // ' '
+    dataPage[6] = d + 48; 
     dataPage[7] = u + 48;
 
     // unison detune default
@@ -490,11 +480,11 @@ void Write_Default_Patchname(unsigned char device, unsigned char bank, unsigned 
 
 
     if (bank < 5)
-      mem_2.writePage(i + (bank * 100), dataPage );
+      mem_1.writePage(i + (bank * 100), dataPage );
     else
-      mem_4.writePage(i +  ((bank - 5) * 100), dataPage );
+      mem_3.writePage(i +  ((bank - 5) * 100), dataPage );
 
-    // increment 00
+    // increment yz
     u++;
     if (u == 10)
     {
@@ -694,10 +684,10 @@ void FORMAT_Memory(unsigned char memory)
         lcd.print(F("ext.EEPROM page "));
         LCD_PrintBCD3(page);
 
+        mem_0.writePageFast(page, dataPage );
         mem_1.writePageFast(page, dataPage );
         mem_2.writePageFast(page, dataPage );
         mem_3.writePageFast(page, dataPage );
-        mem_4.writePageFast(page, dataPage );
 
       }
 #if DEBUG_eeprom
@@ -743,8 +733,8 @@ void FORMAT_Memory(unsigned char memory)
         lcd.setCursor(0, 1);
         lcd.print(F("ext.EEPROM page "));
         LCD_PrintBCD3(page);
-        mem_1.writePageFast(page, dataPage );
-        mem_3.writePageFast(page, dataPage );
+        mem_0.writePageFast(page, dataPage );
+        mem_2.writePageFast(page, dataPage );
       }
 #if DEBUG_eeprom
       Serial.println(F("FORMAT_Memory(3) / 512 pages INITIALISE PATCH finished"));
@@ -782,8 +772,8 @@ void FORMAT_Memory(unsigned char memory)
         lcd.print(F("ext.EEPROM page "));
         LCD_PrintBCD3(page);
 
-        mem_2.writePageFast(page, dataPage );
-        mem_4.writePageFast(page, dataPage );
+        mem_1.writePageFast(page, dataPage );
+        mem_3.writePageFast(page, dataPage );
       }
 #if DEBUG_eeprom
       Serial.println(F("FORMAT_Memory(3) / 512 pages INITIALISE ARP&SEQ finished"));
@@ -876,8 +866,8 @@ void FORMAT_Memory(unsigned char memory)
 ///////////////////////////////////////////////////////////////////
 unsigned char Check_IntEEPROM_Format(void)
 {
-  // 'magic numbers' are equal to zero if formatted previously :
-  if ((EEPROM.read(499) != 0) && (EEPROM.read(498) != 0) && (EEPROM.read(497) != 0))
+  // 'magic numbers' are equal to zero if formatted previously : 4 last internal eeprom bytes are supposed to be null
+  if ((EEPROM.read(EEPROM.length() - 1 ) != 0) && (EEPROM.read(EEPROM.length() - 2) != 0) && (EEPROM.read(EEPROM.length() - 3) != 0))
   {
     Serial.println(F("Check_IntEEPROM_Format()/ missmatch !"));
     return 1;
@@ -899,13 +889,13 @@ unsigned char Check_ExtEEPROM_Format(unsigned char eeprom)
   switch (eeprom)
   {
     case 0:
-      Serial.print(F("mem_1 / "));
-      mem_1.readPage(511, dataPage);
+      Serial.print(F("mem_0 / "));
+      mem_0.readPage(511, dataPage);
       break;
 
     case 2:
-      Serial.print(F("mem_3 / "));
-      mem_3.readPage(511, dataPage);
+      Serial.print(F("mem_2 / "));
+      mem_2.readPage(511, dataPage);
       break;
 
     default:
@@ -932,3 +922,38 @@ unsigned char Check_ExtEEPROM_Format(unsigned char eeprom)
 
 
 
+/*
+   additional features 1.07. problem seen by M.Dieckmann 28 06 2018 :
+   GlobalParameters not updated and saved while edited
+*/
+///////////////////////////////////////////////////////////////////////////////
+// store GlobalParameters into internal EEPROM
+// #define EEPROM_GLOBALPARAMETERS 500 // 172 bytes ! start address 500 , end adress 671 included
+/////////////////////////////////////////////////////////////////////////////////
+void STORE_GlobalParameters(void)
+{
+  for (unsigned char i = (EEPROM_GLOBALPARAMETERS - EEPROM_GLOBALPARAMETERS); i < (EEPROM_GLOBALPARAMETERS + 172 - EEPROM_GLOBALPARAMETERS); ++i)
+  {
+    EEPROM.update(EEPROM_GLOBALPARAMETERS + i, GlobalParameters[i]);
+  }
+
+#if DEBUG_inteeprom
+  Serial.println(F("STORE_GlobalParameters()"));
+#endif
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+// read GlobalParameters from internal EEPROM
+// #define EEPROM_GLOBALPARAMETERS 500 // 172 bytes ! start address 500 , end adress 671 included
+/////////////////////////////////////////////////////////////////////////////////
+void READ_GlobalParameters(void)
+{
+  for (unsigned char i = (EEPROM_GLOBALPARAMETERS - EEPROM_GLOBALPARAMETERS); i < (EEPROM_GLOBALPARAMETERS + 172 - EEPROM_GLOBALPARAMETERS); ++i)
+  {
+    GlobalParameters[i]  = EEPROM.read(EEPROM_GLOBALPARAMETERS);
+  }
+
+#if DEBUG_inteeprom
+  Serial.println(F("READ_GlobalParameters()"));
+#endif
+}

@@ -38,7 +38,7 @@
 #define TRGCLK 3
 #define MTRGCLK 4
 
-#define MIDI_TRIGGER_NOTE 37
+#define MIDI_TRIGGER_NOTE 37 // 37 = rimshot
 #define MIDI_DRUMS_CHANNEL 10
 
 

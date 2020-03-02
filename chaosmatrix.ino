@@ -1383,14 +1383,16 @@ void SendGlobalParameters(unsigned char interface)
   byte sysex[351];
 
   // print temp message on display
+  //lcd.clear();
   lcd.setCursor(0, 1);
-  lcd.print(F("Dumping Master      "));
-  elapsedTime = 0;  //reset tmpMessage-
+  lcd.print(F("Dumping Master ...  "));
 
   for (i = 0; i < 172; i++)
   {
     GlobalParameters[i] = EEPROM.read(EEPROM_GLOBALPARAMETERS + i);
   }
+
+  elapsedTime = 0;  //reset tmpMessage-
 
 #if DEBUG_master
   Serial.println(F("SendGlobalParameters()"));
@@ -1525,12 +1527,7 @@ void StoreEditBuffer(unsigned char interface, unsigned char bank, unsigned char 
   sysex[7] = 0x7f;
   sysex[8] = 0xf7;
 
-  lcd.setCursor(0, 1);
-  lcd.print(F("Patch stored in Matrx"));
-  elapsedTime = 0;  //reset tmpMessage
-
-  switch (interface)
-  {
+  switch (interface) {
     case  INTERFACE_SERIAL1:
       MIDI1.sendSysEx (sizeof(sysex), sysex, true);
       break;
@@ -1553,7 +1550,10 @@ void StoreEditBuffer(unsigned char interface, unsigned char bank, unsigned char 
       break;
   }
 
-
+  // print a short msg on display :
+  lcd.setCursor(0, 1);
+  lcd.print(F("Patch stored in Matrx"));
+  elapsedTime = 1000;  //reset tmpMessage
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1569,10 +1569,7 @@ void Set_OrigArpUniSeq_toDefault(void)
     ArpParametersOrig[j] = pgm_read_byte_near (&Default_ArpParameters[j][0]);
 
   //sequence default (Carpenter)
-  for (unsigned char j = 0; j < 32; j++)
-  {
-    //    sequenceOrig[2 * j + 0] = pgm_read_byte_near (&Default_Sequence[3][32][0]);
-    //    sequenceOrig[2 * j + 1] = pgm_read_byte_near (&Default_Sequence[3][32][1]);
+  for (unsigned char j = 0; j < 32; j++) {
     sequenceOrig[j][0] = pgm_read_byte_near (&Default_Sequence[3][32][0]);
     sequenceOrig[j][1] = pgm_read_byte_near (&Default_Sequence[3][32][1]);
   }
@@ -1754,11 +1751,8 @@ void MIDI_Rcv_Diagnostics(unsigned char interface, byte order1, byte order2)
 
     // send a midi response on all midi out
     sysex[6] = 0x0a; MIDI1.sendSysEx (sizeof(sysex), sysex, true);
-
     sysex[6] = 0x0b; MIDI2.sendSysEx (sizeof(sysex), sysex, true);
-
     sysex[6] = 0x09; MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-
 #if SOFTSERIAL_ENABLED
     sysex[6] = 0x0c; MIDI4.sendSysEx (sizeof(sysex), sysex, true);
     sysex[6] = 0x0d; MIDI5.sendSysEx (sizeof(sysex), sysex, true);

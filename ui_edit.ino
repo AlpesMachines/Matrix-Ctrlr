@@ -18,8 +18,7 @@ unsigned char ascii;
 
 
 // for blinking characters
-
-
+static unsigned char cursor;
 
 
 /*
@@ -48,25 +47,9 @@ unsigned char ascii;
 ////////////////////////////////////////////////////////
 void UI_Display_Edit (void)
 {
-  unsigned char i;
+  //  unsigned char i;
 
-  switch (SoftPanel.Page)
-  {
-#if DEBUG_LCD
-    case SOFT_PAGE4:
-      lcd.clear();
-
-      lcd.setCursor(0, 0);
-      lcd.print((char)ascii);
-      lcd.setCursor(4, 0);
-      lcd.print(F("CLEAR EEPROM"));
-
-      lcd.setCursor(0, 1);
-      lcd.print(ascii, DEC);
-      lcd.setCursor(4, 1);
-      lcd.print(F("Ext Int Init "));
-      break;
-#endif
+  switch (SoftPanel.Page) {
 
     case SOFT_PAGE1:
       DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);			// off
@@ -86,88 +69,104 @@ void UI_Display_Edit (void)
       /*
         EDIT PAGE 2
         []  []   [ ]  []  []
-        12345678901234567890
-          uOOO ________
-        <   >  editname save
-        o   o   *    *   o
+        01234567890123456789
+        Set name w/ encoder:
+         <  999  OBERHEIM >
+            o    o    o
       */
 
       DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);			// off
       DOUT_PinSet1(DIN_ConfigMap[DIN_EDIT].dout_pin); 			// on
-      DOUT_PinSet_Keypanel(1, 1, 0, 0, 1, 1);
+      DOUT_PinSet_Keypanel(1, 0, 0, 0, 1, 1);
       DOUT_PinSet0(DIN_ConfigMap[DIN_CFG].dout_pin);     // off
 
-      //1st line
-      LCD_Clear();
-      LCD_CursorSet(1 + LCD_Offset);
+      // display info 1st line
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(F("Set name w/ encoder:"));
 
-      LCD_PrintCString(F(" "));
-      LCD_PrintBCD1(uBank[device]);
-      LCD_PrintBCD2(uPatch[device]);
+      // display info 2nd line
+      lcd.setCursor(1, 1);
+      LCD_PrintChar(CHAR_DOWN);
 
+      lcd.setCursor(4, 1);
+      lcd.print(uBank[device]);
+      lcd.print(uPatch[device]);
       if (uPatch[device] < 10) {
-        LCD_CursorSet(3 + LCD_Offset);
-        LCD_PrintCString(F("0"));
+        lcd.setCursor(5, 1);;
+        lcd.print(F("0"));
       }
-      LCD_CursorSet(7 + LCD_Offset);
-      LCD_PrintCString(F(":"));
-      // print patch name :
-      LCD_CursorSet(9 + 3 + LCD_Offset);
-      for (i = 0; i < 8; i++) {
+
+      //      lcd.print(F("  "));
+      // print name :
+      lcd.setCursor(8, 1);
+      for (unsigned char i = 0; i < 8; i++) {
         LCD_PrintChar(EditBuffer[device][i]);
       }
 
-      // 2nd line
-      //      lcd.setCursor(0,1);
-      LCD_CursorSet(65 + LCD_Offset);
-      LCD_PrintChar(CHAR_DOWN);
-      LCD_CursorSet(69 + LCD_Offset);
-      //      LCD_PrintCString(F(">"));
+      lcd.setCursor(18, 1);
       LCD_PrintChar(CHAR_UP);
 
-      LCD_CursorSet(71 + 5 + LCD_Offset);
-      LCD_PrintCString(F("EditName"));
-
+      lcd.setCursor(8 + cursor, 1);
+      lcd.blink();
       break;
 
+    /*
+      EDIT PAGE 3
+      []  []   [ ]  []  []
+      01234567890123456789
+      Export currentpatch:
+      Matrix_slot XXX - DO
+       o   o    o   *   *
+    */
     case SOFT_PAGE3: // save patch to matrix1000 memory
 
-      if (SoftPanel.IsNewPage) {
-        DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);      // off
-        DOUT_PinSet1(DIN_ConfigMap[DIN_EDIT].dout_pin);       // off
-        DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 1);
-        DOUT_PinSet0(DIN_ConfigMap[DIN_CFG].dout_pin);     // off
+      //      if (SoftPanel.IsNewPage) {
+      DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);      // off
+      DOUT_PinSet1(DIN_ConfigMap[DIN_EDIT].dout_pin);       // off
+      DOUT_PinSet_Keypanel(0, 0, 0, 1, 1, 1);
+      DOUT_PinSet0(DIN_ConfigMap[DIN_CFG].dout_pin);     // off
 
-        LCD_Clear();
-        LCD_CursorSet(0 + LCD_Offset);
-        LCD_PrintCString(F("BNK SAVE PATCH "));
-        LCD_PrintBCD1(uBank[device]);
-        LCD_PrintBCD2(uPatch[device]);
-        if (uPatch[device] < 10)
-        {
-          LCD_CursorSet(16 + LCD_Offset);
-          LCD_PrintCString(F("0")); // place a zero here for values below 10
-        }
-        saved = 0;
-      }
-
-      LCD_CursorSet(64 + LCD_Offset);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(F("Export currentpatch:"));
+      lcd.setCursor(0, 1);
+      lcd.print(F("Matrix_slot "));
       LCD_PrintBCD1(banksaved);
-      LCD_CursorSet(64 + 4 + LCD_Offset);
-      LCD_PrintCString(F("store in"));
-      LCD_PrintCString(F(":"));
       LCD_PrintBCD2(programsaved);
-      if (programsaved < 10)
-      {
-        LCD_CursorSet(64 + 13 + LCD_Offset);
-        LCD_PrintCString(F("0")); // place a zero here for values below 10
+      if (programsaved < 10) {
+        lcd.setCursor(13, 1);
+        lcd.print(F("0")); // place a zero here for values below 10
       }
+      saved = 0;
+      //      }
+      //
+      //      LCD_PrintBCD2(uPatch[device]);
+      //      if (uPatch[device] < 10) {
+      //        lcd.setCursor(13, 1);
+      //        LCD_PrintCString(F("0")); // place a zero here for values below 10
+      //      }
+      //      saved = 0;
+      //  }
+      //  //
+      //      LCD_CursorSet(64 + LCD_Offset);
+      //      LCD_PrintBCD1(banksaved);
+      //      LCD_CursorSet(64 + 4 + LCD_Offset);
+      //      LCD_PrintCString(F("store in"));
+      //      LCD_PrintCString(F(":"));
+      //      LCD_PrintBCD2(programsaved);
+      //      if (programsaved < 10)
+      //      {
+      //        LCD_CursorSet(64 + 13 + LCD_Offset);
+      //        LCD_PrintCString(F("0")); // place a zero here for values below 10
+      //      }
 
-      LCD_CursorSet(64 + 16 + LCD_Offset);
+      lcd.setCursor(18, 1);
       if (!saved)
-        LCD_PrintCString(F(" DO "));
+        LCD_PrintCString(F("DO"));
       else
-        LCD_PrintCString(F("    "));
+        LCD_PrintCString(F("  "));
+      //    }
       break;
 
     case SOFT_PAGE4: // wizard
@@ -188,6 +187,23 @@ void UI_Display_Edit (void)
       lcd.print(F("RMP MOD MTRX --- ---"));
       break;
 
+    /*
+      #if DEBUG_LCD
+        case SOFT_PAGE4:
+          lcd.clear();
+
+          lcd.setCursor(0, 0);
+          lcd.print((char)ascii);
+          lcd.setCursor(4, 0);
+          lcd.print(F("CLEAR EEPROM"));
+
+          lcd.setCursor(0, 1);
+          lcd.print(ascii, DEC);
+          lcd.setCursor(4, 1);
+          lcd.print(F("Ext Int Init "));
+          break;
+      #endif
+    */
     default:
       break;
   }
@@ -199,7 +215,7 @@ void UI_Display_Edit (void)
 void UI_Handle_Edit(void)
 {
 
-  static unsigned char cursor;
+  //  static unsigned char cursor;
 
   if (SoftPanel.Page == SOFT_PAGE1)
   { //////////////////////////////////////////////////////////////////  PAGE 1 /////////
@@ -212,49 +228,28 @@ void UI_Handle_Edit(void)
   }
   else if (SoftPanel.Page == SOFT_PAGE2) //////////////////////////////////////////////////////////////////  PAGE 2 /////////
   {
-
-    // // for blinking charaters : TO DO   http://forum.arduino.cc/index.php?topic=224521.0
-    //    if (millis() - startedFlash > intervall)
-    //    {
-    //      if (charToPrint[cursor] == ' ')
-    //      {
-    //        charToPrint[cursor] = EditBuffer[device][cursor];
-    //      }
-    //      else
-    //      {
-    //        charToPrint[cursor] = ' ';
-    //      }
-    //      startedFlash = millis();
-    //      lcd.setCursor(0, 1);
-    //      lcd.print(charToPrint[0]);
-    //      lcd.print(charToPrint[1]);
-    //      lcd.print(charToPrint[2]);
-    //    }
-
     switch (SoftPanel.Button)
     {
       case DIN_PAGE:
+        lcd.noBlink();
         SoftPanel.Page = SOFT_PAGE3;
         break;
 
-      case SOFT_EDIT_1: // "<"
-        cursor--;
+      case SOFT_EDIT_1: // "<-"
+        --cursor;
         break;
 
-      case SOFT_EDIT_2: // ">"
-        cursor++;
-        break;
+      case SOFT_EDIT_5: // "->"
+        ++cursor;
 
-      case SOFT_EDIT_5:
-        //		  Write_Patch_To_BS(uBank[device],uPatch[device]); // NON cela se fera dans le menu "PATCH"
         break;
 
       case SOFT_EDIT_INC:
-        EditBuffer[device][cursor]++;
+        ++EditBuffer[device][cursor];
         break;
 
       case SOFT_EDIT_DEC:
-        EditBuffer[device][cursor]--;
+        --EditBuffer[device][cursor];
         break;
 
       case DIN_EDIT:
@@ -271,7 +266,7 @@ void UI_Handle_Edit(void)
     // encoder
     cursor += encoderClic;
 
-    // cursor 0 .. 8 : name characters of the patch
+    // cursor 0 .. 8 : set name of the patch
     if (EditBuffer[device][cursor] >= 90) // limit letters to human readable range (cf ASCII table)
       EditBuffer[device][cursor] = 90;
     if (EditBuffer[device][cursor] < 32)
@@ -280,6 +275,10 @@ void UI_Handle_Edit(void)
     EditBuffer[device][cursor] += SoftPanel.EncoderValue;
     if (cursor > 7)
       cursor = 0;
+
+    lcd.setCursor(8 + cursor, 1);
+    lcd.blink();
+
   }
 
   else if  (SoftPanel.Page == SOFT_PAGE6) ////////////////////////////////////// PAGE6///////////////// provisoire pour test lcd ascii
@@ -312,13 +311,6 @@ void UI_Handle_Edit(void)
         lcd.print(F("4x24LC512 initiliased"));
         elapsedTime = 0;
         break;
-
-      //      case SOFT_EDIT_5:
-      //        lcd.noBlink();
-      //        break;
-      //      case SOFT_EDIT_1:
-      //        lcd.blink();
-      //        break;
 
       default:
         break;
@@ -372,11 +364,11 @@ void UI_Handle_Edit(void)
         WizardEditBuffer( device, 7);
         break;
 
-       case SOFT_EDIT_3:
+      case SOFT_EDIT_3:
         WizardEditBuffer( device, 8);
         break;
-        
-        default:
+
+      default:
         break;
     }
   }
@@ -393,7 +385,7 @@ void UI_Handle_Edit(void)
 #endif
         break;
 
-      case SOFT_EDIT_1:
+      case SOFT_EDIT_4:
         if (!RefreshSoftPanel) {
           banksaved = banksaved == 0 ? 1 : 0;
           saved = 0;

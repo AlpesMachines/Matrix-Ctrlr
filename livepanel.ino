@@ -517,6 +517,12 @@ unsigned char getvalue(unsigned char pin, unsigned char valu)
 /////////////////////////////////////////////////////////////////////////////
 void update_EditBuffer(unsigned char device, unsigned char param, unsigned char value)
 {
+#if DEBUG_uEB
+  Serial.print(F("update_EditBuffer(")); Serial.print(device, DEC); Serial.print(F(", "));
+  Serial.print(param, DEC); Serial.print(F(", "));
+  Serial.print(value, DEC); Serial.println(F(")"));
+#endif
+
   switch (param)
   {
     // made using Excel ;)
@@ -619,7 +625,7 @@ void update_EditBuffer(unsigned char device, unsigned char param, unsigned char 
     case SX_LFO2_SPEEDMODULATION  : EditBuffer[device][EB_LFO2_SPEEDMODULATION  ] = value; lastbyteindex = EB_LFO2_SPEEDMODULATION  ; break;
     case SX_UNISON_DETUNE         : UnisonDetune[device]                          = value; lastbyteindex = EB_UNISON_DETUNE         ; break;
 
-    // Matrix Modulation is missing because is doesn't have SX_ parameters despite it has EB_
+      // Matrix Modulation is missing because is doesn't have SX_ parameters despite it has EB_
   }
 }
 

@@ -201,10 +201,10 @@ const unsigned char customChar4[] PROGMEM = { // tiny bar 4
 const unsigned char customChar5[] PROGMEM = { // quarter note
   0b00010,
   0b00011,
+  0b00011,
   0b00010,
   0b00010,
   0b01110,
-  0b11110,
   0b11110,
   0b01100
 };

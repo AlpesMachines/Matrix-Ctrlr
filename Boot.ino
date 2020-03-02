@@ -111,8 +111,7 @@ void Boot(void)
   Matrix_Modele_Init();
 
   // on each device first :
-  for (unsigned char d = Matrix_Device_A; d <= Matrix_Device_D; d++)
-  {
+  for (unsigned char d = Matrix_Device_A; d <= Matrix_Device_D; d++){
     // recall device configuration
     Device_Init(d);
     // recall last patch (rappeler le dernier patch et bank sauvé, charger l'EditBuffer[device] depuis les 24LC512, l'envoyer)

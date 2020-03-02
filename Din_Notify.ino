@@ -131,6 +131,7 @@ void DIN_NotifyChange(void)
           break;
 
         case DIN_DCO2_PULSE:
+        case DIN_SW9 :
           DOUT_PinSet(DOUT_DCO2_PULSE, din_pin_value);
           break;
 

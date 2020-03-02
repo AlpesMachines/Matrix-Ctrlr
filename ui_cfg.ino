@@ -336,9 +336,10 @@ void UI_Display_Cfg()
       lcd.setCursor(8, 1);
       if (localControl)
       {
-        lcd.print(F(" "));
-        lcd.write((byte)5);
-        lcd.print(F(" "));
+        //        lcd.print(F(" "));
+        //        lcd.write((byte)5); // a note icon
+        //        lcd.print(F(" "));
+        lcd.print(F("on "));
         DOUT_PinSet1(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);
       }
       else
@@ -389,7 +390,33 @@ void UI_Display_Cfg()
       LCD_Clear();
       lcd.print(F("CFG : GRouP (page 4)"));
       lcd.setCursor(0, 1);
-      lcd.print(F(" - TO DO - "));
+      switch (ui_groupMode) {
+        case GROUPSOLO:
+          lcd.print(F("Solo"));
+          break;
+
+        case GROUPDUO:
+          lcd.print(F("Duo "));
+          break;
+
+        case GROUPTRIO:
+          lcd.print(F("Trio"));
+          break;
+
+        case GROUPQUARTET:
+          lcd.print(F("Quar"));
+          break;
+
+        case GROUPDOUBLEDUO:
+          lcd.print(F("2Duo"));
+          break;
+
+        default:
+        lcd.print(F("none"));
+          break;
+
+      }
+      //      lcd.print(ui_groupMode);
       break;
 
     case SOFT_PAGE5: // Matrix Ctrlr memory Dump
@@ -577,6 +604,8 @@ void UI_Handle_Cfg()
         break;
 
       case SOFT_EDIT_5: //
+        STORE_GlobalParameters();
+        READ_GlobalParameters();
         SendGlobalParameters(INTERFACE_SERIAL); // edited matrix
         SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
         break;
@@ -670,6 +699,10 @@ void UI_Handle_Cfg()
   {
     switch (SoftPanel.Button) {
       case DIN_PAGE:
+        STORE_GlobalParameters(); // save Masters Parameters into internal eeprom before leaving
+        READ_GlobalParameters();
+        SendGlobalParameters(INTERFACE_SERIAL); // edited matrix
+        SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
         SoftPanel.Page = SOFT_PAGE22;
         break;
 
@@ -694,6 +727,9 @@ void UI_Handle_Cfg()
         ++GlobalParameters[13];
         if (GlobalParameters[13] > 1)
           GlobalParameters[13] = 0;
+        //
+        //        SendGlobalParameters(INTERFACE_SERIAL); // edited matrix
+        //        SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
         break;
 
       case SOFT_EDIT_INC: //
@@ -722,9 +758,13 @@ void UI_Handle_Cfg()
       }
       else
         return;
-      // ceci deconne et ne met pas à jour en temps réel les valeurs des Globalparam :
-      //                SendGlobalParameters(INTERFACE_SERIAL); // matrix à éditer
-      //                SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
+      /*
+        // ceci deconne et ne met pas à jour en temps réel les valeurs des Globalparam : normal c'est pas dans les conditions !
+           SendGlobalParameters(INTERFACE_SERIAL); // matrix à éditer
+           SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
+      */
+
+
 #if DEBUG
       // do stuff
 #endif
@@ -924,18 +964,32 @@ void UI_Handle_Cfg()
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
   }
-  else if (SoftPanel.Page == SOFT_PAGE4) { // cfg  page 4 //////////////////////////////////////////////////// CFG/GRouP page //////////////////
+  else if (SoftPanel.Page == SOFT_PAGE4) { // cfg  page 4 //////////////////////////////////////////////////// CFG/GRouP page 4 //////////////////
     switch (SoftPanel.Button)
     {
       case DIN_PAGE:
         SoftPanel.Page = SOFT_PAGE1;
         break;
 
+      case SOFT_EDIT_1: //
+        ++ui_groupMode;
+        if (ui_groupMode > 5)
+          ui_groupMode = 0;
+
+        // update system groupMode value :
+        groupMode = ui_groupMode;
+        break;
+
       default:
         break;
     }
-    // encoder : set toto
-    // toto += SoftPanel.EncoderValue;
+    // encoder : set groupMode
+    ui_groupMode += SoftPanel.EncoderValue;
+    if (ui_groupMode > 5)
+      ui_groupMode = 0;
+
+    // update system groupMode value :
+    groupMode = ui_groupMode;
 
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
