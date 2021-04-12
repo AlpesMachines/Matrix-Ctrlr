@@ -23,11 +23,11 @@ void ReadDigital(void)
   //Loop as many as connected buttons :
   //button_state[butt] = SR.Button_Pin_Read(butt);
 
-  // read (twice) button state, hold value in the variable
+  // read (twice) button state, hold value in the variables
   a = SR.Button_Pin_Read(butt);
   b = SR.Button_Pin_Read(butt);
 
-  if (a == b) // if double reading is same result ()
+  if (a == b) // if double reading is same result
   {
     button_state[butt] = a;
 
@@ -88,18 +88,17 @@ void DIN_NotifyChange(void)
     if (booting)
     {
       // test mode
+#if DEBUG_din
       Serial.print(F("din : ")); Serial.print(din_pin); Serial.print(F(" "));
       if (din_pin_value)
         Serial.print(F("*"));
       else
         Serial.print(F("."));
       Serial.println();
-
+#endif
       // display
       lcd.setCursor(0, 1);
       lcd.print(strcpy_P(bufferProgmem, (PGM_P)pgm_read_word(&(DinDescription[din_pin]))));
-      //      lcd.print(F("din:"));
-      //      LCD_PrintBCD2(din_pin);
       lcd.print(F(" "));
       if (din_pin_value)
         lcd.print(F("*"));
@@ -131,6 +130,7 @@ void DIN_NotifyChange(void)
           break;
 
         case DIN_DCO2_PULSE:
+        case DIN_SW9 :
           DOUT_PinSet(DOUT_DCO2_PULSE, din_pin_value);
           break;
 
@@ -229,7 +229,6 @@ void DIN_NotifyChange(void)
         default:
           break;
       }
-
     }
     else
     {
@@ -248,7 +247,6 @@ void DIN_NotifyChange(void)
           case BUTGRP_SOFT:
             SoftPanel_Handler(din_pin, 0); // no encoder inc/dec
             SoftPanel_DisplayHandler(); // à mettre dans display tick avec un req
-            //      appflag_updateDisplay = 1;
 #if DEBUG_din
             Serial.println("btngrp soft");
 #endif
@@ -275,13 +273,13 @@ void DIN_NotifyChange(void)
             Serial.println();
 #endif
             break;
-
-          case BUTGRP_TRIG:
-            ++trigger;
-#if DEBUG_TRIG
-            Serial.print("trigger = "); Serial.println(trigger);
-#endif
-            break;
+          //
+          //          case BUTGRP_TRIG:
+          //            !trigger;
+          //#if DEBUG_TRIG
+          //            Serial.print("trigger = "); Serial.println(trigger);
+          //#endif
+          //            break;
 
           default:
             break;
@@ -290,7 +288,6 @@ void DIN_NotifyChange(void)
       else if ((din_pin_value == 0) && (DIN_ConfigMap[din_pin].group == BUTGRP_SHIFT))
       {
         Shift = 0; // remise à zero de Shift
-        //  Alt = 0;
 #if DEBUG_din
 
         Serial.print("Shift="); Serial.println(Shift);
@@ -302,9 +299,7 @@ void DIN_NotifyChange(void)
       {
         // nop
       }
-      //        // Don't forget to hold the state of the button:
-      //        old_button_state[i] = button_state[i];
-      //timer_digital = 0;
+      //
     }
   }
 }
@@ -315,7 +310,7 @@ void DIN_NotifyChange(void)
 void TestMode(void)
 {
   inTest = true;
-  
+
   for (unsigned char i = 0; i < NBR_LED; ++i)
   {
     SR.Led_Pin_Write(i, 0); // éteint toutes les LEDS
@@ -323,7 +318,7 @@ void TestMode(void)
 
   Serial.println(F("TestMode()"));
 
-  lcd.clear();
+  LCD_Clear();
   lcd.print(F(" --- TEST MODE ---  "));
 
   delay(255);
@@ -345,5 +340,3 @@ void TestMode(void)
     }
   }
 }
-
-

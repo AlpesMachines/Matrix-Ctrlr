@@ -13,4 +13,3 @@ typedef struct {
 extern const mmodmap_t EB_MmodMap[10];
 
 #endif
-

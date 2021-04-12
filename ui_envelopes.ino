@@ -261,5 +261,3 @@ void UI_Handle_Envelopes()
       break; // end page 2
   } // end switch page
 }
-
-

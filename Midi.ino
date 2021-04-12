@@ -161,10 +161,10 @@ void MIDI_RequestSinglePatch(unsigned char interface, unsigned char number)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -363,10 +363,10 @@ void MIDI_SendVoiceParam(unsigned char interface, unsigned char param, unsigned 
     //    {
     //      case  INTERFACE_SERIAL1: update_EditBuffer(Matrix_Device_A, param, value); break;
     //      case  INTERFACE_SERIAL2: update_EditBuffer(Matrix_Device_B, param, value); break;
-    //#if SOFTSERIAL_ENABLED
+    #if SOFTSERIAL_ENABLED
     //      case  INTERFACE_SERIAL4: update_EditBuffer(Matrix_Device_C, param, value); break;
     //      case  INTERFACE_SERIAL5: update_EditBuffer(Matrix_Device_D, param, value); break;
-    //#endif
+    #endif
     //      default: break;
     //    }
 #if DEBUG_matrix
@@ -837,10 +837,10 @@ void MIDI_SetBank(unsigned char interface, unsigned char bank)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this unactivate $F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -865,7 +865,7 @@ void MIDI_SetBank(unsigned char interface, unsigned char bank)
 
 
 /////////////////////////////////////////////////////////////////////////////
-// diagnostics (proper to Matrix Ctrlr
+// diagnostics (proper to Matrix Ctrlr)
 /////////////////////////////////////////////////////////////////////////////
 void MIDI_Send_Diagnostics(unsigned char interface, byte order1, byte order2)
 {
@@ -892,10 +892,10 @@ void MIDI_Send_Diagnostics(unsigned char interface, byte order1, byte order2)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1142,6 +1142,3 @@ byte Translate_CC_SX(unsigned char ctrl)
   }
   return sx_param;
 }
-
-
-

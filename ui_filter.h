@@ -6,5 +6,3 @@ void UI_Display_Filter(void);
 void UI_Handle_Filter(void);
 
 #endif
-
-

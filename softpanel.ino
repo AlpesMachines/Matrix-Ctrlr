@@ -442,4 +442,3 @@ char SetEncoder7Signed(unsigned char *value)
   else
     return 0;
 }
-

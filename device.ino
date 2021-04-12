@@ -246,4 +246,3 @@ void CopyEditBufferOrigToEditBuffer(unsigned char device)
     EditBuffer[device][i] = EditBufferOrig[i];
   //memcpy(EditBuffer[device], EditBufferOrig, 134); // more C langage ;)
 }
-

@@ -1,5 +1,5 @@
 /*
-  // Arpegiator 
+  // Arpegiator
   // created by Alpes Machines 2016
   // for Matrix Ctrlr embedded
   //
@@ -73,7 +73,7 @@ unsigned char  ArpParametersOrig[20];
 
 const unsigned char Default_ArpParameters[20][3] PROGMEM = {
   // default, min, max
-  {0, 0 , 5},   // ui_ext_clock state bool
+  {0, 0 , 6},   // patch midi clock
   {120, 20, 230},   // bpm value
   {false, false, true},  // thru : arp_send_notes
   {0, 0, 1},  // grv
@@ -124,8 +124,8 @@ void ArpParameters_Load(unsigned char device)
     Init_aChord();
 
     // load indiv arp.ino & ui_arp.ino variblaes with value array
-    ui_external_clk = ArpParameters[device][0];
-    bpm = ArpParameters[device][1];
+    //systmClock = ArpParameters[device][0];
+    bpm = ArpParameters[device][1]; uClock.setTempo(bpm);
     arp_send_notes = ArpParameters[device][2];
     ui_aGroove = ArpParameters[device][3];
     ui_aHold = ArpParameters[device][4];
@@ -139,7 +139,7 @@ void ArpParameters_Load(unsigned char device)
     ui_aMltp = ArpParameters[device][12];
     ui_aGate = ArpParameters[device][13];
     ui_aOctave = ArpParameters[device][14];
-    //seqToggle = ArpParameters[device][15]; // not implemnted yet
+    ui_toggleSeq = ArpParameters[device][15]; // not implemnted yet
     router_arp_tag = ArpParameters[device][16];
     ui_seqPlay = ArpParameters[device][17];
     seqSpeed = ArpParameters[device][18];
@@ -162,7 +162,7 @@ void ArpParameters_Store(unsigned char device)
 #endif
 
     // store to Orig[] -> ArpParametersOrig[k] = ArpParameters[device][k] = ui*_;
-    ArpParametersOrig[0 ] = ArpParameters[device][0] = ui_external_clk ;// Clock source
+    ArpParametersOrig[0 ] = ArpParameters[device][0] = systmClock ;// Clock source
     ArpParametersOrig[1 ] = ArpParameters[device][1] = bpm ;
     ArpParametersOrig[2 ] = ArpParameters[device][2] = arp_send_notes;
     ArpParametersOrig[3 ] = ArpParameters[device][3] = ui_aGroove ;
@@ -177,7 +177,7 @@ void ArpParameters_Store(unsigned char device)
     ArpParametersOrig[12 ] = ArpParameters[device][12] = ui_aMltp ;
     ArpParametersOrig[13 ] = ArpParameters[device][13] = ui_aGate ;
     ArpParametersOrig[14 ] = ArpParameters[device][14] = ui_aOctave ;
-    ArpParametersOrig[15 ] = ArpParameters[device][15] = 0; // not implemnted yet
+    ArpParametersOrig[15 ] = ArpParameters[device][15] = ui_toggleSeq;
     ArpParametersOrig[16 ] = ArpParameters[device][16] = router_arp_tag ;
     ArpParametersOrig[17 ] = ArpParameters[device][17] = ui_seqPlay ;
     ArpParametersOrig[18 ] = ArpParameters[device][18] = seqSpeed ;
@@ -209,8 +209,8 @@ void ArpParameters_Init(unsigned char device)
     }
 
     // place values into various ui_var
-    ui_external_clk = ArpParameters[device][0];
-    bpm = ArpParameters[device][1];
+    //systmClock = ArpParameters[device][0];
+    bpm = ArpParameters[device][1]; uClock.setTempo(bpm);
     arp_send_notes = ArpParameters[device][2];
     ui_aGroove = ArpParameters[device][3];
     ui_aHold = ArpParameters[device][4];
@@ -224,7 +224,7 @@ void ArpParameters_Init(unsigned char device)
     ui_aMltp = ArpParameters[device][12];
     ui_aGate = ArpParameters[device][13];
     ui_aOctave = ArpParameters[device][14];
-    // seqToggle = ArpParameters[device][15]; // not implemnted yet
+    ui_toggleSeq = ArpParameters[device][15]; // not implemnted yet
     router_arp_tag = ArpParameters[device][16];
     ui_seqPlay = ArpParameters[device][17];
     seqSpeed = ArpParameters[device][18];
@@ -385,7 +385,8 @@ void Update_Arp(unsigned char pitch, unsigned char velocity, unsigned char chann
             }
             // decrease length
             --arpN; // "there are null elements in the chord (arpN = 0)"
-            if (arpN < 0) arpN = 0;
+            //if (arpN < 0) arpN = 0; <- arduino_modified_sketch_701809/arp.ino:388:22: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+            if (arpN == 255) arpN = 0;
             break; // return;
           }
         }
@@ -406,50 +407,85 @@ void Update_Arp(unsigned char pitch, unsigned char velocity, unsigned char chann
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
-void Play_Arp(byte pitch, byte velocity, byte channel, bool trigger)
+void Play_Arp(byte pitch, byte velocity, byte channel, bool type)
+//{
+//  if (router_arp_tag && channel == MIDI_CHANNEL && (arpN < 7))
+//  {
+//    switch (type)
+//    {
+//      case 0 : // NoteOff
+//        if (arpN == 0) // commented in 0.99h
+//        {
+//          active_arp = false;
+//          aTik = 0; // ajout 099h
+//        }
+//#if DEBUG_ARPN
+//        Serial.print(F("PlayArp()::NoteOff, arpN = ")); Serial.println(arpN, DEC); Serial.println();
+//#endif
+//        break;
+//
+//      case 1 : // NoteOn
+//        // we can't record :
+//        //   ui_seqRec = false;
+//        active_arp = true;
+//        if (arpN == 1)
+//        {
+//          aTik = 0; // reset arp tick at first note received
+//          weakTap = false;
+//        }
+//#if DEBUG_ARPN
+//        Serial.print(F("PlayArp()::Note On arpN = ")); Serial.println(arpN, DEC); Serial.println();
+//#endif
+//
+//        playArpTrigger[0] = pitch;
+//        playArpTrigger[1] = velocity;
+//        playArpTrigger[2] = channel;
+//        playArpTrigger[3] = type; // = seqTrig (on/off = true/false)
+//        break;
+//
+//      default :
+//        break;
+//    }
+//  }
+//  else
+//    return;
+//}
+
 {
   if (router_arp_tag && channel == MIDI_CHANNEL && (arpN < 7))
   {
-    switch (trigger)
-    {
-      case 0 : // NoteOff
-        if (arpN == 0) // commented in 0.99h
-        {
-          active_arp = false;
-          aTik = 0; // ajout 099h
-        }
+    if (type) { // type == NoteOn
+      // we can't record :
+      //   ui_seqRec = false;
+      active_arp = true;
+      if (arpN == 1)
+      {
+        aTik = 0; // reset arp tick at first note received
+        weakTap = false;
+      }
 #if DEBUG_ARPN
-        Serial.print(F("PlayArp()::NoteOff, arpN = ")); Serial.println(arpN, DEC); Serial.println();
-#endif
-        break;
-
-      case 1 : // NoteOn
-        // we can't record :
-        //   ui_seqRec = false;
-        active_arp = true;
-        if (arpN == 1)
-        {
-          aTik = 0; // reset arp tick at first note received
-          weakTap = false;
-        }
-#if DEBUG_ARPN
-        Serial.print(F("PlayArp()::Note On arpN = ")); Serial.println(arpN, DEC); Serial.println();
+      Serial.print(F("PlayArp()::Note On arpN = ")); Serial.println(arpN, DEC); Serial.println();
 #endif
 
-        playArpTrigger[0] = pitch;
-        playArpTrigger[1] = velocity;
-        playArpTrigger[2] = channel;
-        playArpTrigger[3] = trigger; // = seqTrig (on/off = true/false)
-        break;
-
-      default :
-        break;
+      playArpTrigger[0] = pitch;
+      playArpTrigger[1] = velocity;
+      playArpTrigger[2] = channel;
+      playArpTrigger[3] = type; // = seqTrig (on/off = true/false)
+    }
+    else { // type == NoteOff
+      if (arpN == 0) // commented in 0.99h
+      {
+        active_arp = false;
+        aTik = 0; // ajout 099h
+      }
+#if DEBUG_ARPN
+      Serial.print(F("PlayArp()::NoteOff, arpN = ")); Serial.println(arpN, DEC); Serial.println();
+#endif
     }
   }
   else
     return;
 }
-
 /////////////////////////////////////////////////////////////////////////////////////
 // order (or not) the aChord stack
 /////////////////////////////////////////////////////////////////////////////////////
@@ -516,8 +552,8 @@ void ARP2(void)
       aPattern = ui_aMotif;
       TrspA = ui_TrspA;
       aStepMax = arpN * (aOctave + 1) * aMltp; // define max aStep
-      if (aStepMax < 0) aStepMax = 0;
-
+      //if (aStepMax < 0) aStepMax = 0; <- arduino_modified_sketch_701809/arp.ino:519:20: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+      if (aStepMax == 255) aStepMax = 0;
 
 #if DEBUG_ARPN
       Serial.println(F("ARP2()"));
@@ -686,7 +722,8 @@ void ARP3(bool trig)
       aPattern = ui_aMotif;
       TrspA = ui_TrspA;
       aStepMax = arpN * (aOctave + 1) * aMltp;
-      if (aStepMax < 0) aStepMax = 0;
+      //if (aStepMax < 0) aStepMax = 0; <- arduino_modified_sketch_701809/arp.ino:689:20: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+      if (aStepMax == 255) aStepMax = 0;
 
 #if DEBUG_ARPN
       Serial.println(F("ARP3()"));
@@ -1092,4 +1129,3 @@ void ARPMODE2(unsigned char type, unsigned char stepmax)
     }
   }
 }
-

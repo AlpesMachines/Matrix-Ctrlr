@@ -13,7 +13,7 @@ void Display_FW(void) {
   lcd.setCursor(0, 0); lcd.print(F("ALPES MACHINES 2017 "));
   lcd.setCursor(0, 1); lcd.print(F("Matrix Ctrlr ")); lcd.print(firmware);
   delay(255); // to read it ^^
-  //lcd.clear(); // flush lcd
+  //LCD_Clear(); // flush lcd
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ void Display_Tick(void) {
   }
 
   // display analog pot movements
-  if (app_flags.Display_Pot_Req && (SoftPanel.Mode == Patch))
+  if (app_flags.Display_Pot_Req == 1 && (SoftPanel.Mode == Patch))
   {
     //		LivePanel_DisplayAin();
     app_flags.Display_Pot_Req = 0; // handled
@@ -45,14 +45,23 @@ void Display_Tick(void) {
     //    if (DIN_ConfigMap[last_din_pin].group == BUTGRP_LIVE && SoftPanel.Mode == Patch )
     //     LivePanel_DisplayDin(last_din_pin);
     //  else
-    SoftPanel_DisplayHandler ();
+    SoftPanel_DisplayHandler();
     app_flags.Display_DIN_Req = 0; // handled
   }
+
+  // display notes pitch while playing sequence
+  if (app_flags.Display_ARP_Req && (elapsedTime > interval))
+  {
+    UI_Display_Arp(); // SoftPanel_DisplayHandler();
+    app_flags.Display_ARP_Req = 0;
+  }
+
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// not implemented
+/////////////////////////////////////////////////////////////////////////////
 void LCD_Display(void)
 {
 
 }
-
-

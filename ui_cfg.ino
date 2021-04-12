@@ -10,6 +10,7 @@
 #include "define.h"
 #include "ui_filter.h"
 #include "oner.h"
+#include "uclock.h"
 
 ////////// Vibrato waveform /////////////////////////////////////////////////////////
 const char VIB_Waves_Name0[] PROGMEM = {"TRI"};
@@ -75,7 +76,7 @@ void UI_Display_Cfg()
       DOUT_PinSet_Keypanel(1, 1, 1, 1, 1, 0);
       DOUT_PinSet1(DIN_ConfigMap[DIN_CFG].dout_pin);
 
-      lcd.clear();
+      LCD_Clear();
       lcd.setCursor(0, 0); //1st line
       lcd.print(F("CONFIGURE:          "));
       lcd.setCursor(0, 1);
@@ -95,7 +96,7 @@ void UI_Display_Cfg()
 
       if (SoftPanel.IsNewPage)
       {
-        lcd.clear();
+        LCD_Clear();
         lcd.setCursor(0, 0); // 1st line
         lcd.print(F("SPD MOD AMNT WAV GBL"));
       }
@@ -124,7 +125,7 @@ void UI_Display_Cfg()
       //      DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 1);
       DOUT_PinSet1(DIN_ConfigMap[DIN_CFG].dout_pin);
       if (SoftPanel.IsNewPage) {
-        lcd.clear();
+        LCD_Clear();
         lcd.setCursor(0, 0); // 1st line
         lcd.print(F("AMP MOD AMNT BND GBL"));
       }
@@ -207,7 +208,7 @@ void UI_Display_Cfg()
       //      DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 1);
       DOUT_PinSet1(DIN_ConfigMap[DIN_CFG].dout_pin);
       if (SoftPanel.IsNewPage) {
-        lcd.clear();
+        LCD_Clear();
         lcd.setCursor(0, 0); // 1st line
         lcd.print(F("Pd1 Pd2  Lv1 Lv2 Ena"));
       }
@@ -232,7 +233,7 @@ void UI_Display_Cfg()
       //      DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 1);
       DOUT_PinSet1(DIN_ConfigMap[DIN_CFG].dout_pin);
       if (SoftPanel.IsNewPage) {
-        lcd.clear();
+        LCD_Clear();
       }
       // 1st line
       lcd.setCursor(0, 0); // 1st line
@@ -278,17 +279,17 @@ void UI_Display_Cfg()
 
       //      lcd.print(F("Cfg page 3"));
       if (SoftPanel.IsNewPage) {
-        lcd.clear();
+        LCD_Clear();
         lcd.setCursor(0, 0);
-        lcd.print(F("BPM ZON LOC  STN XCC"));
+        lcd.print(F("CLK ZON LOC  JTR XCC"));
       }
 
       // 2nd line
       lcd.setCursor(0, 1);
-      switch (ui_external_clk)
+      switch (systmClock)
       {
         case INTCLK:
-          LCD_PrintBCD3(bpm); //LCD_PrintCString(F("INT"));
+          LCD_PrintCString(F("INT")); //LCD_PrintBCD3(bpm);
           DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
           break;
 
@@ -309,6 +310,11 @@ void UI_Display_Cfg()
 
         case MTRGCLK:
           lcd.print(F("mTg"));
+          DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
+          break;
+
+        case SYSCLK:
+          lcd.print(F("Sys")); // not possible normally
           DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
           break;
 
@@ -336,9 +342,10 @@ void UI_Display_Cfg()
       lcd.setCursor(8, 1);
       if (localControl)
       {
-        lcd.print(F(" "));
-        lcd.write((byte)5);
-        lcd.print(F(" "));
+        //        lcd.print(F(" "));
+        //        lcd.write((byte)5); // a note icon
+        //        lcd.print(F(" "));
+        lcd.print(F("on "));
         DOUT_PinSet1(DIN_ConfigMap[DIN_ENVELOPES].dout_pin);
       }
       else
@@ -348,16 +355,17 @@ void UI_Display_Cfg()
       }
 
       lcd.setCursor(13, 1);
-      if (FilterSustainMode == FILTER_ENV_MODE_BUGGED)
-      {
-        lcd.print(F(" . "));
-        DOUT_PinSet0(DIN_ConfigMap[DIN_KEYBOARD].dout_pin);
-      }
-      else
-      {
-        lcd.print(F(" $ "));
-        DOUT_PinSet1(DIN_ConfigMap[DIN_KEYBOARD].dout_pin);
-      }
+      lcd.print(filter_ratio, DEC);
+      //      if (FilterSustainMode == FILTER_ENV_MODE_BUGGED)
+      //      {
+      //        lcd.print(F(" . "));
+      //        DOUT_PinSet0(DIN_ConfigMap[DIN_KEYBOARD].dout_pin);
+      //      }
+      //      else
+      //      {
+      //        lcd.print(F(" $ "));
+      //        DOUT_PinSet1(DIN_ConfigMap[DIN_KEYBOARD].dout_pin);
+      //      }
 
       lcd.setCursor(17, 1);
       if (mThru_XCc)
@@ -389,7 +397,33 @@ void UI_Display_Cfg()
       LCD_Clear();
       lcd.print(F("CFG : GRouP (page 4)"));
       lcd.setCursor(0, 1);
-      lcd.print(F(" - TO DO - "));
+      switch (ui_groupMode) {
+        case GROUPSOLO:
+          lcd.print(F("Solo"));
+          break;
+
+        case GROUPDUO:
+          lcd.print(F("Duo "));
+          break;
+
+        case GROUPTRIO:
+          lcd.print(F("Trio"));
+          break;
+
+        case GROUPQUARTET:
+          lcd.print(F("Quar"));
+          break;
+
+        case GROUPDOUBLEDUO:
+          lcd.print(F("2Duo"));
+          break;
+
+        default:
+          lcd.print(F("none"));
+          break;
+
+      }
+      //      lcd.print(ui_groupMode);
       break;
 
     case SOFT_PAGE5: // Matrix Ctrlr memory Dump
@@ -416,7 +450,7 @@ void UI_Display_Cfg()
       break;
 
     case SOFT_PAGE51:
-      lcd.clear();
+      LCD_Clear();
       lcd.setCursor(0, 0);
       lcd.print(F("FORMAT EEPROM :  ENC"));
       lcd.setCursor(0, 1);
@@ -577,6 +611,8 @@ void UI_Handle_Cfg()
         break;
 
       case SOFT_EDIT_5: //
+        STORE_GlobalParameters();
+        READ_GlobalParameters();
         SendGlobalParameters(INTERFACE_SERIAL); // edited matrix
         SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
         break;
@@ -670,6 +706,10 @@ void UI_Handle_Cfg()
   {
     switch (SoftPanel.Button) {
       case DIN_PAGE:
+        STORE_GlobalParameters(); // save Masters Parameters into internal eeprom before leaving
+        READ_GlobalParameters();
+        SendGlobalParameters(INTERFACE_SERIAL); // edited matrix
+        SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
         SoftPanel.Page = SOFT_PAGE22;
         break;
 
@@ -694,6 +734,9 @@ void UI_Handle_Cfg()
         ++GlobalParameters[13];
         if (GlobalParameters[13] > 1)
           GlobalParameters[13] = 0;
+        //
+        //        SendGlobalParameters(INTERFACE_SERIAL); // edited matrix
+        //        SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
         break;
 
       case SOFT_EDIT_INC: //
@@ -722,9 +765,13 @@ void UI_Handle_Cfg()
       }
       else
         return;
-      // ceci deconne et ne met pas à jour en temps réel les valeurs des Globalparam :
-      //                SendGlobalParameters(INTERFACE_SERIAL); // matrix à éditer
-      //                SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
+      /*
+        // ceci deconne et ne met pas à jour en temps réel les valeurs des Globalparam : normal c'est pas dans les conditions !
+           SendGlobalParameters(INTERFACE_SERIAL); // matrix à éditer
+           SendGlobalParameters(INTERFACE_SERIAL3); // core OUT to DAW
+      */
+
+
 #if DEBUG
       // do stuff
 #endif
@@ -873,30 +920,37 @@ void UI_Handle_Cfg()
         if (Shift)
           SoftPanel.Page = SOFT_PAGE51; // hidden feature FORMAT()
         else
+        {
+          EEPROM.update(EEPROM_SYS_CLK, systmClock); 
+          //EEPROM.update(EEPROM_SYS_BPM, bpm); // -> feature ?
           SoftPanel.Page = SOFT_PAGE1; // return to beginning of CFG
+        }
         break;
 
-      case SOFT_EDIT_1: // bpm
-        //ui_external_clk = !ui_external_clk; // prior 0.99x
-        ++ui_external_clk;
-        if (ui_external_clk > MTRGCLK)
-          ui_external_clk = INTCLK;
+      case SOFT_EDIT_1: // set midi clock for system
+        ++systmClock;
+        if (systmClock > MTRGCLK)
+          systmClock = INTCLK; // can't be zero
+        //EEPROM.update(EEPROM_SYS_CLK, systmClock); // don't save with this button as it is frequently pushed. use PAGE
         break;
 
       case SOFT_EDIT_2: // ext clock
         zActive = !zActive;
+        EEPROM.update(EEPROM_Z_ACTIVE, zActive);
         break;
 
-      case SOFT_EDIT_3: // set encoder polarity
-        //        encoder_inverted = !encoder_inverted;
-        //        EEPROM.update(EEPROM_ENCODER_INVERTED, encoder_inverted);
-        localControl = !localControl;
+      case SOFT_EDIT_3: // midi local control of Ctrlr
+        localControl ^=1; //localControl = !localControl;
         EEPROM.update(EEPROM_LOCAL_CONTROL, localControl);
         break;
 
-      case SOFT_EDIT_4: // toggle env1 filter mode to handle sustain bug. enable/disable
-        FilterSustainMode = FilterSustainMode == FILTER_ENV_MODE_BUGGED ? FILTER_ENV_MODE_HACKED : FILTER_ENV_MODE_BUGGED;
-        EEPROM.update(EEPROM_FILTERSUSTAIN_MODE, FilterSustainMode); // save this
+      case SOFT_EDIT_4: // edit potentiometers jitter "filter_ratio"
+        ++filter_ratio;
+        if (filter_ratio > 9) filter_ratio = 1;
+        EEPROM.update(EEPROM_FILTER_RATIO, filter_ratio);
+        // toggle env1 filter mode to handle sustain bug. enable/disable
+        //        FilterSustainMode = FilterSustainMode == FILTER_ENV_MODE_BUGGED ? FILTER_ENV_MODE_HACKED : FILTER_ENV_MODE_BUGGED;
+        //        EEPROM.update(EEPROM_FILTERSUSTAIN_MODE, FilterSustainMode); // save this
         break;
 
       case SOFT_EDIT_5: // Set A/B : deviceA is arp, device B is Seq
@@ -913,29 +967,44 @@ void UI_Handle_Cfg()
       default:
         break;
     }
-    // encoder : set bpm
-    if (ui_external_clk == INTCLK)
-      bpm += SoftPanel.EncoderValue;
-    // range bpm :
-    if (bpm < BPM_min)
-      bpm = BPM_min;
-    if (bpm > BPM_Max)
-      bpm = BPM_Max;
+//    // encoder : set bpm
+//    if (systmClock == INTCLK)
+//      bpm += SoftPanel.EncoderValue;
+//    // range bpm :
+//    if (bpm < BPM_min)
+//      bpm = BPM_min;
+//    if (bpm > BPM_Max)
+//      bpm = BPM_Max;
+//    uClock.setTempo(bpm);
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
   }
-  else if (SoftPanel.Page == SOFT_PAGE4) { // cfg  page 4 //////////////////////////////////////////////////// CFG/GRouP page //////////////////
+  else if (SoftPanel.Page == SOFT_PAGE4) { // cfg  page 4 //////////////////////////////////////////////////// CFG/GRouP page 4 //////////////////
     switch (SoftPanel.Button)
     {
       case DIN_PAGE:
         SoftPanel.Page = SOFT_PAGE1;
         break;
 
+      case SOFT_EDIT_1: //
+        ++ui_groupMode;
+        if (ui_groupMode > 5)
+          ui_groupMode = 0;
+
+        // update system groupMode value :
+        groupMode = ui_groupMode;
+        break;
+
       default:
         break;
     }
-    // encoder : set toto
-    // toto += SoftPanel.EncoderValue;
+    // encoder : set groupMode
+    ui_groupMode += SoftPanel.EncoderValue;
+    if (ui_groupMode > 5)
+      ui_groupMode = 0;
+
+    // update system groupMode value :
+    groupMode = ui_groupMode;
 
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
@@ -1048,4 +1117,3 @@ void UI_Handle_Cfg()
     app_flags.Display_DIN_Req = 1;
   }
 }
-

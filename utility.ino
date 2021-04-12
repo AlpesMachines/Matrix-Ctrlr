@@ -1,6 +1,9 @@
 #include <SRIO_mxctr.h>
 #include "din.h"
-
+/*
+ * contains macros common to MIOS8 and some coding hints
+ * */
+ 
 // cool functions :)
 // https://github.com/paradajz/OpenDeck/blob/master/src/Firmware/core/helpers/BitManipulation.h
 //
@@ -35,10 +38,10 @@ void DOUT_PinSet_Keypanel(unsigned char key1_led, unsigned char key2_led, unsign
 {
   SR.Led_Pin_Write(DOUT_DCO, key1_led);
   SR.Led_Pin_Write(DOUT_FILTER, key2_led);
-  SR.Led_Pin_Write(DOUT_ENV,key3_led);
-  SR.Led_Pin_Write(DOUT_KBD,key4_led);
-  SR.Led_Pin_Write(DOUT_MATRIXMOD,key5_led);
-  SR.Led_Pin_Write(DOUT_PAGE,key_page_led); 
+  SR.Led_Pin_Write(DOUT_ENV, key3_led);
+  SR.Led_Pin_Write(DOUT_KBD, key4_led);
+  SR.Led_Pin_Write(DOUT_MATRIXMOD, key5_led);
+  SR.Led_Pin_Write(DOUT_PAGE, key_page_led);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -48,7 +51,7 @@ unsigned char DOUT_PinGet(unsigned char pin)
   return SR.Led_Pin_Read(pin);
   // return 0;
 }
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_CursorSet(unsigned char cell)
 {
@@ -68,13 +71,20 @@ void LCD_CursorSet(unsigned char cell)
   lcd.setCursor(col, row);
 }
 
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_Clear(void)
 {
-  lcd.clear();
+  lcd.clear(); // tres lent
+
+
+//// encore plus lent :
+//  lcd.setCursor(0, 0);
+//  lcd.print(F("                    "));
+//  lcd.setCursor(0, 1);
+//  lcd.print(F("                    "));
 }
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_PrintBCD3(int value)
 {
@@ -88,7 +98,7 @@ void LCD_PrintBCD3(int value)
   }
 }
 
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_PrintBCD2(int value)
 {
@@ -100,21 +110,21 @@ void LCD_PrintBCD2(int value)
   }
 }
 
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_PrintBCD1(int value)
 {
   lcd.print(value, DEC);
 }
 
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_PrintChar(char caractere)
 {
   lcd.print(caractere);
 }
 
- 
+
 ////////////////////////////////////////////////////////////////////
 void LCD_PrintCString( String msg)
 {
@@ -126,5 +136,3 @@ void LCD_PrintHex2(unsigned char data)
 {
   lcd.print (data, HEX);
 }
-
-

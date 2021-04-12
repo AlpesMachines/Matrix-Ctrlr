@@ -29,6 +29,13 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
 
   MIDI_Incoming = true; // show that we receive midi message
 
+  // MIDI THRU in software : MIDI IN A -> MIDI OUT CORE
+  if (softMIDITHRU) {
+    if (channel == MIDI_CHANNEL)
+      MIDI3.sendNoteOff(pitch, velocity, channel + 4);
+  }
+
+  // sending notes off to synths
   if (channel == MIDI_CHANNEL)
   {
     // update split point: done in NoteOn
@@ -41,7 +48,7 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
       Feed_aChordLatch(pitch, velocity, channel);
     else if (ui_aHold && (SetAB == false) && (pitch < aSplit))
       Feed_aChordLatch(pitch, velocity, channel);
-    else //   if(1)// ((arpN >= 7-1)||(arpN==0))
+    else                                           //   if(1)// ((arpN >= 7-1)||(arpN==0))
       MIDI1.sendNoteOff(pitch, velocity, channel); // let pass last noteOff after arpegio ***
 
     if (SetAB)
@@ -49,14 +56,13 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
       if ((pitch > aSplit) && router_arp_tag && (arpN - 1 < 7)) // ARP
       {
         // send to arp buffer
-        Update_Arp( pitch, velocity, channel, 0);
+        Update_Arp(pitch, velocity, channel, 0);
         //if (arpN == 0) MIDI1.sendNoteOff(pitch, velocity, channel); // kill last note
-        Play_Arp( pitch,  velocity,  channel, 0);
+        Play_Arp(pitch, velocity, channel, 0);
 
 #if DEBUG_ARP
         Serial.println(F("ArpegiateOption false"));
 #endif
-
       }
       else if ((pitch <= aSplit) && (ui_seqRec || ui_seqPlay)) // SEQ
       {
@@ -91,30 +97,26 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
           MIDI1.sendNoteOff(pitch, velocity, channel);
         }
 
-
 #if DEBUG_ARP
         Serial.println(F("arpegiateOption FALSE"));
 #endif
       }
       else // normal behaviour : play notes thru
         //MIDI1.sendNoteOff(pitch, velocity, channel); // ***
-      return;
-
+        return;
     }
     else
     {
       if ((pitch <= aSplit) && (router_arp_tag) && (arpN - 1 < 7)) // ARP
       {
         // send to arp buffer
-        Update_Arp( pitch, velocity, channel, 0);
+        Update_Arp(pitch, velocity, channel, 0);
         //if (arpN == 0) MIDI1.sendNoteOff(pitch, velocity, channel); // kill last note
-        Play_Arp( pitch,  velocity,  channel, 0);
-
+        Play_Arp(pitch, velocity, channel, 0);
 
 #if DEBUG_ARP
         Serial.println(F("ArpegiateOption false"));
 #endif
-
       }
       else if ((pitch > aSplit) && (ui_seqRec || ui_seqPlay)) // SEQ
       {
@@ -149,21 +151,17 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
           MIDI1.sendNoteOff(pitch, velocity, channel);
         }
 
-
 #if DEBUG_ARP
         Serial.println(F("arpegiateOption FALSE"));
 #endif
       }
       else // normal behaviour : play notes thru
         //MIDI1.sendNoteOff(pitch, velocity, channel); // *** double noteoff dans midimonitor donc commentaire necessaire (voir*** plus haut)
-      return;
+        return;
     }
   }
   if (channel == MIDI_CHANNEL + 1)
     MIDI2.sendNoteOff(pitch, velocity, channel);
-
-  //  if (channel == MIDI_CHANNEL + 16)
-  //    MIDI3.sendNoteOff(pitch, velocity, channel);
 
 #if SOFTSERIAL_ENABLED
   if (channel == MIDI_CHANNEL + 2)
@@ -174,18 +172,23 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
 #endif
 
 #if DEBUG_router
-  Serial.print(F("Note OFF handled and sent : ")); Serial.print(channel, DEC); Serial.print(F(" ")); Serial.print(pitch, DEC); Serial.print(F(" ")); Serial.println (velocity, DEC);
+  Serial.print(F("Note OFF handled and sent : "));
+  Serial.print(channel, DEC);
+  Serial.print(F(" "));
+  Serial.print(pitch, DEC);
+  Serial.print(F(" "));
+  Serial.println(velocity, DEC);
 #endif
 
   // external midi note trigger (e.g rimshot, note=37, channel=10)
-  if (ui_external_clk == MTRGCLK && channel == MIDI_DRUMS_CHANNEL && pitch == MIDI_TRIGGER_NOTE)
+  if (systmClock == MTRGCLK && channel == MIDI_DRUMS_CHANNEL && pitch == MIDI_TRIGGER_NOTE)
   {
     ARP3(true);
     SEQ2(true);
     DOUT_PinSet(DOUT_ACTIVITY2, false); // tempo led
   }
-}
 
+}
 
 ///////////////////////////////////////////////////////////
 // routing midi note on msg
@@ -207,6 +210,23 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
   // rimshot = 37
   MIDI_Incoming = true;
 
+
+  // MIDI THRU in software : MIDI IN A -> MIDI OUT CORE
+  if (softMIDITHRU) {
+    if (channel == MIDI_CHANNEL)
+      MIDI3.sendNoteOn(pitch, velocity, channel + 4);
+  }
+
+  // learn split pitch A/S if we are in ARP menu page4 :
+  if ( ui_aSplitLearning && channel == MIDI_CHANNEL && SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE4) {  
+    ui_aSplit = pitch; // pitch note on received learned
+    UI_Display_Arp(); // update displayed value
+    ui_aSplitLearning = false; // stop learning
+    // notice we hear the note. if we don't want to listen it/ problem with arp[] activated, do quit using return: 
+    return;
+  }
+
+  // sending notes On to synths
   if (velocity == 0)
   { // This acts like a NoteOff:
     HandleNoteOff(channel, pitch, velocity);
@@ -221,26 +241,24 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
       //      TrspA = ui_TrspA; // 3
       //      pitchA = pitch + ((TrspA << 2) + (TrspA << 3) - 36); // 12*x = 4*x+8*x = x<<2 + x<<3
 
-
       if (SetAB)
       {
         // ARPEGIO
         if ((pitch > aSplit) && (router_arp_tag) && (arpN < 7 - 1)) // was only 'if(active_arp)'
         {
-          Update_Arp(pitch, velocity, channel , 1);
-          Play_Arp( pitch,  velocity,  channel, 1);
+          Update_Arp(pitch, velocity, channel, 1);
+          Play_Arp(pitch, velocity, channel, 1);
 
 #if DEBUG_ARP
           Serial.println(F("ArpegiateOption TRUE"));
 #endif
-
         }
         // SEQUENCER
         else if ((pitch <= aSplit) && ((ui_seqRec == 1) || (ui_seqPlay == 1)))
         {
           if (ui_seqRec) // if we record a seq
           {
-            Rec_Seq(pitch, velocity, channel, 0); // opt = 0 for the moment TO IMPROVE
+            Rec_Seq(pitch, velocity, channel, 0);       // opt = 0 for the moment TO IMPROVE
             MIDI1.sendNoteOn(pitch, velocity, channel); // to listen what you rec !
 
 #if DEBUG_SEQ
@@ -266,7 +284,12 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
 
 #if DEBUG_SEQ
             Serial.println(F("we are in Play_Seq() inside router"));
-            Serial.print(F("pitch/velo/chnl : $")); Serial.print(pitch, HEX); Serial.print(F(" ")); Serial.print(velocity, HEX); Serial.print(F(" ")); Serial.println (channel, HEX);
+            Serial.print(F("pitch/velo/chnl : $"));
+            Serial.print(pitch, HEX);
+            Serial.print(F(" "));
+            Serial.print(velocity, HEX);
+            Serial.print(F(" "));
+            Serial.println(channel, HEX);
             Serial.println();
 #endif
             return; // stop here and return
@@ -278,6 +301,7 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
         }
         else // normal behabviour : play notes
           MIDI1.sendNoteOn(pitch, velocity, channel);
+
         return;
       }
       else
@@ -285,20 +309,19 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
         // ARPEGIO
         if ((pitch <= aSplit) && (router_arp_tag) && (arpN < 7 - 1)) // was only 'if(active_arp)'
         {
-          Update_Arp(pitch, velocity, channel , 1);
-          Play_Arp( pitch,  velocity,  channel, 1);
+          Update_Arp(pitch, velocity, channel, 1);
+          Play_Arp(pitch, velocity, channel, 1);
 
 #if DEBUG_ARP
           Serial.println(F("ArpegiateOption TRUE"));
 #endif
-
         }
         // SEQUENCER
         else if ((pitch > aSplit) && ((ui_seqRec == 1) || (ui_seqPlay == 1)))
         {
           if (ui_seqRec) // if we record a seq
           {
-            Rec_Seq(pitch, velocity, channel, 0); // opt = 0 for the moment TO IMPROVE
+            Rec_Seq(pitch, velocity, channel, 0);       // opt = 0 for the moment TO IMPROVE
             MIDI1.sendNoteOn(pitch, velocity, channel); // to listen what you rec !
 
 #if DEBUG_SEQ
@@ -323,7 +346,12 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
 
 #if DEBUG_SEQ
             Serial.println(F("we are in Play_Seq() inside router"));
-            Serial.print(F("pitch/velo/chnl : $")); Serial.print(pitch, HEX); Serial.print(F(" ")); Serial.print(velocity, HEX); Serial.print(F(" ")); Serial.println (channel, HEX);
+            Serial.print(F("pitch/velo/chnl : $"));
+            Serial.print(pitch, HEX);
+            Serial.print(F(" "));
+            Serial.print(velocity, HEX);
+            Serial.print(F(" "));
+            Serial.println(channel, HEX);
             Serial.println();
 #endif
             return; // stop here and return
@@ -353,16 +381,22 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
   }
 
 #if DEBUG_router
-  Serial.print(F("Note ON  handled and sent : ")); Serial.print(channel, DEC); Serial.print(F(" ")); Serial.print(pitch, DEC); Serial.print(F(" ")); Serial.println (velocity, DEC);
+  Serial.print(F("Note ON  handled and sent : "));
+  Serial.print(channel, DEC);
+  Serial.print(F(" "));
+  Serial.print(pitch, DEC);
+  Serial.print(F(" "));
+  Serial.println(velocity, DEC);
 #endif
 
   // external midi note trigger (e.g rimshot, note=37, channel=10)
-  if (ui_external_clk == MTRGCLK && channel == MIDI_DRUMS_CHANNEL && pitch == MIDI_TRIGGER_NOTE)
+  if (systmClock == MTRGCLK && channel == MIDI_DRUMS_CHANNEL && pitch == MIDI_TRIGGER_NOTE)
   {
     ARP3(false);
     SEQ2(false);
     DOUT_PinSet(DOUT_ACTIVITY2, true); // tempo led
   }
+
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -374,9 +408,9 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
 
   // Here are managed Control change messages : Control change recognized by Matrix 1000 (named as Active Controllers in operating manual) are
   // directly forwarded to the appropriate Serial port selected by the device function. Control change not recognized by Matrix 1000 but
-  // generated by DAW are forwarded to the appropriate serial port regarding channel. directly recorded by a DAW. Notice that bank select (CC=00)
+  // generated by DAW are forwarded to the appropriate serial port regarding channel. directly recorded by a DAW.
   // Notice than the Arduino Matrix Controller does generate CC messages when sending param sysex messages for being
-  // is moreover differently managed as it commands the bank select for the Arduino Matrix Controller.
+  // Notice that bank select (CC=00) is moreover differently managed as it commands the bank select for the Arduino Matrix Controller.
   // pseudo code :
   //  if(CC == message classiques (breath, modwheel, etc))
   //    sendControlChange(controlNumber, value, channel)
@@ -386,15 +420,20 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
   // (mThru_XCc == true) if Sysex/CC enabled.
 
 #if DEBUG_router
-  Serial.print(F("ControlChange handled: ")); Serial.print(channel, DEC); Serial.print(F(" ")); Serial.print (controlNumber, DEC); Serial.print(F(" ")); Serial.println(value, DEC);
+  Serial.print(F("ControlChange handled: "));
+  Serial.print(channel, DEC);
+  Serial.print(F(" "));
+  Serial.print(controlNumber, DEC);
+  Serial.print(F(" "));
+  Serial.println(value, DEC);
 #endif
 
   if ((channel >= MIDI_CHANNEL) && (channel <= (MIDI_CHANNEL + 3)) && (controlNumber < 128) && (value < 128))
   {
     switch (controlNumber)
     {
-      case 0: // bank select
-      case 31: // bank change
+      case 0:           // bank select
+      case 31:          // bank change
         if (value < 10) // limits to 9 banks
         {
           uBank[device] = value;
@@ -405,16 +444,45 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
         }
         break;
 
-      case 1: // Modwheel = LEVER2
-      case 2: // breath control = LEVER3
-      case 4: // footcontrol = PEDAL1
-      case 6: // data entry
-      case 7: // midi Volume
-      case 64: // Sustain (pedal 2)
-      case 96: // data increment
-      case 97: // data decrement
-      case 98: // NRPN LSB
-      case 99: // NRPN MSB
+      // manage Sustain (pedal 2) when arp is running to (de)activate arpHold (15 MARS 2021)
+      // MIDI CC 64 Damper Pedal /Sustain Pedal On/Off switch that controls sustain. (See also Sostenuto CC 66)
+      // 0 to 63 = Off, 64 to 127 = On
+      case 64:  // Sustain (pedal 2)
+        if (channel == MIDI_CHANNEL &&  router_arp_tag) { // active_arp
+          /*if (value > 63)
+            ui_aHold = true;
+            else
+            ui_aHold = false;
+          */
+          // compliqué au relachment de la pédale
+        }
+        else {
+          if (channel == MIDI_CHANNEL + 0)
+            MIDI1.sendControlChange(controlNumber, value, channel);
+
+          if (channel == MIDI_CHANNEL + 1)
+            MIDI2.sendControlChange(controlNumber, value, channel);
+
+#if SOFTSERIAL_ENABLED
+          if (channel == MIDI_CHANNEL + 2)
+            MIDI4.sendControlChange(controlNumber, value, channel);
+
+          if (channel == MIDI_CHANNEL + 3)
+            MIDI5.sendControlChange(controlNumber, value, channel);
+#endif
+        }
+        break;
+
+      case 1:   // Modwheel = LEVER2
+      case 2:   // breath control = LEVER3
+      case 4:   // footcontrol = PEDAL1
+      case 6:   // data entry
+      case 7:   // midi Volume
+      //case 64:  // Sustain (pedal 2)
+      case 96:  // data increment
+      case 97:  // data decrement
+      case 98:  // NRPN LSB
+      case 99:  // NRPN MSB
       case 100: // RPN LSB
       case 101: // RPN MSB
       case 120: // all sounds off
@@ -430,9 +498,6 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
 
         if (channel == MIDI_CHANNEL + 1)
           MIDI2.sendControlChange(controlNumber, value, channel);
-
-        //if(channel == MIDI_CHANNEL+8)
-        //     MIDI3.sendControlChange(controlNumber,value,channel);
 
 #if SOFTSERIAL_ENABLED
         if (channel == MIDI_CHANNEL + 2)
@@ -466,7 +531,7 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
         if (channel == MIDI_CHANNEL && mThru_XCc) // case A
         {
           MIDI_SendVoiceParam(INTERFACE_SERIAL1, Translate_CC_SX(controlNumber), value, false);
-          update_EditBuffer(Matrix_Device_A, Translate_CC_SX(controlNumber), value); 
+          update_EditBuffer(Matrix_Device_A, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 1) && mThru_XCc) // case B
@@ -489,7 +554,8 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
         }
         else
         { // echo (optional)
-          if(localControl) MIDI3.sendControlChange(controlNumber,value,channel);
+          if (localControl)
+            MIDI3.sendControlChange(controlNumber, value, channel);
         }
         // legacy code :
         //        MIDI_SendVoiceParam(channel - MIDI_CHANNEL + 1, pgm_read_word_near(&singlePatchDataFormatX[controlNumber][2]), value, false); // WORKING !!! 0.99r
@@ -499,10 +565,17 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
         break;
 
 #if DEBUG_router
-        Serial.print(F("ControlChange MIDI_SendVoiceParam/EditBuffer[device] : ")); Serial.print(channel, DEC); Serial.print(F(" ")); Serial.print (controlNumber, DEC); Serial.print(F(" ")); Serial.println(value, DEC);
-        Serial.print(F("EditBuffer[device][")); Serial.print(controlNumber, HEX); Serial.print(F("] = ")); Serial.println(value, HEX);
+        Serial.print(F("ControlChange MIDI_SendVoiceParam/EditBuffer[device] : "));
+        Serial.print(channel, DEC);
+        Serial.print(F(" "));
+        Serial.print(controlNumber, DEC);
+        Serial.print(F(" "));
+        Serial.println(value, DEC);
+        Serial.print(F("EditBuffer[device]["));
+        Serial.print(controlNumber, HEX);
+        Serial.print(F("] = "));
+        Serial.println(value, HEX);
 #endif
-
     }
   }
   else
@@ -529,11 +602,16 @@ void HandleProgramChange(byte channel, byte program)
     //INTERFACE_SERIAL = channel;
 
 #if DEBUG_midi
-    Serial.print(F("channel = ")); Serial.println(channel, DEC);
-    Serial.print(F("program = ")); Serial.println(program, DEC);
-    Serial.print(F("device = ")); Serial.println(channel + Matrix_Device_A - MIDI_CHANNEL, DEC);
-    Serial.print(F("INTERFACE_SERIAL = ")); Serial.println(INTERFACE_SERIAL, DEC);
-    Serial.print(F("uPatch[device] = ")); Serial.println(uPatch[device], DEC);
+    Serial.print(F("channel = "));
+    Serial.println(channel, DEC);
+    Serial.print(F("program = "));
+    Serial.println(program, DEC);
+    Serial.print(F("device = "));
+    Serial.println(channel + Matrix_Device_A - MIDI_CHANNEL, DEC);
+    Serial.print(F("INTERFACE_SERIAL = "));
+    Serial.println(INTERFACE_SERIAL, DEC);
+    Serial.print(F("uPatch[device] = "));
+    Serial.println(uPatch[device], DEC);
 #endif
     // Read_Patch_From_BS(channel + Matrix_Device_A - MIDI_CHANNEL, uBank[channel + Matrix_Device_A - MIDI_CHANNEL], uPatch[channel + Matrix_Device_A - MIDI_CHANNEL]);
 
@@ -541,35 +619,34 @@ void HandleProgramChange(byte channel, byte program)
     {
       case Matrix_Device_A:
         ARP_GLOBAL_INIT(device);
-        Reset_UI_ARP(); // stop arp parameters
+        Reset_UI_ARP();                                            // stop arp parameters
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
-        UpdateDinStates(); // mise à jour des Leds
+        UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL1);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL1, UnisonDetune[device]); // send Unison detune value
-        ArpParameters_Load(device); // load arp parameters
+        ArpParameters_Load(device);                                      // load arp parameters
         break;
 
       case Matrix_Device_B:
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
-        UpdateDinStates(); // mise à jour des Leds
+        UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL2);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL2, UnisonDetune[device]); // send Unison detune value
         break;
 
       case Matrix_Device_C:
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
-        UpdateDinStates(); // mise à jour des Leds
+        UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL4);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL4, UnisonDetune[device]); // send Unison detune value
         break;
 
       case Matrix_Device_D:
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
-        UpdateDinStates(); // mise à jour des Leds
+        UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL5);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL5, UnisonDetune[device]); // send Unison detune value
         break;
-
     }
 
     SoftPanel.Mode = Patch;
@@ -580,9 +657,8 @@ void HandleProgramChange(byte channel, byte program)
   else
   {
     // not concerned
-    return ;
+    return;
   }
-
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -610,7 +686,10 @@ void HandleAfterTouchChannel(byte channel, byte pressure)
 #endif
 
 #if DEBUG_router
-  Serial.print(F("Aftertouch handled and sent : ")); Serial.print(channel, DEC); Serial.print(F(" aftertouch ")); Serial.println(pressure);
+  Serial.print(F("Aftertouch handled and sent : "));
+  Serial.print(channel, DEC);
+  Serial.print(F(" aftertouch "));
+  Serial.println(pressure);
 #endif
 }
 
@@ -640,7 +719,10 @@ void HandlePitchBend(byte channel, int pitchValue)
 #endif
 
 #if DEBUG_router
-  Serial.print(F("Pitchbend handled and sent : ")); Serial.print(channel, DEC); Serial.print(F(" pitchbend = ")); Serial.println(pitchValue, DEC);
+  Serial.print(F("Pitchbend handled and sent : "));
+  Serial.print(channel, DEC);
+  Serial.print(F(" pitchbend = "));
+  Serial.println(pitchValue, DEC);
 #endif
 }
 
@@ -652,7 +734,7 @@ void HandleClock(void)
   // don't show midi here : the heartbeat LED does
   // MIDI_Incoming = true;
 
-  if (ui_external_clk == MIDCLK)
+  if (systmClock == MIDCLK)
   {
     ARP2(); // we always call ARP2()
 
@@ -661,7 +743,7 @@ void HandleClock(void)
     // each time a clock message 0xf8 is received on MIDI3 Input port we increment mClock :
     ++mClock;
     if (mClock > 23) // 24 ppqn
-      mClock = 0; // reset
+      mClock = 0;    // reset
 
     // Flash on each beat during a half quarter (métronome) : 6 pulses x 4 = 24 ppqn
     // ||  0  1  2  3  4  5 |  6  7  8  9 10 11 | 12 13 14 15 16 17 | 18 19 20 21 22 23 ||  //
@@ -669,11 +751,11 @@ void HandleClock(void)
       DOUT_PinSet(DOUT_ACTIVITY2, 0); // heartbeat led
     else
       DOUT_PinSet(DOUT_ACTIVITY2, 1);
-
   }
 #if DEBUG_router
   Serial.print(F("midi Clock handled. "));
-  Serial.print(F("mClock = ")); Serial.println(mClock);
+  Serial.print(F("mClock = "));
+  Serial.println(mClock);
 #endif
 }
 
@@ -683,13 +765,14 @@ void HandleClock(void)
 void HandleStart(void)
 {
   MIDI_Incoming = true;
-  if (ui_external_clk == MIDCLK)
+  if (systmClock == MIDCLK)
   {
     mClock = -1; // reset bar (= 255)
   }
 #if DEBUG_router
   Serial.print(F("midi Start handled. "));
-  Serial.print(F("mClock = ")); Serial.println(mClock);
+  Serial.print(F("mClock = "));
+  Serial.println(mClock);
   Serial.println();
 #endif
 }
@@ -700,14 +783,15 @@ void HandleStart(void)
 void HandleStop(void)
 {
   MIDI_Incoming = true;
-  if (ui_external_clk == MIDCLK)
+  if (systmClock == MIDCLK)
   {
-    mClock = 24; // end bar
+    mClock = 24;              // end bar
     DOUT_PinSet(DOUT_ARP, 0); // light off Arp LED
   }
 #if DEBUG_router
   Serial.print(F("midi Stop handled. "));
-  Serial.print(F("mClock = ")); Serial.println(mClock);
+  Serial.print(F("mClock = "));
+  Serial.println(mClock);
   Serial.println();
 #endif
 }
@@ -722,16 +806,16 @@ void HandleContinue(void)
 
 #if DEBUG_router
   Serial.print(F("midi Continue handled. "));
-  Serial.print(F("mClock = ")); Serial.println(mClock);
+  Serial.print(F("mClock = "));
+  Serial.println(mClock);
   Serial.println();
 #endif
 }
 
-
 ///////////////////////////////////////////////////////
 // Midi SysEx handler
 ////////////////////////////////////////////////////////
-void HandleSystemExclusive(byte * sysex, unsigned int length)
+void HandleSystemExclusive(byte *sysex, unsigned int length)
 {
   // thanks to this forum topic :
   // https://forum.arduino.cc/index.php?topic=344674.0
@@ -745,16 +829,19 @@ void HandleSystemExclusive(byte * sysex, unsigned int length)
 #if DEBUG_sysexhandler
   //Print Sysex on Serial0 on serial monitor window :
   Serial.println(F("HandleSystemExclusive : "));
-  for (unsigned int i = 0; i < length; ++i) {
-    Serial.print(sysex[i], HEX); Serial.print(" ");
+  for (unsigned int i = 0; i < length; ++i)
+  {
+    Serial.print(sysex[i], HEX);
+    Serial.print(" ");
   }
   Serial.println(F("EOX "));
-  Serial.print(F("length = ")); Serial.println(length, DEC);
+  Serial.print(F("length = "));
+  Serial.println(length, DEC);
   Serial.println();
 #endif
 
   //   disableMidiCallbacks(); // NRT : stable 2/4/2016
-  HandleBank(sysex, length); // NRT : stable 2/4/2016
+  HandleReceivedSysEx(sysex, length); // NRT : stable 2/4/2016
   //   Serial3.flush();// NRT : stable 2/4/2016
   //   enableMidiCallbacks();  // NRT : stable 2/4/2016
 
@@ -762,14 +849,41 @@ void HandleSystemExclusive(byte * sysex, unsigned int length)
 }
 
 ///////////////////////////////////////////////////////
-// Midi SysEx handler
+// received SysEx handler
 ////////////////////////////////////////////////////////
-unsigned int HandleBank(byte * sysex, unsigned int length)
+unsigned int HandleReceivedSysEx(byte *sysex, unsigned int length)
 {
-  if ((sysex[1] == 0x10) && (sysex[2] == 0x06))     // for matrix synths and Matrix Ctrlr units
+  if ((sysex[1] == 0x10) && (sysex[2] == 0x06)) // for matrix synths and Matrix Ctrlr units
   {
     switch (length)
     {
+      case 7:
+        // MIDI_RequestMastersParameters
+        if (sysex[3] == 0x04 && sysex[4] == 0x03)
+        {
+          // requete sur Ctrlr + envoi Core out
+          SendGlobalParameters(INTERFACE_SERIAL3);
+        }
+
+        // MIDI_RequestEditBuffer
+        if (sysex[3] == 0x04 && sysex[4] == 0x04)
+        {
+          // requete sur Ctrlr + envoi core out
+          SendEditBuffer( device, INTERFACE_SERIAL3);
+        }
+        // parameter sysex
+        if (sysex[3] = 0x06)
+        {
+          // get parameter and its value -> sysex[4] & sysex[5]
+          // update editbuffer & UI (dout) of the selected device,
+          update_EditBuffer(device, sysex[4], sysex[5]);
+          UpdateDinStates();
+          // send parameter's value to the selected device
+          MIDI_SendVoiceParam(INTERFACE_SERIAL, sysex[4], sysex[5], mThru_XCc);
+        }
+        return sysex[3];
+        break;
+
       case 275:
         switch (sysex[3])
         {
@@ -777,7 +891,8 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
             // sysex[4]: numéro de patch 0-99
             // EXTRATRICK here : scoot patch 0, next will be 1 then delay, then 3 etc.
             // Initiate a second pass manually accepting zero, delay, 2, delay, 4 etc :
-            if (sysex[4] > 99) return sysex[4]; // not concerned so quit
+            if (sysex[4] > 99)
+              return sysex[4]; // not concerned so quit
 
             if (MIDI_ReceivingBank) // asking bank to the Matrix "GET"
             {
@@ -794,14 +909,13 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
               // create iterative name, default apr and seq and uni and write them to mem2 & mem4
               if (sysex[4] == 99)
               {
-                MIDI_ReceivingBank = false ;
+                MIDI_ReceivingBank = false;
 
                 lcd.setCursor(0, 1);
                 lcd.print(F("Bank received !    "));
-                elapsedTime = 0;  //reset tmpMessage
+                elapsedTime = 0; //reset tmpMessage
 
                 Write_Default_Patchname(device, uBank[device], BankNumberDump);
-
               }
 
               SR.Led_Pin_Write(DOUT_F1, 0);
@@ -818,27 +932,31 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
               UpdateDinStates(); // update LEDs at the end of the sysex
 
               // print temp message on display
-              //lcd.clear();
+              //LCD_Clear();
               lcd.setCursor(0, 1);
               lcd.print(F("Patch received : "));
               LCD_PrintBCD3(sysex[4]); //lcd.print(F(" "));
-              elapsedTime = 0;  //reset tmpMessage
-
+              elapsedTime = 0;         //reset tmpMessage
 
               Write_Bank_To_BS(device, uBank[device], sysex[4]); // write received patch without setting its number bankpatch in internal EEPROM !
               // Wire.h de l'arduino n'est pas assez rapide et n'arrive pas à faire cette fonction v0.96 : introduction dun delai de 300ms lors de l upload
               // corrigé dans 1.00c avec MINIBUFFER 128 et delay(1). corrigé encore mieux avec extratrick dans 1.02
 
 #if (DEBUG_sysexhandler)
-              Serial.print(F("sysex[4]=patch num : ")); Serial.println(sysex[4], DEC);
-              for (unsigned int i = 0; i < length; ++i) {
-                Serial.print(sysex[i], HEX); Serial.print(F(" "));
+              Serial.print(F("sysex[4]=patch num : "));
+              Serial.println(sysex[4], DEC);
+              for (unsigned int i = 0; i < length; ++i)
+              {
+                Serial.print(sysex[i], HEX);
+                Serial.print(F(" "));
               }
               Serial.println(F(" "));
 
               Serial.println(F("EditBuffer[device] : "));
-              for (unsigned char i = 0; i < 134; ++i) {
-                Serial.print(EditBuffer[device][i], HEX); Serial.print(F(" "));
+              for (unsigned char i = 0; i < 134; ++i)
+              {
+                Serial.print(EditBuffer[device][i], HEX);
+                Serial.print(F(" "));
               }
               Serial.println();
               Serial.println();
@@ -851,11 +969,21 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
 
 #if DEBUG_factory
               Serial.print(F("{"));
-              for (unsigned char i = 0; i < 133; ++i) {
-                Serial.print(F("0x")); if (EditBuffer[device][i] < 0x10) Serial.print(F("0")); Serial.print(EditBuffer[device][i], HEX); Serial.print(F(", "));
+              for (unsigned char i = 0; i < 133; ++i)
+              {
+                Serial.print(F("0x"));
+                if (EditBuffer[device][i] < 0x10)
+                  Serial.print(F("0"));
+                Serial.print(EditBuffer[device][i], HEX);
+                Serial.print(F(", "));
               }
-              Serial.print(F("0x")); if (EditBuffer[device][133] < 0x10) Serial.print(F("0")); Serial.print(EditBuffer[device][133], HEX);
-              Serial.print(F("},")); Serial.print(F(" // patch ")); Serial.println(sysex[4], DEC);
+              Serial.print(F("0x"));
+              if (EditBuffer[device][133] < 0x10)
+                Serial.print(F("0"));
+              Serial.print(EditBuffer[device][133], HEX);
+              Serial.print(F("},"));
+              Serial.print(F(" // patch "));
+              Serial.println(sysex[4], DEC);
 #endif
               SR.Led_Pin_Write(DOUT_SHIFT, 0); // shift led Off
               return sysex[4];
@@ -863,7 +991,7 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
 
             break;
 
-          case 0x0d: //EditBuffer[device]
+          case 0x0d:                        //EditBuffer[device]
             SR.Led_Pin_Write(DOUT_EDIT, 1); // Shift LED ON
 
             // update EditBuffer[device]
@@ -876,7 +1004,7 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
             // print temp message on display
             lcd.setCursor(0, 1);
             lcd.print(F("EditBuffer received "));
-            elapsedTime = 0;  //reset tmpMessage
+            elapsedTime = 0; //reset tmpMessage
 
             // update matrix
             SendEditBuffer(device, INTERFACE_SERIAL);
@@ -885,8 +1013,10 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
 #if DEBUG_sysexhandler
             Serial.println(F("EditBuffer[device] sysex msg type (received from DAW) !"));
             Serial.println(F("EditBuffer[device] sent to Mx : "));
-            for (unsigned char i = 0; i < 134; ++i) {
-              Serial.print(EditBuffer[device][i], HEX); Serial.print(F(" "));
+            for (unsigned char i = 0; i < 134; ++i)
+            {
+              Serial.print(EditBuffer[device][i], HEX);
+              Serial.print(F(" "));
             }
             Serial.println();
 #endif
@@ -914,22 +1044,27 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
             EEPROM.update(EEPROM_GLOBALPARAMETERS + i, GlobalParameters[i]);
 
 #if DEBUG_inteeprom
-            Serial.print(F("writing GlobalParameter[")); Serial.print(i, DEC); Serial.print(F("] on internal EEPROM addr : $")); Serial.println(EEPROM_GLOBALPARAMETERS + i , HEX);
+            Serial.print(F("writing GlobalParameter["));
+            Serial.print(i, DEC);
+            Serial.print(F("] on internal EEPROM addr : $"));
+            Serial.println(EEPROM_GLOBALPARAMETERS + i, HEX);
 #endif
           }
 
 #if DEBUG_sysexhandler
           Serial.println(F("Master Parameters[ ] = { "));
-          for (unsigned char i = 0; i < 172; ++i) {
-            Serial.print(GlobalParameters[i], DEC); Serial.print(F(", ")); // to get it via serial debug and put into arduino IDE code easily ;)
+          for (unsigned char i = 0; i < 172; ++i)
+          {
+            Serial.print(GlobalParameters[i], DEC);
+            Serial.print(F(", ")); // to get it via serial debug and put into arduino IDE code easily ;)
           }
           Serial.println(F(" }"));
 #endif
           // print temp message on display
-          lcd.clear();
+          LCD_Clear();
           lcd.setCursor(0, 1);
           lcd.print(F("Master received     "));
-          elapsedTime = 0;  //reset tmpMessage
+          elapsedTime = 0; //reset tmpMessage
 
           SR.Led_Pin_Write(DOUT_SHIFT, 0); // shift led Off
           SR.Led_Pin_Write(DOUT_CFG, 0);
@@ -995,7 +1130,7 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
           return sysex[3];
         break;
 
-      case 52: // SystemCfg
+      case 52:                // SystemCfg
         if (sysex[3] == 0x0f) // // SystemCfg
         {
           SR.Led_Pin_Write(DOUT_CFG, 1);
@@ -1019,8 +1154,10 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
           encoder_inverted = sysex[19];
           mThru_XCc = sysex[20];
           // dummy sysex[21] EEPROM.read(EEPROM_EXTCLOCK) -> not used
-          for (unsigned char i = 0; i < 4; ++i) {
-            for (unsigned char j = 0; j < 5; ++j) {
+          for (unsigned char i = 0; i < 4; ++i)
+          {
+            for (unsigned char j = 0; j < 5; ++j)
+            {
               ZONE[i][j] = sysex[22 + 5 * i + j];
             }
           }
@@ -1031,7 +1168,8 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
           Serial.println(F("SystemCfg msg received "));
           for (unsigned char i = 0; i < 52; ++i)
           {
-            Serial.print(sysex[i], HEX); Serial.print(F(" ")); // to get it via serial debug and put into code easily ;)
+            Serial.print(sysex[i], HEX);
+            Serial.print(F(" ")); // to get it via serial debug and put into code easily ;)
           }
           Serial.println();
 #endif
@@ -1039,7 +1177,7 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
           // print temp message on display
           lcd.setCursor(0, 1);
           lcd.print(F("System received    "));
-          elapsedTime = 0;  //reset tmpMessage
+          elapsedTime = 0; //reset tmpMessage
 
           // http://www.locoduino.org/spip.php?article72
 
@@ -1065,7 +1203,9 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
           EEPROM.update(EEPROM_LOCAL_CONTROL, localControl);
 
 #if DEBUG_inteeprom
-          Serial.print(F("writing SystemCfg, ")); Serial.print(F("sysex type $")); Serial.println(sysex[3], HEX);
+          Serial.print(F("writing SystemCfg, "));
+          Serial.print(F("sysex type $"));
+          Serial.println(sysex[3], HEX);
 
 #endif
 
@@ -1078,7 +1218,7 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
           return sysex[3];
         break;
 
-      case 8: // diagnostic
+      case 8:                                     // diagnostics
         if (sysex[3] == 0x0f && sysex[4] == 0x01) // echo on core out ONLY
         {
           MIDI_Rcv_Diagnostics(INTERFACE_SERIAL3, sysex[5], sysex[6]);
@@ -1117,17 +1257,13 @@ unsigned int HandleBank(byte * sysex, unsigned int length)
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Activate all necessary MIDI callbacks
+// Connect the midi callbacks to the library
 ///////////////////////////////////////////////////////////////////////////////////
 void enableMidiCallbacks(void)
 {
-  // Connect the midi callbacks to the library,
-  // Core in
-  //  MIDI3.setHandleNoteOff(HandleNoteOff);
-  //  MIDI3.setHandleNoteOn(HandleNoteOn);
-
+  /////// Midi CORE IN //////////////////
   MIDI3.setHandleNoteOff(ZoneNoteOff);
   MIDI3.setHandleNoteOn(ZoneNoteOn);
-
   MIDI3.setHandleControlChange(HandleControlChange);
   MIDI3.setHandleProgramChange(HandleProgramChange);
   MIDI3.setHandleAfterTouchChannel(HandleAfterTouchChannel);
@@ -1138,18 +1274,14 @@ void enableMidiCallbacks(void)
   MIDI3.setHandleContinue(HandleContinue);
   MIDI3.setHandleStop(HandleStop);
 
-  // Midi in A (deviceA)
-  //  MIDI1.setHandleNoteOff(HandleNoteOff);
-  //  MIDI1.setHandleNoteOn(HandleNoteOn);
-
+  /////// Midi IN A /////////////////////
   MIDI1.setHandleNoteOff(ZoneNoteOff);
   MIDI1.setHandleNoteOn(ZoneNoteOn);
-
   MIDI1.setHandleControlChange(HandleControlChange);
   MIDI1.setHandleProgramChange(HandleProgramChange);
   MIDI1.setHandleAfterTouchChannel(HandleAfterTouchChannel);
   MIDI1.setHandlePitchBend(HandlePitchBend);
-  //MIDI1.setHandleSystemExclusive(HandleSystemExclusive);
+  MIDI1.setHandleSystemExclusive(HandleSystemExclusive);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1157,7 +1289,7 @@ void enableMidiCallbacks(void)
 ////////////////////////////////////////////////////////////////////////////////////
 void disableMidiCallbacks(void)
 {
-  // Core MIDI IN
+  /////// Midi CORE IN //////////////////
   MIDI3.disconnectCallbackFromType(midi::NoteOn);
   MIDI3.disconnectCallbackFromType(midi::NoteOff);
   MIDI3.disconnectCallbackFromType(midi::ControlChange);
@@ -1170,7 +1302,7 @@ void disableMidiCallbacks(void)
   MIDI3.disconnectCallbackFromType(midi::Continue);
   MIDI3.disconnectCallbackFromType(midi::Stop);
 
-  // Midi IN A
+  /////// Midi IN A /////////////////////
   MIDI1.disconnectCallbackFromType(midi::NoteOn);
   MIDI1.disconnectCallbackFromType(midi::NoteOff);
   MIDI1.disconnectCallbackFromType(midi::ControlChange);
@@ -1180,15 +1312,13 @@ void disableMidiCallbacks(void)
   //MIDI1.disconnectCallbackFromType(midi::SystemExclusive);
 }
 
-
-
-
-//
-//
-// A VOIR SI ON LA GARDE, un peu débile comme fonction
-//
-void GetBank(unsigned char interface, unsigned char bankRequested)
-{
+/*
+  //
+  //
+  // A VOIR SI ON LA GARDE, un peu débile comme fonction
+  //
+  void GetBank(unsigned char interface, unsigned char bankRequested)
+  {
   unsigned char programRequested;
   unsigned long startTime;
   //  byte sysex_patch[] = {0xf0, 0x10,0x06,0x04,0x01,programRequested,0xf7};
@@ -1205,10 +1335,11 @@ void GetBank(unsigned char interface, unsigned char bankRequested)
     programRequested = 0;
   }
 
-#if DEBUG_sysexbankhandler
-  Serial.print(F("GetBank : ")); Serial.println(bankRequested);
+  #if DEBUG_sysexbankhandler
+  Serial.print(F("GetBank : "));
+  Serial.println(bankRequested);
   Serial.println();
-#endif
+  #endif
 
   for (unsigned char i = 0; i < 101; ++i)
   {
@@ -1228,7 +1359,7 @@ void GetBank(unsigned char interface, unsigned char bankRequested)
         //        case INTERFACE_SERIAL3:
         //          MIDI3.sendProgramChange(programRequested,MIDI_CHANNEL+8);
         //        break;
-#if SOFTSERIAL_ENABLED
+  #if SOFTSERIAL_ENABLED
       case INTERFACE_SERIAL4:
         MIDI4.sendProgramChange(programRequested, MIDI_CHANNEL + 3);
         break;
@@ -1236,12 +1367,13 @@ void GetBank(unsigned char interface, unsigned char bankRequested)
       case INTERFACE_SERIAL5:
         MIDI5.sendProgramChange(programRequested, MIDI_CHANNEL + 4);
         break;
-#endif
+  #endif
 
       default:
         break;
     }
-    lcd.setCursor(11, 1); lcd.print(programRequested, DEC);
+    lcd.setCursor(11, 1);
+    lcd.print(programRequested, DEC);
     //MIDI_RequestEditBuffer[device](interface, programRequested);
     //MIDI1.sendSysEx(sizeof(sysex_patch), sysex_patch, true); // enfin ! ça marche !!
     MIDI_RequestSinglePatch(interface, programRequested);
@@ -1260,28 +1392,31 @@ void GetBank(unsigned char interface, unsigned char bankRequested)
     // last = 101
   }
 
-  if (programRequested == 101) { // 0,...,99, end. (program was 100 at the end of the loop)
+  if (programRequested == 101)
+  { // 0,...,99, end. (program was 100 at the end of the loop)
     lcd.setCursor(8, 1);
     lcd.print(F("DONE! "));
     delay(800);
 
-#if DEBUG_sysexbankhandler
+  #if DEBUG_sysexbankhandler
     Serial.println(F("GetBank() finished !"));
-#endif
+  #endif
 
     return; // finished !
   }
   else
   {
-    lcd.setCursor(8, 1); lcd.print(F("error "));
+    lcd.setCursor(8, 1);
+    lcd.print(F("error "));
     delay(2000);
 
-#if DEBUG_sysexbankhandler
-    Serial.println(); Serial.println(F("GetBank error !!!")); Serial.println();
-#endif
+  #if DEBUG_sysexbankhandler
+    Serial.println();
+    Serial.println(F("GetBank error !!!"));
+    Serial.println();
+  #endif
 
     return;
   }
-}
-
-
+  }
+*/

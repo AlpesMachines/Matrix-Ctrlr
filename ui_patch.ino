@@ -49,8 +49,8 @@ void UI_Display_Patch (void)
 
       LCD_Clear();
       //1st line
-      LCD_CursorSet(0 + LCD_Offset);
-      LCD_PrintCString(F("PATCH  "));
+      lcd.setCursor(0,0);
+      lcd.print(F("PATCH  "));
       switch (device) {
         case Matrix_Device_A:
           lcd.print(F("A"));
@@ -74,12 +74,12 @@ void UI_Display_Patch (void)
       LCD_PrintBCD2(uPatch[device]);
       if (uPatch[device] < 10)
       {
-        LCD_CursorSet(9 + LCD_Offset);
+        lcd.setCursor(9,0);
         LCD_PrintCString(F("0")); // place a zero here for values below 10
       }
 
       // display patchname
-      LCD_CursorSet(12 + LCD_Offset);
+      lcd.setCursor(12,0);
       for (j = 0; j < 8; j++) {
         if (EditBuffer[device][j] < 0x20) // cf ASCII tables
           EditBuffer[device][j] = EditBuffer[device][j] + 0x40; // +64 (0x40) compatible with Matrix 1000 patch names
@@ -89,8 +89,8 @@ void UI_Display_Patch (void)
       }
 
       // 2nd line
-      LCD_CursorSet(64 + LCD_Offset);
-      LCD_PrintCString(F("GET INIT ORG EDT SAV"));
+      lcd.setCursor(0,1);
+      lcd.print(F("GET INIT ORG EDT SAV"));
       break;
 
     /*
@@ -115,24 +115,24 @@ void UI_Display_Patch (void)
 
       //1st line
       LCD_Clear();
-      LCD_CursorSet(0 + LCD_Offset);
+      lcd.setCursor(0,0);
       LCD_PrintCString(F("mBank:"));
       LCD_PrintBCD1(BankNumberDump);
-      LCD_CursorSet(8 + LCD_Offset);
+      lcd.setCursor(8,0);
       lcd.write(255); lcd.write(255); lcd.write((byte)0); //LCD_PrintCString(F("==>"));
-      LCD_CursorSet(12 + LCD_Offset);
-      LCD_PrintCString(F("cBank"));
+      lcd.setCursor(12,0);
+      LCD_PrintCString(F(" Bank"));
       LCD_PrintBCD2(uBank[device]);
       //2nd line
-      LCD_CursorSet(65 + LCD_Offset);
+      lcd.setCursor(0,1);
       lcd.write((byte)6); //LCD_PrintChar(CHAR_DOWN);
-      LCD_CursorSet(69 + LCD_Offset);
+      lcd.setCursor(4,1);
       lcd.write((byte)7); //LCD_PrintChar(CHAR_UP);
-      LCD_CursorSet(72 + LCD_Offset);
+      lcd.setCursor(10,1);
       LCD_PrintCString(F("GET "));	//68
-      LCD_CursorSet(78 + LCD_Offset);
+      lcd.setCursor(16,1);
       lcd.write((byte)6); //LCD_PrintChar(CHAR_DOWN);
-      LCD_CursorSet(82 + LCD_Offset);
+      lcd.setCursor(19,1);
       lcd.write((byte)7); //LCD_PrintChar(CHAR_UP);
 
 
@@ -168,17 +168,17 @@ void UI_Display_Patch (void)
       //1st line
       LCD_Clear();
       // patch number of M1000 :
-      LCD_CursorSet(1 + LCD_Offset);
+      lcd.setCursor(1 ,0);
       LCD_PrintCString(F("m"));
       LCD_PrintBCD1(BankNumber);
       LCD_PrintBCD2(ProgramNumber);
       if (ProgramNumber < 10) {
-        LCD_CursorSet(3 + LCD_Offset);
+        lcd.setCursor(3 ,0);
         LCD_PrintCString(F("0"));
       } // place a zero here for values below 10
 
       // name of patch :
-      LCD_CursorSet(6 + LCD_Offset);
+      lcd.setCursor(6 ,0);
       for (j = 0; j < 8; j++) {
         if (EditBufferOrig[j] < 0x20) { // cf ASCII tables
           EditBufferOrig[j] = EditBufferOrig[j] + 0x40; // +64 (0x40) compatible with Matrix 1000 patch names
@@ -188,25 +188,24 @@ void UI_Display_Patch (void)
         LCD_PrintChar(EditBufferOrig[j]);
       }
       // storage destination :
-      LCD_CursorSet(15 + LCD_Offset);
-      // LCD_PrintCString(F("u"));
+      lcd.setCursor(15 ,0);
       LCD_PrintBCD1(uBank[device]);
       LCD_PrintBCD2(uPatch[device]);
       if (uPatch[device] < 10) { // Patch
-        LCD_CursorSet(16 + LCD_Offset);
+        lcd.setCursor(16,0);
         LCD_PrintCString(F("0"));
       }
 
       //2nd line
-      LCD_CursorSet(65 + LCD_Offset);
+      lcd.setCursor(1,1);
       lcd.write((byte)6); //LCD_PrintChar(CHAR_DOWN);
-      LCD_CursorSet(69 + LCD_Offset);
+      lcd.setCursor(5,1);
       lcd.write((byte)7); //LCD_PrintChar(CHAR_UP);
-      LCD_CursorSet(72 + LCD_Offset);
+      lcd.setCursor(8,1);
       LCD_PrintCString(F("SAVE"));
-      LCD_CursorSet(78 + LCD_Offset);
+      lcd.setCursor(14,1);
       lcd.write((byte)6); //LCD_PrintChar(CHAR_DOWN);
-      LCD_CursorSet(82 + LCD_Offset);
+      lcd.setCursor(18,1);
       lcd.write((byte)7); //LCD_PrintChar(CHAR_UP);
       break;
 
@@ -222,11 +221,11 @@ void UI_Display_Patch (void)
       DOUT_PinSet1(DIN_ConfigMap[DIN_PAGE].dout_pin);     // on
       DOUT_PinSet0(DIN_ConfigMap[DIN_EDIT].dout_pin);     // off
 
-      lcd.clear();
+      LCD_Clear();
       lcd.setCursor(0, 0);
       lcd.print(F("COPY & PASTE :      "));
       lcd.setCursor(0, 1);
-      lcd.print(F("Cpy Past Edt/Arp/Seq"));
+      lcd.print(F("Cpy|Pst> Edt Arp Seq"));
       DOUT_PinSet(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin, copy);
       DOUT_PinSet(DIN_ConfigMap[DIN_FILTER].dout_pin, paste);
       break;
@@ -237,7 +236,7 @@ void UI_Display_Patch (void)
       DOUT_PinSet0(DIN_ConfigMap[DIN_CFG].dout_pin);     // off
       DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 1);
       // 1st line
-      lcd.clear();
+      LCD_Clear();
       lcd.setCursor(0, 0);
       lcd.print(F("PATCH page5"));
       break;
@@ -275,7 +274,8 @@ void UI_Handle_Patch(void)
         if (Shift)
         {
           ui_toggleSeq = !ui_toggleSeq;
-          if (seqPushedKey != 255) HandleNoteOff(seqPushedKey, 0x00, MIDI_CHANNEL);
+          if (seqPushedKey != 255) 
+            HandleNoteOff(seqPushedKey, 0x00, MIDI_CHANNEL);
         }
         else
         {
@@ -297,7 +297,7 @@ void UI_Handle_Patch(void)
         lcd.print(F("EditBuffer, Unison, "));
         lcd.setCursor(0, 1);
         lcd.print(F("Arp & Seq saved !   "));
-        elapsedTime = 0; // temp msg
+        elapsedTime = 30000; // temp msg
 
         ArpParameters_Store(device); // copy the ui_ in buffer[device] done in WritePatchtoBS() below
         Write_Patch_To_BS(device, uBank[device], uPatch[device]); // save patch buffer in BS
@@ -320,6 +320,7 @@ void UI_Handle_Patch(void)
         }
         // send EditBuffer[device] to core out for copy/past in MidiMonitor.app if necessary
         SendEditBuffer(device, INTERFACE_SERIAL3);
+        UpdateDinStates();
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL3, UnisonDetune[device]);
         break;
 
@@ -330,6 +331,7 @@ void UI_Handle_Patch(void)
           MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL, UnisonDetuneOrig);
         }
         SendEditBufferOrig(INTERFACE_SERIAL3);
+        UpdateDinStates();
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL3, UnisonDetuneOrig);
         break;
 
@@ -775,6 +777,3 @@ void UI_Handle_Patch(void)
     }
   }
 }//end of UI_Handle_Patch()
-
-
-

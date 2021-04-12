@@ -16,6 +16,7 @@ typedef union
     unsigned Display_Pot_Req: 1;
     unsigned Display_DOUT_Req: 1;		// not used
     unsigned Display_ENC_Req: 1;
+    unsigned Display_ARP_Req:1;
     //unsigned Transmit_Delayed_Pot:1;	//added for matrix
   };
 } app_flags_t;

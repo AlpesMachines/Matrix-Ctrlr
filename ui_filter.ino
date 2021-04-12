@@ -131,7 +131,7 @@ void UI_Display_Filter()
       LCD_PrintCString(F("ON "));
     }
 
-//    lcd.clear();
+//    LCD_Clear();
 //    lcd.print(F("FLT/VCA page3"));
 
   } // end page 3
@@ -319,5 +319,3 @@ unsigned char getFreeModBus(void)
   }
   return bus; // none found
 }
-
-

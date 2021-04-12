@@ -44,122 +44,122 @@ const char pitchNotation8[] PROGMEM = {"G#-1"};
 const char pitchNotation9[] PROGMEM = {"A-1 "};
 const char pitchNotation10[] PROGMEM = {"A#-1"};
 const char pitchNotation11[] PROGMEM = {"B-1 "};
-const char pitchNotation12[] PROGMEM = {" C0 "};
-const char pitchNotation13[] PROGMEM = {" C#0"};
-const char pitchNotation14[] PROGMEM = {" D0 "};
-const char pitchNotation15[] PROGMEM = {" D#0"};
-const char pitchNotation16[] PROGMEM = {" E0 "};
-const char pitchNotation17[] PROGMEM = {" F0 "};
-const char pitchNotation18[] PROGMEM = {" F#0"};
-const char pitchNotation19[] PROGMEM = {" G0 "};
-const char pitchNotation20[] PROGMEM = {" G#0"};
-const char pitchNotation21[] PROGMEM = {" A0 "};
-const char pitchNotation22[] PROGMEM = {" A#0"};
-const char pitchNotation23[] PROGMEM = {" B0 "};
-const char pitchNotation24[] PROGMEM = {" C1 "};
-const char pitchNotation25[] PROGMEM = {" C#1"};
-const char pitchNotation26[] PROGMEM = {" D1 "};
-const char pitchNotation27[] PROGMEM = {" D#1"};
-const char pitchNotation28[] PROGMEM = {" E1 "};
-const char pitchNotation29[] PROGMEM = {" F1 "};
-const char pitchNotation30[] PROGMEM = {" F#1"};
-const char pitchNotation31[] PROGMEM = {" G1 "};
-const char pitchNotation32[] PROGMEM = {" G#1"};
-const char pitchNotation33[] PROGMEM = {" A1 "};
-const char pitchNotation34[] PROGMEM = {" A#1"};
-const char pitchNotation35[] PROGMEM = {" B1 "};
-const char pitchNotation36[] PROGMEM = {" C2 "};
-const char pitchNotation37[] PROGMEM = {" C#2"};
-const char pitchNotation38[] PROGMEM = {" D2 "};
-const char pitchNotation39[] PROGMEM = {" D#2"};
-const char pitchNotation40[] PROGMEM = {" E2 "};
-const char pitchNotation41[] PROGMEM = {" F2 "};
-const char pitchNotation42[] PROGMEM = {" F#2"};
-const char pitchNotation43[] PROGMEM = {" G2 "};
-const char pitchNotation44[] PROGMEM = {" G#2"};
-const char pitchNotation45[] PROGMEM = {" A2 "};
-const char pitchNotation46[] PROGMEM = {" A#2"};
-const char pitchNotation47[] PROGMEM = {" B2 "};
-const char pitchNotation48[] PROGMEM = {" C3 "};
-const char pitchNotation49[] PROGMEM = {" C#3"};
-const char pitchNotation50[] PROGMEM = {" D3 "};
-const char pitchNotation51[] PROGMEM = {" D#3"};
-const char pitchNotation52[] PROGMEM = {" E3 "};
-const char pitchNotation53[] PROGMEM = {" F3 "};
-const char pitchNotation54[] PROGMEM = {" F#3"};
-const char pitchNotation55[] PROGMEM = {" G3 "};
-const char pitchNotation56[] PROGMEM = {" G#3"};
-const char pitchNotation57[] PROGMEM = {" A3 "};
-const char pitchNotation58[] PROGMEM = {" A#3"};
-const char pitchNotation59[] PROGMEM = {" B3 "};
-const char pitchNotation60[] PROGMEM = {" C4 "};
-const char pitchNotation61[] PROGMEM = {" C#4"};
-const char pitchNotation62[] PROGMEM = {" D4 "};
-const char pitchNotation63[] PROGMEM = {" D#4"};
-const char pitchNotation64[] PROGMEM = {" E4 "};
-const char pitchNotation65[] PROGMEM = {" F4 "};
-const char pitchNotation66[] PROGMEM = {" F#4"};
-const char pitchNotation67[] PROGMEM = {" G4 "};
-const char pitchNotation68[] PROGMEM = {" G#4"};
-const char pitchNotation69[] PROGMEM = {" A4 "};
-const char pitchNotation70[] PROGMEM = {" A#4"};
-const char pitchNotation71[] PROGMEM = {" B4 "};
-const char pitchNotation72[] PROGMEM = {" C5 "};
-const char pitchNotation73[] PROGMEM = {" C#5"};
-const char pitchNotation74[] PROGMEM = {" D5 "};
-const char pitchNotation75[] PROGMEM = {" D#5"};
-const char pitchNotation76[] PROGMEM = {" E5 "};
-const char pitchNotation77[] PROGMEM = {" F5 "};
-const char pitchNotation78[] PROGMEM = {" F#5"};
-const char pitchNotation79[] PROGMEM = {" G5 "};
-const char pitchNotation80[] PROGMEM = {" G#5"};
-const char pitchNotation81[] PROGMEM = {" A5 "};
-const char pitchNotation82[] PROGMEM = {" A#5"};
-const char pitchNotation83[] PROGMEM = {" B5 "};
-const char pitchNotation84[] PROGMEM = {" C6 "};
-const char pitchNotation85[] PROGMEM = {" C#6"};
-const char pitchNotation86[] PROGMEM = {" D6 "};
-const char pitchNotation87[] PROGMEM = {" D#6"};
-const char pitchNotation88[] PROGMEM = {" E6 "};
-const char pitchNotation89[] PROGMEM = {" F6 "};
-const char pitchNotation90[] PROGMEM = {" F#6"};
-const char pitchNotation91[] PROGMEM = {" G6 "};
-const char pitchNotation92[] PROGMEM = {" G#6"};
-const char pitchNotation93[] PROGMEM = {" A6 "};
-const char pitchNotation94[] PROGMEM = {" A#6"};
-const char pitchNotation95[] PROGMEM = {" B6 "};
-const char pitchNotation96[] PROGMEM = {" C7 "};
-const char pitchNotation97[] PROGMEM = {" C#7"};
-const char pitchNotation98[] PROGMEM = {" D7 "};
-const char pitchNotation99[] PROGMEM = {" D#7"};
-const char pitchNotation100[] PROGMEM = {" E7 "};
-const char pitchNotation101[] PROGMEM = {" F7 "};
-const char pitchNotation102[] PROGMEM = {" F#7"};
-const char pitchNotation103[] PROGMEM = {" G7 "};
-const char pitchNotation104[] PROGMEM = {" G#7"};
-const char pitchNotation105[] PROGMEM = {" A7 "};
-const char pitchNotation106[] PROGMEM = {" A#7"};
-const char pitchNotation107[] PROGMEM = {" B7 "};
-const char pitchNotation108[] PROGMEM = {" C8 "};
-const char pitchNotation109[] PROGMEM = {" C#8"};
-const char pitchNotation110[] PROGMEM = {" D8 "};
-const char pitchNotation111[] PROGMEM = {" D#8"};
-const char pitchNotation112[] PROGMEM = {" E8 "};
-const char pitchNotation113[] PROGMEM = {" F8 "};
-const char pitchNotation114[] PROGMEM = {" F#8"};
-const char pitchNotation115[] PROGMEM = {" G8 "};
-const char pitchNotation116[] PROGMEM = {" G#8"};
-const char pitchNotation117[] PROGMEM = {" A8 "};
-const char pitchNotation118[] PROGMEM = {" A#8"};
-const char pitchNotation119[] PROGMEM = {" B8 "};
-const char pitchNotation120[] PROGMEM = {" C9 "};
-const char pitchNotation121[] PROGMEM = {" C#9"};
-const char pitchNotation122[] PROGMEM = {" D9 "};
-const char pitchNotation123[] PROGMEM = {" D#9"};
-const char pitchNotation124[] PROGMEM = {" E9 "};
-const char pitchNotation125[] PROGMEM = {" F9 "};
-const char pitchNotation126[] PROGMEM = {" F#9"};
-const char pitchNotation127[] PROGMEM = {" G9 "};
+const char pitchNotation12[] PROGMEM = {"C0  "};
+const char pitchNotation13[] PROGMEM = {"C#0 "};
+const char pitchNotation14[] PROGMEM = {"D0  "};
+const char pitchNotation15[] PROGMEM = {"D#0 "};
+const char pitchNotation16[] PROGMEM = {"E0  "};
+const char pitchNotation17[] PROGMEM = {"F0  "};
+const char pitchNotation18[] PROGMEM = {"F#0 "};
+const char pitchNotation19[] PROGMEM = {"G0  "};
+const char pitchNotation20[] PROGMEM = {"G#0 "};
+const char pitchNotation21[] PROGMEM = {"A0  "};
+const char pitchNotation22[] PROGMEM = {"A#0 "};
+const char pitchNotation23[] PROGMEM = {"B0  "};
+const char pitchNotation24[] PROGMEM = {"C1  "};
+const char pitchNotation25[] PROGMEM = {"C#1 "};
+const char pitchNotation26[] PROGMEM = {"D1  "};
+const char pitchNotation27[] PROGMEM = {"D#1 "};
+const char pitchNotation28[] PROGMEM = {"E1  "};
+const char pitchNotation29[] PROGMEM = {"F1  "};
+const char pitchNotation30[] PROGMEM = {"F#1 "};
+const char pitchNotation31[] PROGMEM = {"G1  "};
+const char pitchNotation32[] PROGMEM = {"G#1 "};
+const char pitchNotation33[] PROGMEM = {"A1  "};
+const char pitchNotation34[] PROGMEM = {"A#1 "};
+const char pitchNotation35[] PROGMEM = {"B1  "};
+const char pitchNotation36[] PROGMEM = {"C2  "};
+const char pitchNotation37[] PROGMEM = {"C#2 "};
+const char pitchNotation38[] PROGMEM = {"D2  "};
+const char pitchNotation39[] PROGMEM = {"D#2 "};
+const char pitchNotation40[] PROGMEM = {"E2  "};
+const char pitchNotation41[] PROGMEM = {"F2  "};
+const char pitchNotation42[] PROGMEM = {"F#2 "};
+const char pitchNotation43[] PROGMEM = {"G2  "};
+const char pitchNotation44[] PROGMEM = {"G#2 "};
+const char pitchNotation45[] PROGMEM = {"A2  "};
+const char pitchNotation46[] PROGMEM = {"A#2 "};
+const char pitchNotation47[] PROGMEM = {"B2  "};
+const char pitchNotation48[] PROGMEM = {"C3  "};
+const char pitchNotation49[] PROGMEM = {"C#3 "};
+const char pitchNotation50[] PROGMEM = {"D3  "};
+const char pitchNotation51[] PROGMEM = {"D#3 "};
+const char pitchNotation52[] PROGMEM = {"E3  "};
+const char pitchNotation53[] PROGMEM = {"F3  "};
+const char pitchNotation54[] PROGMEM = {"F#3 "};
+const char pitchNotation55[] PROGMEM = {"G3  "};
+const char pitchNotation56[] PROGMEM = {"G#3 "};
+const char pitchNotation57[] PROGMEM = {"A3  "};
+const char pitchNotation58[] PROGMEM = {"A#3 "};
+const char pitchNotation59[] PROGMEM = {"B3  "};
+const char pitchNotation60[] PROGMEM = {"C4  "};
+const char pitchNotation61[] PROGMEM = {"C#4 "};
+const char pitchNotation62[] PROGMEM = {"D4  "};
+const char pitchNotation63[] PROGMEM = {"D#4 "};
+const char pitchNotation64[] PROGMEM = {"E4  "};
+const char pitchNotation65[] PROGMEM = {"F4  "};
+const char pitchNotation66[] PROGMEM = {"F#4 "};
+const char pitchNotation67[] PROGMEM = {"G4  "};
+const char pitchNotation68[] PROGMEM = {"G#4 "};
+const char pitchNotation69[] PROGMEM = {"A4  "};
+const char pitchNotation70[] PROGMEM = {"A#4 "};
+const char pitchNotation71[] PROGMEM = {"B4  "};
+const char pitchNotation72[] PROGMEM = {"C5  "};
+const char pitchNotation73[] PROGMEM = {"C#5 "};
+const char pitchNotation74[] PROGMEM = {"D5  "};
+const char pitchNotation75[] PROGMEM = {"D#5 "};
+const char pitchNotation76[] PROGMEM = {"E5  "};
+const char pitchNotation77[] PROGMEM = {"F5  "};
+const char pitchNotation78[] PROGMEM = {"F#5 "};
+const char pitchNotation79[] PROGMEM = {"G5  "};
+const char pitchNotation80[] PROGMEM = {"G#5 "};
+const char pitchNotation81[] PROGMEM = {"A5  "};
+const char pitchNotation82[] PROGMEM = {"A#5 "};
+const char pitchNotation83[] PROGMEM = {"B5  "};
+const char pitchNotation84[] PROGMEM = {"C6  "};
+const char pitchNotation85[] PROGMEM = {"C#6 "};
+const char pitchNotation86[] PROGMEM = {"D6  "};
+const char pitchNotation87[] PROGMEM = {"D#6 "};
+const char pitchNotation88[] PROGMEM = {"E6  "};
+const char pitchNotation89[] PROGMEM = {"F6  "};
+const char pitchNotation90[] PROGMEM = {"F#6 "};
+const char pitchNotation91[] PROGMEM = {"G6  "};
+const char pitchNotation92[] PROGMEM = {"G#6 "};
+const char pitchNotation93[] PROGMEM = {"A6  "};
+const char pitchNotation94[] PROGMEM = {"A#6 "};
+const char pitchNotation95[] PROGMEM = {"B6  "};
+const char pitchNotation96[] PROGMEM = {"C7  "};
+const char pitchNotation97[] PROGMEM = {"C#7 "};
+const char pitchNotation98[] PROGMEM = {"D7  "};
+const char pitchNotation99[] PROGMEM = {"D#7 "};
+const char pitchNotation100[] PROGMEM = {"E7  "};
+const char pitchNotation101[] PROGMEM = {"F7  "};
+const char pitchNotation102[] PROGMEM = {"F#7 "};
+const char pitchNotation103[] PROGMEM = {"G7  "};
+const char pitchNotation104[] PROGMEM = {"G#7 "};
+const char pitchNotation105[] PROGMEM = {"A7  "};
+const char pitchNotation106[] PROGMEM = {"A#7 "};
+const char pitchNotation107[] PROGMEM = {"B7  "};
+const char pitchNotation108[] PROGMEM = {"C8  "};
+const char pitchNotation109[] PROGMEM = {"C#8 "};
+const char pitchNotation110[] PROGMEM = {"D8  "};
+const char pitchNotation111[] PROGMEM = {"D#8 "};
+const char pitchNotation112[] PROGMEM = {"E8  "};
+const char pitchNotation113[] PROGMEM = {"F8  "};
+const char pitchNotation114[] PROGMEM = {"F#8 "};
+const char pitchNotation115[] PROGMEM = {"G8  "};
+const char pitchNotation116[] PROGMEM = {"G#8 "};
+const char pitchNotation117[] PROGMEM = {"A8  "};
+const char pitchNotation118[] PROGMEM = {"A#8 "};
+const char pitchNotation119[] PROGMEM = {"B8  "};
+const char pitchNotation120[] PROGMEM = {"C9  "};
+const char pitchNotation121[] PROGMEM = {"C#9 "};
+const char pitchNotation122[] PROGMEM = {"D9  "};
+const char pitchNotation123[] PROGMEM = {"D#9 "};
+const char pitchNotation124[] PROGMEM = {"E9  "};
+const char pitchNotation125[] PROGMEM = {"F9  "};
+const char pitchNotation126[] PROGMEM = {"F#9 "};
+const char pitchNotation127[] PROGMEM = {"G9  "};
 
 // https://github.com/arduino/Arduino/wiki/1.6-Frequently-Asked-Questions  And, yes, it's really tricky even for experts!
 
@@ -302,6 +302,7 @@ unsigned char enc_value; // general purpose value for test
 unsigned char arp_on; // launch clockbox (PLAY/STOP)
 
 bool ui_SetAB;
+bool ui_aSplitLearning;
 bool ui_toggleSeq;
 unsigned char ui_aSplit;
 unsigned char ui_TrspA;
@@ -481,6 +482,7 @@ void UI_Display_Arp()
         SPD REC Opt PLAY StP
 
       */
+      
       DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);   // off
       DOUT_PinSet0(DIN_ConfigMap[DIN_EDIT].dout_pin);    // off
       DOUT_PinSet1(DIN_ConfigMap[DIN_ARP].dout_pin);     // ON
@@ -488,7 +490,7 @@ void UI_Display_Arp()
       // 1st line
       if (SoftPanel.IsNewPage)
       {
-        lcd.clear();
+        LCD_Clear(); // 
         lcd.setCursor(0, 0);
         lcd.print(F("SPD REC PLAY R/T StP"));
       }
@@ -610,9 +612,8 @@ void UI_Display_Arp()
         }
       }
 
-      if (ui_seqPlay)
-      {
-        // print seq pitch e.g C#3,rest,tie under R/T
+      if (ui_seqPlay) {
+        // print seq pitch while playing it e.g C#3,rest,tie under R/T
         lcd.setCursor(13, 1);
         if (sequence[seqPlayStep][1] == 0) // rest
           lcd.print(F("    "));
@@ -651,7 +652,7 @@ void UI_Display_Arp()
 
       // bpm
       lcd.setCursor(0, 1);
-      switch (ui_external_clk)
+      switch (systmClock)
       {
         case INTCLK:
           LCD_PrintBCD3(bpm);
@@ -673,14 +674,21 @@ void UI_Display_Arp()
           lcd.print(F("mTg "));
           break;
 
+//        case SYSCLK:
+//          if (systmClock == systmClock && systmClock == INTCLK)
+//            LCD_PrintBCD3(bpm);
+//          else
+//            lcd.print(F("Sys "));
+//          break;
+
         default:
           lcd.print(F("--- "));
           break;
       }
-      if (ui_external_clk == INTCLK)
-        DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
-      else
-        DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
+//      if (systmClock == INTCLK)
+//        DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
+//      else
+//        DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
 
 
       lcd.setCursor(4, 1); // activate the arp router
@@ -719,12 +727,12 @@ void UI_Display_Arp()
       lcd.setCursor(17, 1); //  HOLD indicator
       if (ui_aHold)
       {
-        lcd.print(F(" *  "));
+        lcd.print(F(" * "));
         DOUT_PinSet1(DIN_ConfigMap[DIN_MATRIX].dout_pin);   // on
       }
       else
       {
-        lcd.print(F(" .  "));
+        lcd.print(F(" . "));
         DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX].dout_pin);   // off
       }
 
@@ -745,7 +753,7 @@ void UI_Display_Arp()
       // 1st line
       if (SoftPanel.IsNewPage)
       {
-        lcd.clear();
+        LCD_Clear();
         lcd.setCursor(0, 0);
         lcd.print(F("SET SPLT TrA TrS SEQ"));
       }
@@ -820,22 +828,16 @@ void UI_Handle_Arp()
 
     case DIN_ARP:
       if (Shift)
-       SendSingleArpData(INTERFACE_SERIAL3, uPatch[device]);
+        SendSingleArpData(INTERFACE_SERIAL3, uPatch[device]);
       break;
   }
 
-  if (SoftPanel.Page == SOFT_PAGE3) ////////////////// arp page : arp setup //////////////
+  if (SoftPanel.Page == SOFT_PAGE3) ////////////////// arp page 3 : arp setup //////////////
   {
     switch (SoftPanel.Button)
     {
       case DIN_PAGE: // next page
         SoftPanel.Page = SOFT_PAGE4;
-        break;
-
-      case SOFT_EDIT_1:  // int/mid/s24/trig midiclock state
-        ++ui_external_clk;
-        if (ui_external_clk > MTRGCLK)
-          ui_external_clk = INTCLK;
         break;
 
       case SOFT_EDIT_2: // AB cfg
@@ -878,25 +880,16 @@ void UI_Handle_Arp()
         break;
 
       case Edit1:
-        // encoder : set BPM :: WORK :)
-        if (ui_external_clk == INTCLK)
-        {
           SetEncoderValueARP(&bpm, BPM_Max);
           if (bpm < BPM_min)
             bpm = BPM_min;
-        }
-
-        if (ui_external_clk != INTCLK)
-          DOUT_PinSet1(DIN_ConfigMap[DIN_FILTER].dout_pin);    // on
-        else
-          DOUT_PinSet0(DIN_ConfigMap[DIN_FILTER].dout_pin);    // off
-        break;
+            uClock.setTempo(bpm);
 
       default:
         break;
     }
   }
-  else if (SoftPanel.Page == SOFT_PAGE1) /////////////// arp page : ARP ///////////////////
+  else if (SoftPanel.Page == SOFT_PAGE1) /////////////// arp page1 : ARP ///////////////////
   {
     switch (SoftPanel.Button)
     {
@@ -983,6 +976,9 @@ void UI_Handle_Arp()
       case Edit2:
         DOUT_PinSet_Keypanel(0, 1, 0, 0, 0, 0);
         SetEncoderValueARP(&ui_aSplit, 127);
+
+        // here we could implement a midi learn of the pitch for split (only by NoteOn msg)
+        ui_aSplitLearning = true;
         break;
 
       case Edit3:
@@ -1042,7 +1038,7 @@ void UI_Handle_Arp()
         ui_seqRec = !ui_seqRec;
 
 #if DEBUG_SEQ
-        Serial.print(F("ui_external_clk = ")); Serial.println(ui_external_clk, DEC);
+        Serial.print(F("systmClock = ")); Serial.println(systmClock, DEC);
         Serial.print(F("ui_seqRec = ")); Serial.println(ui_seqRec, DEC);
         Serial.print(F("ui_seqPlay = ")); Serial.println(ui_seqPlay, DEC);
 #endif
@@ -1050,11 +1046,11 @@ void UI_Handle_Arp()
 
       case SOFT_EDIT_3: // stop record sequence & play/stop sequence
         ui_seqRec = false;
-        ui_seqPlay = !ui_seqPlay;
+        ui_seqPlay = !ui_seqPlay; // + ui_toggleSeq
         seqTick = 0;
 
 #if DEBUG_SEQ
-        Serial.print(F("ui_external_clk = ")); Serial.println(ui_external_clk, DEC);
+        Serial.print(F("systmClock = ")); Serial.println(systmClock, DEC);
         Serial.print(F("ui_seqRec = ")); Serial.println(ui_seqRec, DEC);
         Serial.print(F("ui_seqPlay = ")); Serial.println(ui_seqPlay, DEC);
 #endif
@@ -1106,7 +1102,7 @@ void UI_Handle_Arp()
         break;
 
 #if DEBUG_SEQ
-        Serial.print(F("ui_external_clk = ")); Serial.println(ui_external_clk, DEC);
+        Serial.print(F("systmClock = ")); Serial.println(systmClock, DEC);
         Serial.print(F("ui_seqRec = ")); Serial.println(ui_seqRec, DEC);
         Serial.print(F("ui_seqPlay = ")); Serial.println(ui_seqPlay, DEC);
 #endif
@@ -1228,4 +1224,3 @@ char SetEncoderValue3ARP(char *value)
   }
   else return 0;
 }
-

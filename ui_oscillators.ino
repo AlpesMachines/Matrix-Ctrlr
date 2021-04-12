@@ -388,5 +388,3 @@ void UI_Handle_Oscillators()
       break;
   }
 }
-
-

@@ -402,5 +402,3 @@ void handle_matrix_page3()
       MIDI_SendVoiceParam(INTERFACE_SERIAL, param, value, true);
   }
 }
-
-

@@ -296,7 +296,7 @@ const unsigned char Default_Sequence[10][32][2] PROGMEM = { // 32 steps (could b
     {48, 97}, //
     {48, 80}, //
 
-    {36, 80}, // 
+    {36, 80}, //
     {36, 80}, //
     {36, 80}, //
     {36, 80}, //
@@ -581,7 +581,7 @@ void Insert_SeqRest(unsigned char param)
 /////////////////////////////////////////////////////////////////////////////////////////
 // used to play the seq
 /////////////////////////////////////////////////////////////////////////////////////////
-void Play_Seq(byte pitch, byte velocity, byte channel, bool trigger)
+void Play_Seq(byte pitch, byte velocity, byte channel, bool type)
 {
   if (ui_seqPlay && (channel == MIDI_CHANNEL))
   {
@@ -599,10 +599,10 @@ void Play_Seq(byte pitch, byte velocity, byte channel, bool trigger)
     playSeqTrigger[0] = pitch;
     playSeqTrigger[1] = velocity;
     playSeqTrigger[2] = channel;
-    playSeqTrigger[3] = trigger; // = seqTrig (note on/off = true/false)
+    playSeqTrigger[3] = type; // = seqTrig (note on/off = true/false)
 
     // update display lcd :
-    if (SoftPanel.Mode == Arp) UI_Display_Arp();
+    //if (SoftPanel.Mode == Arp) UI_Display_Arp();
 
   }
   else
@@ -658,11 +658,13 @@ void SEQ(void)
         {
           MIDI3.sendNoteOn(sequence[seqPlayStep][0] - sequence[0][0] + playSeqTrigger[0] + ((TrspB << 2) + (TrspB << 3) - 36), sequence[seqPlayStep][1] - sequence[0][1] + playSeqTrigger[1], MIDI_CHANNEL);
         }
-      }
 
-      // update display lcd : if you like but you'll permanently switch from other menus while playing otherwise
-      if (SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE2)
-        UI_Display_Arp();
+        // update display lcd :
+        if (SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE2) {   
+          app_flags.Display_ARP_Req = 1;
+          //UI_Display_Arp(); // ralenti bcp trop les bpm émis : 115 au lieu de 120 -> usage du flag à la place
+        }
+      }
 #if DEBUG_SEQ
       Serial.print(F("seqPlayStep = ")); Serial.println(seqPlayStep, DEC); Serial.println();
       Serial.print(F("play_Seq de seq.ino NteOn interface 1 :: pitch: $")); Serial.print(sequence[seqPlayStep][0], HEX); Serial.print(F(" velo: $")); Serial.print(sequence[seqPlayStep][1], HEX); Serial.print(F(" channel: $")); Serial.println (MIDI_CHANNEL, HEX);
@@ -822,11 +824,13 @@ void SEQ2(bool trig)
         {
           MIDI3.sendNoteOn(sequence[seqPlayStep][0] - sequence[0][0] + playSeqTrigger[0] + ((TrspB << 2) + (TrspB << 3) - 36), sequence[seqPlayStep][1] - sequence[0][1] + playSeqTrigger[1], MIDI_CHANNEL);
         }
-      }
 
-      // update display lcd : if you like but you'll permanently switch from other menus while playing otherwise
-      if (SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE2)
-        UI_Display_Arp();
+        // update display lcd :
+        if (SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE2) {   
+          app_flags.Display_ARP_Req = 1;
+          //UI_Display_Arp(); // ralenti bcp trop les bpm émis : 115 au lieu de 120 -> usage du flag à la place
+        }
+      }
 #if DEBUG_SEQ
       Serial.print(F("seqPlayStep = ")); Serial.println(seqPlayStep, DEC); Serial.println();
       Serial.print(F("play_Seq de seq.ino NteOn interface 1 :: pitch: $")); Serial.print(sequence[seqPlayStep][0], HEX); Serial.print(F(" velo: $")); Serial.print(sequence[seqPlayStep][1], HEX); Serial.print(F(" channel: $")); Serial.println (MIDI_CHANNEL, HEX);
@@ -917,4 +921,3 @@ void SEQ2(bool trig)
     }
   }
 }
-

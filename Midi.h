@@ -11,7 +11,7 @@ extern void MIDI_SendSysex(unsigned char interface, byte* sysex);
 void MIDI_SendChannel(void);
 void MIDI_SendPatchProgram(unsigned char interface, unsigned char program);
 void MIDI_SendPatchNumber(unsigned char interface, unsigned char bank, unsigned char program);
-void MIDI_RequestEditBuffer(unsigned char device,unsigned char interface, unsigned char program);
+void MIDI_RequestEditBuffer(unsigned char device, unsigned char interface, unsigned char program);
 void MIDI_RequestSinglePatch(unsigned char interface, unsigned char program);
 void MIDI_RequestMasterParameters(unsigned char interface);
 void MIDI_BankRequest(unsigned char interface, unsigned char bank_req);
@@ -39,5 +39,3 @@ void MIDI_HandleRemoteParameterEdit(unsigned char byte);
 void MIDI_HandleRemoteModulationEdit(unsigned char byte);
 
 #endif
-
-

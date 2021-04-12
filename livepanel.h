@@ -9,6 +9,6 @@ extern void LivePanel_BlinkLEDs(void);
 extern void LivePanel_Init(void);
 extern void LivePanel_HandleAin(unsigned char pin , unsigned char pin_value);
 extern void LivePanel_HandleTransmitDelay(void);
-extern void LivePanel_DisplayAin();
+//extern void LivePanel_DisplayAin();
 
 #endif

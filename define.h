@@ -16,10 +16,10 @@
 #define INTERFACE_SERIAL2 2
 #define INTERFACE_SERIAL3 3
 
-//#if SOFTSERIAL_ENABLED
+#if SOFTSERIAL_ENABLED
 #define INTERFACE_SERIAL4 4
 #define INTERFACE_SERIAL5 5
-//#endif
+#endif
 
 #define encoder0PinA  2
 #define encoder0PinB  3
@@ -30,15 +30,17 @@
 #define SHIFT_VALUE 9 // value given to shift button pressed
 #define ALT_VALUE 1
 
-#define TRIGGER_INPUT_Pin A11
-#define ANALOGCLOCK_Pin A10
-#define INTCLK 0
+#define TRIGGER_Pin A11
+#define SYNC24_Pin A10
+
+#define SYSCLK -1
 #define MIDCLK 1
 #define S24CLK 2
 #define TRGCLK 3
 #define MTRGCLK 4
+#define INTCLK 0
 
-#define MIDI_TRIGGER_NOTE 37
+#define MIDI_TRIGGER_NOTE 37 // 37 = rimshot
 #define MIDI_DRUMS_CHANNEL 10
 
 
@@ -110,6 +112,9 @@
 #define EEPROM_Z_ACTIVE 38
 
 #define EEPROM_LOCAL_CONTROL 39
+#define EEPROM_FILTER_RATIO 40
+#define EEPROM_SYS_CLK 41
+//#define EEPROM_SYS_BPM 42
 
 
 #define EEPROM_GLOBALPARAMETERS 500 // 172 bytes ! start address 500 , end adress 671 included
@@ -427,4 +432,3 @@
 
 
 #endif
-

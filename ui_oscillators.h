@@ -5,4 +5,3 @@ void UI_Display_Oscillators(void);
 void UI_Handle_Oscillators(void);
 
 #endif
-

@@ -231,6 +231,3 @@ const pots PotConfigMap[] =
   {   SX_ENV3_RELEASE,          0,   63, UNSIGNED6, 1}, // ain_pin 30
   {   SX_LFO2_SPEEDMODULATION,  0,  127, SIGNED7, 1} // ain_pin 31
 };
-
-
-

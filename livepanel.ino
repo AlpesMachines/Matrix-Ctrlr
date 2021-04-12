@@ -160,7 +160,7 @@ void LivePanel_DinHandler(unsigned char pin)
 /////////////////////////////////////////////////////////////////////////////
 void LivePanel_DisplayDin (unsigned char pin) // , unsigned char value
 {
-  lcd.clear(); // risque de foutre la merde dans les menus EDIT : pas du tout :)
+  LCD_Clear(); // risque de foutre la merde dans les menus EDIT : pas du tout :)
   RefreshSoftPanel = 1; // soft panel display may have been overwritten, make sure it completely refreshes on a button click
 
   switch (pin) {
@@ -304,24 +304,25 @@ void LivePanel_BlinkLEDs(void)
     // nope
   }
 
-  // external trigger TR707
-  if (trigger && (ui_external_clk == TRGCLK))
-  {
-    DOUT_PinSet(DOUT_ACTIVITY2, DIN_STATE_ON);
-    //DOUT_PinSet(DOUT_ARP, DIN_STATE_ON); // nuit à la compréhension
-
-    trigger = 0;
-  }
-  else if ((DOUT_PinGet(DOUT_ACTIVITY2) == DIN_STATE_ON) && (ui_external_clk == TRGCLK))
-  {
-    DOUT_PinSet(DOUT_ACTIVITY2, DIN_STATE_OFF);
-    //DOUT_PinSet(DOUT_ARP, DIN_STATE_OFF); // nuit à compréhension
-
-  }
-  else
-  {
-    // nope
-  }
+//  --> managed in the interrupt now (fw 1.12)
+// // external trigger TR707 
+//  if (trigger && (systmClock == TRGCLK))
+//  {
+//    DOUT_PinSet(DOUT_ACTIVITY2, DIN_STATE_ON);
+//    //DOUT_PinSet(DOUT_ARP, DIN_STATE_ON); // nuit à la compréhension
+//
+//    trigger = 0;
+//  }
+//  else if ((DOUT_PinGet(DOUT_ACTIVITY2) == DIN_STATE_ON) && (systmClock == TRGCLK))
+//  {
+//    DOUT_PinSet(DOUT_ACTIVITY2, DIN_STATE_OFF);
+//    //DOUT_PinSet(DOUT_ARP, DIN_STATE_OFF); // nuit à compréhension
+//
+//  }
+//  else
+//  {
+//    // nope
+//  }
 
   // SHIFT BUTTON LED (On if Pressed, Off when released)
   if (Shift)
@@ -381,25 +382,18 @@ void LivePanel_BlinkLEDs(void)
 
     // blink F1 led if arp play & Hold
     if (router_arp_tag && !ui_aHold)
-    {
       DOUT_PinSet(DOUT_F1, DIN_STATE_ON);
-    }
     else if (router_arp_tag && ui_aHold)
-    {
       DOUT_PinSet(DOUT_F1, blink);
-    }
     else
       DOUT_PinSet(DOUT_F1, DIN_STATE_OFF);
 
     // blink F2 led if seqplay & toggle
     if (ui_seqPlay && !ui_toggleSeq)
-    {
       DOUT_PinSet(DOUT_F2, DIN_STATE_ON);
-    }
     else if (ui_seqPlay && ui_toggleSeq)
-    {
       DOUT_PinSet(DOUT_F2, blink);
-    }
+
     else
       DOUT_PinSet(DOUT_F2, DIN_STATE_OFF);
 
@@ -427,7 +421,11 @@ void LivePanel_HandleAin(unsigned char pin , unsigned char pin_value)
   else
     MIDI_SendVoiceParam(INTERFACE_SERIAL, param, value, mThru_XCc);
 
-  LivePanel_DisplayAin(pin, value);
+  if(SoftPanel.Mode != Cfg && MIDI_Incoming == false) {
+  //if(SoftPanel.Mode != Cfg && Serial3.peek() < 0) {
+    LivePanel_DisplayAin(pin, value); // don't show jittering pot value when setting JITTER in CFG/MISC
+    //app_flags.Display_Pot_Req = 1;
+  }
 
   // filter sustain is bugged, handle it here, and return
   if ((pin == POT_FILTER_SUSTAIN) && (Alt == 0)) // create bug on ENV3 AMP
@@ -517,6 +515,12 @@ unsigned char getvalue(unsigned char pin, unsigned char valu)
 /////////////////////////////////////////////////////////////////////////////
 void update_EditBuffer(unsigned char device, unsigned char param, unsigned char value)
 {
+#if DEBUG_uEB
+  Serial.print(F("update_EditBuffer(")); Serial.print(device, DEC); Serial.print(F(", "));
+  Serial.print(param, DEC); Serial.print(F(", "));
+  Serial.print(value, DEC); Serial.println(F(")"));
+#endif
+
   switch (param)
   {
     // made using Excel ;)
@@ -619,7 +623,7 @@ void update_EditBuffer(unsigned char device, unsigned char param, unsigned char 
     case SX_LFO2_SPEEDMODULATION  : EditBuffer[device][EB_LFO2_SPEEDMODULATION  ] = value; lastbyteindex = EB_LFO2_SPEEDMODULATION  ; break;
     case SX_UNISON_DETUNE         : UnisonDetune[device]                          = value; lastbyteindex = EB_UNISON_DETUNE         ; break;
 
-    // Matrix Modulation is missing because is doesn't have SX_ parameters despite it has EB_
+      // Matrix Modulation is missing because is doesn't have SX_ parameters despite it has EB_
   }
 }
 
@@ -628,6 +632,7 @@ void update_EditBuffer(unsigned char device, unsigned char param, unsigned char 
 /////////////////////////////////////////////////////////////////////////////
 void LivePanel_DisplayAin( char param, byte value)
 {
+  
   unsigned char ain_val;
   unsigned char valtype = PotConfigMap[last_ain_pin + Alt * 32].valtype;
 
@@ -694,4 +699,3 @@ void LivePanel_Init()
   Serial.println(F("LivePanel_Init()")); Serial.println();
 #endif
 }
-

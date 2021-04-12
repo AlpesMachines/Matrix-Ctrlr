@@ -37,7 +37,7 @@ const byte DefaultSystemConfig[47 ] PROGMEM = {
   1, // last matrix modelC
   1, // last matrix modelD
   0, // encoder inverted
-  0, // mthru xcc
+  false, // mthru xcc
   0, // internal clock
   0, // last bankB
   1, // last patchB
@@ -70,9 +70,11 @@ const byte DefaultSystemConfig[47 ] PROGMEM = {
   127, // EEPROM ZoneD
   4, // EEPROM ZoneD
 
-  0, // EEPROM_Z_ACTIVE
+  false, // EEPROM_Z_ACTIVE
   1, // localControl
-  0, 0, 0, 0, 0, 0, 0 // 7 free parameters
+  1, // EEPROM_FILTER_RATIO
+  INTCLK, // EEPROM_SYS_CLK
+  0, 0, 0, 0, 0 // 6 free parameters
 
 };
 
@@ -831,10 +833,10 @@ void SendPatchInit(unsigned char  interface)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -923,10 +925,10 @@ void SendEditBuffer(unsigned char device, unsigned char  interface)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1016,10 +1018,10 @@ void SendEditBufferOrig(unsigned char  interface)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1091,10 +1093,10 @@ void SendSinglePatchData(unsigned char interface, unsigned char patch_num)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1165,10 +1167,10 @@ void SendSingleUnison(unsigned char interface, unsigned char number)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1258,10 +1260,10 @@ void SendSingleArpData(unsigned char interface, unsigned char number)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1343,10 +1345,10 @@ void SendGlobalParametersInit(unsigned char interface)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1383,14 +1385,16 @@ void SendGlobalParameters(unsigned char interface)
   byte sysex[351];
 
   // print temp message on display
+  //LCD_Clear();
   lcd.setCursor(0, 1);
-  lcd.print(F("Dumping Master      "));
-  elapsedTime = 0;  //reset tmpMessage-
+  lcd.print(F("Dumping Master ...  "));
 
   for (i = 0; i < 172; i++)
   {
     GlobalParameters[i] = EEPROM.read(EEPROM_GLOBALPARAMETERS + i);
   }
+
+  elapsedTime = 0;  //reset tmpMessage-
 
 #if DEBUG_master
   Serial.println(F("SendGlobalParameters()"));
@@ -1433,10 +1437,10 @@ void SendGlobalParameters(unsigned char interface)
 
     case INTERFACE_SERIAL3:
       unsigned char tmp;
-      tmp = ui_external_clk;
-      ui_external_clk = true; // desactive F8 on serial port
+      tmp = systmClock;
+      systmClock = MIDCLK; // desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = tmp; // retrieve state
+      systmClock = tmp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1460,8 +1464,8 @@ void SendGlobalParameters(unsigned char interface)
 //////////////////////////////////////////////////////////
 void DumpCtrlrBank(unsigned char interface, unsigned char bank)
 {
-  unsigned char tmp = ui_external_clk;
-  ui_external_clk = MIDCLK; // desactive 0xF8 clock message on serial port
+  unsigned char tmp = systmClock;
+  systmClock = MIDCLK; // desactive 0xF8 clock message on serial port
 
   // send patch 0 to patch 99 :
   for (unsigned char k = 0; k < 100; k++)
@@ -1503,7 +1507,7 @@ void DumpCtrlrBank(unsigned char interface, unsigned char bank)
   lcd.print(F("Dump Bank finished  "));
   elapsedTime = 0;  //reset tmpMessage
 
-  ui_external_clk = tmp; // retrieve state
+  systmClock = tmp; // retrieve state
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1525,12 +1529,7 @@ void StoreEditBuffer(unsigned char interface, unsigned char bank, unsigned char 
   sysex[7] = 0x7f;
   sysex[8] = 0xf7;
 
-  lcd.setCursor(0, 1);
-  lcd.print(F("Patch stored in Matrx"));
-  elapsedTime = 0;  //reset tmpMessage
-
-  switch (interface)
-  {
+  switch (interface) {
     case  INTERFACE_SERIAL1:
       MIDI1.sendSysEx (sizeof(sysex), sysex, true);
       break;
@@ -1553,7 +1552,10 @@ void StoreEditBuffer(unsigned char interface, unsigned char bank, unsigned char 
       break;
   }
 
-
+  // print a short msg on display :
+  lcd.setCursor(0, 1);
+  lcd.print(F("Patch stored in Matrx"));
+  elapsedTime = 1000;  //reset tmpMessage
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1569,10 +1571,7 @@ void Set_OrigArpUniSeq_toDefault(void)
     ArpParametersOrig[j] = pgm_read_byte_near (&Default_ArpParameters[j][0]);
 
   //sequence default (Carpenter)
-  for (unsigned char j = 0; j < 32; j++)
-  {
-    //    sequenceOrig[2 * j + 0] = pgm_read_byte_near (&Default_Sequence[3][32][0]);
-    //    sequenceOrig[2 * j + 1] = pgm_read_byte_near (&Default_Sequence[3][32][1]);
+  for (unsigned char j = 0; j < 32; j++) {
     sequenceOrig[j][0] = pgm_read_byte_near (&Default_Sequence[3][32][0]);
     sequenceOrig[j][1] = pgm_read_byte_near (&Default_Sequence[3][32][1]);
   }
@@ -1658,10 +1657,10 @@ void SendCtrlrSystemCfg(unsigned char interface)
 
     case INTERFACE_SERIAL3:
       unsigned char stamp;
-      stamp = ui_external_clk;
-      ui_external_clk = true; // doing this desactive F8 on serial port
+      stamp = systmClock;
+      systmClock = MIDCLK; // doing this desactive F8 on serial port
       MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-      ui_external_clk = stamp; // retrieve state
+      systmClock = stamp; // retrieve state
       break;
 
 #if SOFTSERIAL_ENABLED
@@ -1700,7 +1699,7 @@ void MIDI_Rcv_Diagnostics(unsigned char interface, byte order1, byte order2)
   // simple test message (echo) "hello buddy"
   if (order1 == 0x00 && order2 == 0x00)
   {
-    lcd.clear();
+    LCD_Clear();
     lcd.setCursor(0, 0);
     lcd.print(F("Hello Buddy ! :)     "));
     lcd.setCursor(0, 1);
@@ -1722,10 +1721,10 @@ void MIDI_Rcv_Diagnostics(unsigned char interface, byte order1, byte order2)
 
       case INTERFACE_SERIAL3:
         unsigned char stamp;
-        stamp = ui_external_clk;
-        ui_external_clk = true; // doing this desactive F8 on serial port
+        stamp = systmClock;
+        systmClock = MIDCLK; // doing this desactive F8 on serial port
         MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-        ui_external_clk = stamp; // retrieve state
+        systmClock = stamp; // retrieve state
         break;
 
 #if SOFTSERIAL_ENABLED
@@ -1745,7 +1744,7 @@ void MIDI_Rcv_Diagnostics(unsigned char interface, byte order1, byte order2)
   // etc ..
   else if (order1 == 0x00 && order2 == 0x01)
   {
-    lcd.clear();
+    LCD_Clear();
     lcd.setCursor(0, 0);
     lcd.print(F("Echo msg on Midi Out:"));
     lcd.setCursor(0, 1);
@@ -1754,11 +1753,8 @@ void MIDI_Rcv_Diagnostics(unsigned char interface, byte order1, byte order2)
 
     // send a midi response on all midi out
     sysex[6] = 0x0a; MIDI1.sendSysEx (sizeof(sysex), sysex, true);
-
     sysex[6] = 0x0b; MIDI2.sendSysEx (sizeof(sysex), sysex, true);
-
     sysex[6] = 0x09; MIDI3.sendSysEx (sizeof(sysex), sysex, true);
-
 #if SOFTSERIAL_ENABLED
     sysex[6] = 0x0c; MIDI4.sendSysEx (sizeof(sysex), sysex, true);
     sysex[6] = 0x0d; MIDI5.sendSysEx (sizeof(sysex), sysex, true);

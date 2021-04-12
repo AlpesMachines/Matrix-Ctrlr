@@ -29,12 +29,12 @@ void Boot(void)
   lcd.print(F("--- Boot  System ---"));
 
   // stabilise analog inputs
-  for (unsigned char k = 0; k < 32; k++)
-  {
+  filter_ratio = EEPROM.read(EEPROM_FILTER_RATIO);
+  delayMicroseconds (50);
+  for (unsigned char k = 0; k < 128; k++)
     ReadAnalog();
+  for (unsigned char k = 0; k < 32; k++)
     ReadDigital();
-  }
-
 
   /////////////////////// check formatting ////////////////////////
 
@@ -58,8 +58,8 @@ void Boot(void)
   // recall interface behaviour:
   encoder_inverted = EEPROM.read(EEPROM_ENCODER_INVERTED);  // read encoder config
   mThru_XCc = EEPROM.read(EEPROM_MTHRU_XCC);
+  systmClock = EEPROM.read(EEPROM_SYS_CLK);
   localControl = EEPROM.read(EEPROM_LOCAL_CONTROL);
-  //ui_external_clk = true;
 
   // recall base midi channel and thru lib functionnality
   MIDI_Init();
@@ -111,14 +111,11 @@ void Boot(void)
   Matrix_Modele_Init();
 
   // on each device first :
-  for (unsigned char d = Matrix_Device_A; d <= Matrix_Device_D; d++)
-  {
+  for (unsigned char d = Matrix_Device_A; d <= Matrix_Device_D; d++) {
     // recall device configuration
     Device_Init(d);
     // recall last patch (rappeler le dernier patch et bank sauvé, charger l'EditBuffer[device] depuis les 24LC512, l'envoyer)
     PATCH_Init(d);
-    // leds, later
-    //UpdateDinStates();
   }
 
   // then on the lastdevice saved :

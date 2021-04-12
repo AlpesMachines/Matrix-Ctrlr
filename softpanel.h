@@ -87,5 +87,3 @@ extern SoftPanel_t SoftPanel;
 //extern enum PanelMode_t SoftPanelMode;
 
 #endif
-
-
