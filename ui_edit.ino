@@ -101,8 +101,13 @@ void UI_Display_Edit (void)
       // print name :
       lcd.setCursor(8, 1);
       for (unsigned char i = 0; i < 8; i++) {
+        if (EditBuffer[device][i] < 0x20) // cf ASCII tables
+          EditBuffer[device][i] = EditBuffer[device][i] + 0x40; // +64 (0x40) compatible with Matrix 1000 patch names
+        else
+          EditBuffer[device][i] = EditBuffer[device][i];
         LCD_PrintChar(EditBuffer[device][i]);
       }
+
 
       lcd.setCursor(18, 1);
       LCD_PrintChar(CHAR_UP);

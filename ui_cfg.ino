@@ -784,8 +784,8 @@ void UI_Handle_Cfg()
   {
     switch (SoftPanel.Button) {
       case DIN_PAGE:
-        //ZONE_Save();
-        //SoftPanel.Page = SOFT_PAGE23;
+        ZONE_Save(); // uncomment to enable saving Zone parameters by pressing PAGE button
+        //SoftPanel.Page = SOFT_PAGE23; // dummy, additional future menu
         SoftPanel.Page = SOFT_PAGE1;
         break;
 

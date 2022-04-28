@@ -695,7 +695,7 @@ void LivePanel_Init()
   transmit_counter    = 0;
   is_transmit_delayed = 0;
 
-#if DEBUG_analog
+#if DEBUG_adc
   Serial.println(F("LivePanel_Init()")); Serial.println();
 #endif
 }

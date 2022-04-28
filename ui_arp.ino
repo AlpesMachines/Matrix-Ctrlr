@@ -482,7 +482,7 @@ void UI_Display_Arp()
         SPD REC Opt PLAY StP
 
       */
-      
+
       DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);   // off
       DOUT_PinSet0(DIN_ConfigMap[DIN_EDIT].dout_pin);    // off
       DOUT_PinSet1(DIN_ConfigMap[DIN_ARP].dout_pin);     // ON
@@ -490,7 +490,7 @@ void UI_Display_Arp()
       // 1st line
       if (SoftPanel.IsNewPage)
       {
-        LCD_Clear(); // 
+        LCD_Clear(); //
         lcd.setCursor(0, 0);
         lcd.print(F("SPD REC PLAY R/T StP"));
       }
@@ -674,21 +674,21 @@ void UI_Display_Arp()
           lcd.print(F("mTg "));
           break;
 
-//        case SYSCLK:
-//          if (systmClock == systmClock && systmClock == INTCLK)
-//            LCD_PrintBCD3(bpm);
-//          else
-//            lcd.print(F("Sys "));
-//          break;
+        //        case SYSCLK:
+        //          if (systmClock == systmClock && systmClock == INTCLK)
+        //            LCD_PrintBCD3(bpm);
+        //          else
+        //            lcd.print(F("Sys "));
+        //          break;
 
         default:
           lcd.print(F("--- "));
           break;
       }
-//      if (systmClock == INTCLK)
-//        DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
-//      else
-//        DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
+      //      if (systmClock == INTCLK)
+      //        DOUT_PinSet1(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
+      //      else
+      //        DOUT_PinSet0(DIN_ConfigMap[DIN_OSCILLATORS].dout_pin);
 
 
       lcd.setCursor(4, 1); // activate the arp router
@@ -788,6 +788,66 @@ void UI_Display_Arp()
 
       break;
 
+    case SOFT_PAGE5: // chord memory
+      /*
+        ARP PAGE
+        []  []   [ ]  []  []
+        01234567890123456789
+        CHORDS   cm1 cm2 cm3
+        set cln   *   o   o
+      */
+      DOUT_PinSet0(DIN_ConfigMap[DIN_PATCH].dout_pin);   // off
+      DOUT_PinSet0(DIN_ConfigMap[DIN_EDIT].dout_pin);    // off
+      DOUT_PinSet1(DIN_ConfigMap[DIN_ARP].dout_pin);
+      DOUT_PinSet_Keypanel(0, 0, 0, 0, 0, 0);
+      // 1st line
+      if (SoftPanel.IsNewPage)
+      {
+        LCD_Clear();
+        lcd.setCursor(0, 0);
+        lcd.print(F("CHORDS   cm1 cm2 cm3"));
+      }
+      // 2nd line
+      lcd.setCursor(0, 1);
+      lcd.print(F("Rec      "));
+
+      // mem1
+      lcd.setCursor(9, 1);
+      if (currentChords == CHORDS_MEM1 && learningChord) {
+        lcd.print(F(" o "));
+      } else if (currentChords == CHORDS_MEM1 ) {
+        lcd.print(F(" * "));
+      } else {
+        lcd.print(F(" . "));
+      }
+
+      // mem2
+      lcd.setCursor(13, 1);
+      if (currentChords == CHORDS_MEM2 && learningChord) {
+        lcd.print(F(" o "));
+      } else if (currentChords == CHORDS_MEM2) {
+        lcd.print(F(" * "));
+      } else {
+        lcd.print(F(" . "));
+      }
+
+      // mem3
+      lcd.setCursor(17, 1);
+      if (currentChords == CHORDS_MEM3 && learningChord) {
+        lcd.print(F(" o "));
+      } else if (currentChords == CHORDS_MEM3) {
+        lcd.print(F(" * "));
+      } else {
+        lcd.print(F(" . "));
+      }
+
+#if DEBUG_CHORDM
+        Serial.print(F("learningChord = ")); if(learningChord == true) Serial.println(F("vrai")); if(learningChord == false) Serial.println(F("faux"));
+        Serial.print(F("currentChords = ")); Serial.println(currentChords,DEC); 
+#endif
+      break;
+
+    default: break;
   }
 }
 
@@ -880,10 +940,10 @@ void UI_Handle_Arp()
         break;
 
       case Edit1:
-          SetEncoderValueARP(&bpm, BPM_Max);
-          if (bpm < BPM_min)
-            bpm = BPM_min;
-            uClock.setTempo(bpm);
+        SetEncoderValueARP(&bpm, BPM_Max);
+        if (bpm < BPM_min)
+          bpm = BPM_min;
+        uClock.setTempo(bpm);
 
       default:
         break;
@@ -953,7 +1013,7 @@ void UI_Handle_Arp()
     switch (SoftPanel.Button)
     {
       case DIN_PAGE:
-        SoftPanel.Page = SOFT_PAGE1; // go to arp page
+        SoftPanel.Page = SOFT_PAGE5; // go to chord page
         break;
 
       case SOFT_EDIT_INC: //
@@ -1114,6 +1174,22 @@ void UI_Handle_Arp()
     // realtime display feature
     app_flags.Display_DIN_Req = 1;
   }
+  else if (SoftPanel.Page == SOFT_PAGE5) ////////////////////////////////////  page5 : CHORDS ///////////////////PAGE5)
+  {
+    switch (SoftPanel.Button)
+    {
+      case SOFT_EDIT_1: CLEAN_CHORD(currentChords); learningChord = true; break;
+      //case SOFT_EDIT_2: learningChord = false; CLEAN_CHORD(currentChords); /*currentChords == CHORDS_MEM0;*/ break;
+
+      case SOFT_EDIT_3: if (currentChords == CHORDS_MEM1) currentChords = CHORDS_MEM0; else currentChords = CHORDS_MEM1; break;
+      case SOFT_EDIT_4: if (currentChords == CHORDS_MEM2) currentChords = CHORDS_MEM0; else currentChords = CHORDS_MEM2; break;
+      case SOFT_EDIT_5: if (currentChords == CHORDS_MEM3) currentChords = CHORDS_MEM0; else currentChords = CHORDS_MEM3; break;
+
+      case DIN_PAGE:    SoftPanel.Page = SOFT_PAGE1;  break;
+
+      default: break;
+    }
+  }
   else
   {
     // nope
@@ -1143,7 +1219,7 @@ void ui_aSpeedGateGrooveLimits()
 void Reset_UI_ARP(void)
 {
   // only work when device = A
-  if (device != Matrix_Device_A)
+  if (device != MATRIX_DEVICE_A)
     return; // quit
 
   if (ui_aHold == true)

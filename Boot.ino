@@ -28,19 +28,7 @@ void Boot(void)
   lcd.setCursor(0, 0);
   lcd.print(F("--- Boot  System ---"));
 
-  // stabilise analog inputs
-  filter_ratio = EEPROM.read(EEPROM_FILTER_RATIO);
-  delayMicroseconds (50);
-  for (unsigned char k = 0; k < 128; k++)
-    ReadAnalog();
-  for (unsigned char k = 0; k < 32; k++)
-    ReadDigital();
-
   /////////////////////// check formatting ////////////////////////
-
-  // check 24LC512 as blank or formatted before previously
-  if (Check_ExtEEPROM_Format(0) || Check_ExtEEPROM_Format(2))
-    FORMAT_Memory(3);
 
   // check internal eeprom formated previously
   if ( Check_IntEEPROM_Format())
@@ -48,18 +36,34 @@ void Boot(void)
 
   // automatically reboot if Formatting necessary
 
-
   /////////////////////// recall system config ////////////////////////
   Serial.println(F("recall system config"));
 
   lcd.setCursor(0, 1);
   lcd.print(F("recall system config"));
 
+  // stabilise analog inputs, but first check for a working JTR value
+  filter_ratio = EEPROM.read(EEPROM_FILTER_RATIO);
+  if (filter_ratio == 0 || filter_ratio > 9) {
+    filter_ratio = 1;
+    EEPROM.update(filter_ratio, EEPROM_FILTER_RATIO);
+  }
+
   // recall interface behaviour:
   encoder_inverted = EEPROM.read(EEPROM_ENCODER_INVERTED);  // read encoder config
   mThru_XCc = EEPROM.read(EEPROM_MTHRU_XCC);
   systmClock = EEPROM.read(EEPROM_SYS_CLK);
   localControl = EEPROM.read(EEPROM_LOCAL_CONTROL);
+
+  delayMicroseconds (50);
+  for (unsigned char k = 0; k < 128; k++)
+    ReadAnalog();
+  for (unsigned char k = 0; k < 32; k++)
+    ReadDigital();
+
+  // check 24LC512 as blank or formatted before previously
+  if (Check_ExtEEPROM_Format(0) || Check_ExtEEPROM_Format(2))
+    FORMAT_Memory(3);
 
   // recall base midi channel and thru lib functionnality
   MIDI_Init();
@@ -87,7 +91,8 @@ void Boot(void)
   //SoftPanel_Init();
 
   //  recall Zone[] definition
-  ZONE_Init();
+  // ZONE_Init();
+  ZONE_Load();
 
   /////////////////////// recall patch config ////////////////////////
   /*
@@ -111,7 +116,7 @@ void Boot(void)
   Matrix_Modele_Init();
 
   // on each device first :
-  for (unsigned char d = Matrix_Device_A; d <= Matrix_Device_D; d++) {
+  for (unsigned char d = MATRIX_DEVICE_A; d <= MATRIX_DEVICE_D; d++) {
     // recall device configuration
     Device_Init(d);
     // recall last patch (rappeler le dernier patch et bank sauvé, charger l'EditBuffer[device] depuis les 24LC512, l'envoyer)
@@ -132,9 +137,9 @@ void Boot(void)
   // send Unison detune value TO DO to A, B, C, D : done in patch_init() in the loop
 
   // load &ArpParameters into ui*_arpVar of last device (is this particular case : MtrixA)
-  ArpParameters_Load(Matrix_Device_A);
+  ArpParameters_Load(MATRIX_DEVICE_A);
   Init_aChord();
-
+  initChords();
   delay(200);
 
   /////////////////////// recall silent notes ////////////////////////

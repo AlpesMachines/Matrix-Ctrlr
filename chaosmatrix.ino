@@ -784,7 +784,7 @@ void SendPatchInit(unsigned char  interface)
   byte sysex[275]; // = { 0xf0, 0x10, 0x06, 0x0d, 0, 0, 0xf7 };
 
   // for matrix 6
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
   {
     // enter remote edit mode matrix 6
     // TO DO -> NO not necessary
@@ -818,7 +818,7 @@ void SendPatchInit(unsigned char  interface)
   sysex[273] = checksum & 0x7f;
   sysex[274] = 0xf7;
 
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
     //send pgrm change number 0
     MIDI_SendPatchProgram(interface, 0);
 
@@ -877,7 +877,7 @@ void SendEditBuffer(unsigned char device, unsigned char  interface)
 
   byte sysex[275]; // = { 0xf0, 0x10, 0x06, 0x01, 0, 0, 0xf7 };
 
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
   {
     // for Matrix 6
     sysex[0] = 0xf0; // begin sysex header
@@ -908,7 +908,7 @@ void SendEditBuffer(unsigned char device, unsigned char  interface)
   sysex[273] = checksum & 0x7f;
   sysex[274] = 0xf7;
 
-  if ((matrix_modele == matrix_6) && (interface != INTERFACE_SERIAL3))
+  if ((matrix_modele == MATRIX_6) && (interface != INTERFACE_SERIAL3))
   {
     //send pgrm change number 0
     MIDI_SendPatchProgram(interface, 0);
@@ -946,7 +946,7 @@ void SendEditBuffer(unsigned char device, unsigned char  interface)
   }
 
   // turn on Matrix 6 in Patch Edit Quick mode:
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
   {
     MIDI_EnterRemoteEditMode(interface);
   }
@@ -975,7 +975,7 @@ void SendEditBufferOrig(unsigned char  interface)
   // = { 0xf0, 0x10, 0x06, 0x0d, 0x00, [patch data 134bytes + cs], 0xf7 };
   byte sysex[275];
 
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
   {
     // for Matrix 6
     sysex[0] = 0xf0; // begin sysex header
