@@ -64,7 +64,7 @@ void AIN_NotifyChange()
           if (inTest)
           {
             // test mode
-#if DEBUG_analog
+#if DEBUG_adc
             Serial.print(F("ain_pin : ")); Serial.print(i);
             Serial.print(F(" / ain_pin_value : ")); Serial.println(Analog_Mapped[i]);
 #endif
@@ -86,7 +86,7 @@ void AIN_NotifyChange()
           {
             RefreshSoftPanel = 1;
 
-#if DEBUG_analog
+#if DEBUG_adc
             // print something like : A0-### value
             Serial.print(F("AIN_NotifyChange()")); Serial.print(F("ain_pin = ")); Serial.print(ain_pin); Serial.print(F(", ain_pin_value = ")); Serial.println(ain_pin_value);
 #endif

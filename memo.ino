@@ -31,6 +31,7 @@
 // the patch structure (could also be located somewhere else, depending on
 // where and how you are storing values in RAM)
 unsigned char dataPage[128]; // ext EEPROM
+unsigned char ToneName[8];
 
 /////////////////////////////////////////////////////////
 // This function read a patch stored into BS
@@ -113,7 +114,7 @@ unsigned char PATCH_Store(unsigned char bank, unsigned char patch, bool method)
     {
       for (i = 8; i < 134; i++)
         dataPage[i - 8] = EditBufferOrig[i]; // tone of EditBuffer[device]
-      dataPage[126] = dataPage[127] = 0; // free bytes
+      dataPage[126] = dataPage[127] = 0; // 2 free bytes
 
       mem_0.writePage(patch + (bank * 100), dataPage );
 
@@ -271,7 +272,7 @@ void Read_Patch_From_BS(unsigned char device, unsigned char bank, unsigned char 
   //    ArpParameters_Load(device);
 
   //sequence associated to patch
-  if (device == Matrix_Device_A)
+  if (device == MATRIX_DEVICE_A)
   {
     for ( j = 0; j < 32; j++)
     {
@@ -341,7 +342,7 @@ void Write_Patch_To_BS(unsigned char device, unsigned char bank, unsigned char p
     ArpParametersOrig[j] = ArpParameters[device][j];
 
   //sequence associated to patch
-  if (device == Matrix_Device_A)
+  if (device == MATRIX_DEVICE_A)
   {
     for ( j = 0; j < 32; j++)
     {
@@ -476,7 +477,7 @@ void Write_Default_Patchname(unsigned char device, unsigned char bank, unsigned 
       dataPage[ j + 29 + 32] = pgm_read_byte_near (&Default_Sequence[3][32][1]);
 
     for ( j = 0; j < 34; j++)
-      dataPage[ j + 29 + 32 + 32] = 0;
+      dataPage[ j + 29 + 32 + 32] = 0; // additional data : 34 bytes -> chords[3][6][2] ?
 
 
     if (bank < 5)
@@ -509,22 +510,22 @@ void Store_LastBankPatch_to_EEPROM(unsigned char device, unsigned char bank, uns
 
   switch (device)
   {
-    case Matrix_Device_A:
+    case MATRIX_DEVICE_A:
       EEPROM.update(EEPROM_LASTBANKA, bank);
       EEPROM.update(EEPROM_LASTPATCHA, patch);
       break;
 
-    case Matrix_Device_B:
+    case MATRIX_DEVICE_B:
       EEPROM.update(EEPROM_LASTBANKB, bank);
       EEPROM.update(EEPROM_LASTPATCHB, patch);
       break;
 
-    case Matrix_Device_C:
+    case MATRIX_DEVICE_C:
       EEPROM.update(EEPROM_LASTBANKC, bank);
       EEPROM.update(EEPROM_LASTPATCHC, patch);
       break;
 
-    case Matrix_Device_D:
+    case MATRIX_DEVICE_D:
       EEPROM.update(EEPROM_LASTBANKD, bank);
       EEPROM.update(EEPROM_LASTPATCHD, patch);
       break;
@@ -544,22 +545,22 @@ void Recall_LastBankPatch_from_EEPROM(unsigned char device)
 {
   switch (device)
   {
-    case Matrix_Device_A:
+    case MATRIX_DEVICE_A:
       uBank[device] = EEPROM.read(EEPROM_LASTBANKA);
       uPatch[device] = EEPROM.read(EEPROM_LASTPATCHA);
       break;
 
-    case Matrix_Device_B:
+    case MATRIX_DEVICE_B:
       uBank[device] = EEPROM.read(EEPROM_LASTBANKB);
       uPatch[device] = EEPROM.read(EEPROM_LASTPATCHB);
       break;
 
-    case Matrix_Device_C:
+    case MATRIX_DEVICE_C:
       uBank[device] = EEPROM.read(EEPROM_LASTBANKC);
       uPatch[device] = EEPROM.read(EEPROM_LASTPATCHC);
       break;
 
-    case Matrix_Device_D:
+    case MATRIX_DEVICE_D:
       uBank[device] = EEPROM.read(EEPROM_LASTBANKD);
       uPatch[device] = EEPROM.read(EEPROM_LASTPATCHD);
       break;
@@ -573,26 +574,26 @@ void Recall_LastBankPatch_from_EEPROM(unsigned char device)
 #if DEBUG_inteeprom
   switch (device)
   {
-    case Matrix_Device_A:
-      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / Matrix_Device_A / device = ")); Serial.print(device + 0x0a, HEX);
+    case MATRIX_DEVICE_A:
+      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / MATRIX_DEVICE_A / device = ")); Serial.print(device + 0x0a, HEX);
       Serial.print(F(" / uBank[device] = ")); Serial.print(uBank[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.print(EEPROM_LASTBANKA, DEC);
       Serial.print(F(" / uPatch[device] = ")); Serial.print(uPatch[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.println(EEPROM_LASTPATCHA, DEC);
       break;
 
-    case Matrix_Device_B:
-      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / Matrix_Device_B / device = ")); Serial.print(device + 0x0a, HEX);
+    case MATRIX_DEVICE_B:
+      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / MATRIX_DEVICE_B / device = ")); Serial.print(device + 0x0a, HEX);
       Serial.print(F(" / uBank[device] = ")); Serial.print(uBank[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.print(EEPROM_LASTBANKB, DEC);
       Serial.print(F(" / uPatch[device] = ")); Serial.print(uPatch[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.println(EEPROM_LASTPATCHB, DEC);
       break;
 
-    case Matrix_Device_C:
-      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / Matrix_Device_C / device = ")); Serial.print(device + 0x0a, HEX);
+    case MATRIX_DEVICE_C:
+      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / MATRIX_DEVICE_C / device = ")); Serial.print(device + 0x0a, HEX);
       Serial.print(F(" / uBank[device] = ")); Serial.print(uBank[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.print(EEPROM_LASTBANKC, DEC);
       Serial.print(F(" / uPatch[device] = ")); Serial.print(uPatch[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.println(EEPROM_LASTPATCHC, DEC);
       break;
 
-    case Matrix_Device_D:
-      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / Matrix_Device_D / device = ")); Serial.print(device + 0x0a, HEX);
+    case MATRIX_DEVICE_D:
+      Serial.print(F("Recall_LastBankPatch_from_EEPROM() / MATRIX_DEVICE_D / device = ")); Serial.print(device + 0x0a, HEX);
       Serial.print(F(" / uBank[device] = ")); Serial.print(uBank[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.print(EEPROM_LASTBANKD, DEC);
       Serial.print(F(" / uPatch[device] = ")); Serial.print(uPatch[device], DEC); Serial.print(F(" / in EEPROM.addr=")); Serial.println(EEPROM_LASTPATCHD, DEC);
       break;
@@ -615,40 +616,40 @@ void PATCH_Init(unsigned char device)
 #endif
   switch (device)
   {
-    case Matrix_Device_A:
+    case MATRIX_DEVICE_A:
       // send correct EditBuffer to Matrix A:
-      Recall_LastBankPatch_from_EEPROM(Matrix_Device_A); // recall last ubank upatch used in previous session
-      Read_Patch_From_BS(Matrix_Device_A, uBank[Matrix_Device_A], uPatch[Matrix_Device_A]); // read EditBuffer[device] coresponding
-      //CopyEditBufferOrigToEditBuffer(Matrix_Device_A);
-      SendEditBuffer(Matrix_Device_A, INTERFACE_SERIAL1); // send EditBuffer[device] to Mxi
-      // DEBUG//SendEditBuffer(Matrix_Device_A, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
+      Recall_LastBankPatch_from_EEPROM(MATRIX_DEVICE_A); // recall last ubank upatch used in previous session
+      Read_Patch_From_BS(MATRIX_DEVICE_A, uBank[MATRIX_DEVICE_A], uPatch[MATRIX_DEVICE_A]); // read EditBuffer[device] coresponding
+      //CopyEditBufferOrigToEditBuffer(MATRIX_DEVICE_A);
+      SendEditBuffer(MATRIX_DEVICE_A, INTERFACE_SERIAL1); // send EditBuffer[device] to Mxi
+      // DEBUG//SendEditBuffer(MATRIX_DEVICE_A, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
       break;
 
-    case Matrix_Device_B:
+    case MATRIX_DEVICE_B:
       // Matrix in B:
-      Recall_LastBankPatch_from_EEPROM(Matrix_Device_B); // recall last ubank upatch used in previous session
-      Read_Patch_From_BS(Matrix_Device_B, uBank[Matrix_Device_B], uPatch[Matrix_Device_B]); // read EditBuffer[device] coresponding
-      //CopyEditBufferOrigToEditBuffer(Matrix_Device_B);
-      SendEditBuffer(Matrix_Device_B, INTERFACE_SERIAL2); // send EditBuffer[device] to Mxi
-      // DEBUG//SendEditBuffer(Matrix_Device_B, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
+      Recall_LastBankPatch_from_EEPROM(MATRIX_DEVICE_B); // recall last ubank upatch used in previous session
+      Read_Patch_From_BS(MATRIX_DEVICE_B, uBank[MATRIX_DEVICE_B], uPatch[MATRIX_DEVICE_B]); // read EditBuffer[device] coresponding
+      //CopyEditBufferOrigToEditBuffer(MATRIX_DEVICE_B);
+      SendEditBuffer(MATRIX_DEVICE_B, INTERFACE_SERIAL2); // send EditBuffer[device] to Mxi
+      // DEBUG//SendEditBuffer(MATRIX_DEVICE_B, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
       break;
 
-    case Matrix_Device_C:
+    case MATRIX_DEVICE_C:
       // Matrix in C:
-      Recall_LastBankPatch_from_EEPROM(Matrix_Device_C); // recall last ubank upatch used in previous session
-      Read_Patch_From_BS(Matrix_Device_C, uBank[Matrix_Device_C], uPatch[Matrix_Device_C]); // read EditBuffer[device] coresponding
-      //CopyEditBufferOrigToEditBuffer(Matrix_Device_C);
-      SendEditBuffer(Matrix_Device_C, INTERFACE_SERIAL4); // send EditBuffer[device] to Mxi
-      // DEBUG//SendEditBuffer(Matrix_Device_C, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
+      Recall_LastBankPatch_from_EEPROM(MATRIX_DEVICE_C); // recall last ubank upatch used in previous session
+      Read_Patch_From_BS(MATRIX_DEVICE_C, uBank[MATRIX_DEVICE_C], uPatch[MATRIX_DEVICE_C]); // read EditBuffer[device] coresponding
+      //CopyEditBufferOrigToEditBuffer(MATRIX_DEVICE_C);
+      SendEditBuffer(MATRIX_DEVICE_C, INTERFACE_SERIAL4); // send EditBuffer[device] to Mxi
+      // DEBUG//SendEditBuffer(MATRIX_DEVICE_C, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
       break;
 
-    case Matrix_Device_D:
+    case MATRIX_DEVICE_D:
       // Matrix in D:
-      Recall_LastBankPatch_from_EEPROM(Matrix_Device_D); // recall last ubank upatch used in previous session
-      Read_Patch_From_BS(Matrix_Device_D, uBank[Matrix_Device_D], uPatch[Matrix_Device_D]); // read EditBuffer[device] coresponding
-      //CopyEditBufferOrigToEditBuffer(Matrix_Device_D);
-      SendEditBuffer(Matrix_Device_D, INTERFACE_SERIAL5); // send EditBuffer[device] to Mxi
-      // DEBUG//SendEditBuffer(Matrix_Device_D, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
+      Recall_LastBankPatch_from_EEPROM(MATRIX_DEVICE_D); // recall last ubank upatch used in previous session
+      Read_Patch_From_BS(MATRIX_DEVICE_D, uBank[MATRIX_DEVICE_D], uPatch[MATRIX_DEVICE_D]); // read EditBuffer[device] coresponding
+      //CopyEditBufferOrigToEditBuffer(MATRIX_DEVICE_D);
+      SendEditBuffer(MATRIX_DEVICE_D, INTERFACE_SERIAL5); // send EditBuffer[device] to Mxi
+      // DEBUG//SendEditBuffer(MATRIX_DEVICE_D, INTERFACE_SERIAL3); // send EditBuffer[device] to core out
       break;
     default: break;
   }
@@ -677,7 +678,7 @@ void FORMAT_Memory(unsigned char memory)
       lcd.print(F("CLEARING WITH 0xff   "));
 
       // write 512 blank pages on 4 eeprom 24LC512
-      for (unsigned int page = 0; page < 512; ++page)
+      for (unsigned int page = 0; page < 512; page++)
       {
 
         lcd.setCursor(0, 1);
@@ -701,7 +702,7 @@ void FORMAT_Memory(unsigned char memory)
       lcd.setCursor(0, 0);
       lcd.print(F("CLEARING WITH 0xff   "));
 
-      for (unsigned int addr = 0; addr <= EEPROM.length(); ++addr)
+      for (unsigned int addr = 0; addr <= EEPROM.length(); addr++)
       {
         EEPROM.write(addr, 0xff);
 
@@ -715,61 +716,61 @@ void FORMAT_Memory(unsigned char memory)
       software_Reboot();
       break;
 
-//    case 5:
-//      unsigned char patchRand;
-//
-//      // display
-//      lcd.setCursor(0, 0);
-//      lcd.print(F("INITIALISEwithTOP100"));
-//
-//      for (unsigned int page = 0; page < 511; ++page)
-//      {
-//        lcd.setCursor(0, 1);
-//        lcd.print(F("ext.EEPROM page "));
-//        LCD_PrintBCD3(page);
-//
-//        patchRand = random(0, 100); // choose one among the TOP100 availbale
-//
-//        for (unsigned char i = 8; i < 134; i++) // tone data
-//          dataPage[i - 8] = pgm_read_byte_near(&PatchFactory_BANK1[patchRand][i]);
-//
-//        dataPage[126] = dataPage[127] = 0; // remaining bytes
-//
-//        mem_0.writePageFast(page, dataPage );
-//        mem_2.writePageFast(page, dataPage );
-//
-//        // name, arp, unison, seq
-//        for (unsigned char i = 0; i < 8; i++)
-//          dataPage[i] = pgm_read_byte_near(&PatchFactory_BANK1[patchRand][i]); // patchname of patchNbr[]
-//        dataPage[8] = 0; // unison data
-//
-//        for (unsigned char i = 0; i < 20; i++)
-//          dataPage[i + 9] = pgm_read_byte_near(&Default_ArpParameters[i][0]); // arp data
-//
-//        for (unsigned char i = 0; i < 32; i++) {
-//          dataPage[2 * i + 0 + 29] =  pgm_read_byte_near(&Default_Sequence[3][32][0]); // seq data
-//          dataPage[2 * i + 1 + 29] =  pgm_read_byte_near(&Default_Sequence[3][32][1]); // seq data
-//
-//        }
-//        for (unsigned char i = 93; i < 128; i++)
-//          dataPage[i] = 0; // free space of page
-//
-//        mem_1.writePageFast(page, dataPage );
-//        mem_3.writePageFast(page, dataPage );
-//      }
-//      // last page for control with Check_ExtEEPROM_Format()
-//      lcd.setCursor(0, 1);
-//      lcd.print(F("ext.EEPROM page "));
-//      LCD_PrintBCD3(511);
-//      for (unsigned char i = 8; i < 134; i++) // tone data
-//        dataPage[i - 8] = pgm_read_byte_near( &DefaultEditBuffer[i]);
-//      dataPage[126] = dataPage[127] = 0; // remaining bytes
-//      mem_0.writePageFast(511, dataPage );
-//      mem_2.writePageFast(511, dataPage );
-//#if DEBUG_eeprom
-//      Serial.println(F("FORMAT_Memory(5) / 512 pages INITIALISE TOP100 finished"));
-//#endif
-//      break;
+    //    case 5:
+    //      unsigned char patchRand;
+    //
+    //      // display
+    //      lcd.setCursor(0, 0);
+    //      lcd.print(F("INITIALISEwithTOP100"));
+    //
+    //      for (unsigned int page = 0; page < 511; ++page)
+    //      {
+    //        lcd.setCursor(0, 1);
+    //        lcd.print(F("ext.EEPROM page "));
+    //        LCD_PrintBCD3(page);
+    //
+    //        patchRand = random(0, 100); // choose one among the TOP100 availbale
+    //
+    //        for (unsigned char i = 8; i < 134; i++) // tone data
+    //          dataPage[i - 8] = pgm_read_byte_near(&PatchFactory_BANK1[patchRand][i]);
+    //
+    //        dataPage[126] = dataPage[127] = 0; // remaining bytes
+    //
+    //        mem_0.writePageFast(page, dataPage );
+    //        mem_2.writePageFast(page, dataPage );
+    //
+    //        // name, arp, unison, seq
+    //        for (unsigned char i = 0; i < 8; i++)
+    //          dataPage[i] = pgm_read_byte_near(&PatchFactory_BANK1[patchRand][i]); // patchname of patchNbr[]
+    //        dataPage[8] = 0; // unison data
+    //
+    //        for (unsigned char i = 0; i < 20; i++)
+    //          dataPage[i + 9] = pgm_read_byte_near(&Default_ArpParameters[i][0]); // arp data
+    //
+    //        for (unsigned char i = 0; i < 32; i++) {
+    //          dataPage[2 * i + 0 + 29] =  pgm_read_byte_near(&Default_Sequence[3][32][0]); // seq data
+    //          dataPage[2 * i + 1 + 29] =  pgm_read_byte_near(&Default_Sequence[3][32][1]); // seq data
+    //
+    //        }
+    //        for (unsigned char i = 93; i < 128; i++)
+    //          dataPage[i] = 0; // free space of page
+    //
+    //        mem_1.writePageFast(page, dataPage );
+    //        mem_3.writePageFast(page, dataPage );
+    //      }
+    //      // last page for control with Check_ExtEEPROM_Format()
+    //      lcd.setCursor(0, 1);
+    //      lcd.print(F("ext.EEPROM page "));
+    //      LCD_PrintBCD3(511);
+    //      for (unsigned char i = 8; i < 134; i++) // tone data
+    //        dataPage[i - 8] = pgm_read_byte_near( &DefaultEditBuffer[i]);
+    //      dataPage[126] = dataPage[127] = 0; // remaining bytes
+    //      mem_0.writePageFast(511, dataPage );
+    //      mem_2.writePageFast(511, dataPage );
+    //#if DEBUG_eeprom
+    //      Serial.println(F("FORMAT_Memory(5) / 512 pages INITIALISE TOP100 finished"));
+    //#endif
+    //      break;
 
     case 3:
       // write all pages of odd eeproms
@@ -784,14 +785,20 @@ void FORMAT_Memory(unsigned char memory)
       lcd.setCursor(0, 0);
       lcd.print(F("INITIALISE TONE      "));
 
-      for (unsigned int page = 0; page < 512; ++page)
+      for (unsigned int page = 0; page < 512; page++)
       {
         lcd.setCursor(0, 1);
         lcd.print(F("ext.EEPROM page "));
         LCD_PrintBCD3(page);
+#if DEBUG_eeprom
+        Serial.print(F("INITIALISE TONE of "));
+        Serial.print(F("ext.EEPROM page "));
+        Serial.println(page, DEC);
+#endif
         mem_0.writePageFast(page, dataPage );
         mem_2.writePageFast(page, dataPage );
       }
+
 #if DEBUG_eeprom
       Serial.println(F("FORMAT_Memory(3) / 512 pages INITIALISE TONE finished"));
 #endif
@@ -821,13 +828,16 @@ void FORMAT_Memory(unsigned char memory)
       lcd.print(F("INITIALISE U&ARP&SEQ"));
 
       // write all pages of pair eeprom
-      for (unsigned int page = 0; page < 512; ++page)
+      for (unsigned int page = 0; page < 512; page++)
       {
-
         lcd.setCursor(0, 1);
         lcd.print(F("ext.EEPROM page "));
         LCD_PrintBCD3(page);
-
+#if DEBUG_eeprom
+        Serial.print(F("INITIALISE U&ARP&SEQ of "));
+        Serial.print(F("ext.EEPROM page "));
+        Serial.println(page, DEC);
+#endif
         mem_1.writePageFast(page, dataPage );
         mem_3.writePageFast(page, dataPage );
       }
@@ -842,13 +852,18 @@ void FORMAT_Memory(unsigned char memory)
       lcd.setCursor(0, 0);
       lcd.print(F("Default SYSCONFIG[] "));
 
-      for (unsigned int addr = 0; addr < 48; ++addr)
+      for (unsigned int addr = 0; addr < 48; addr++)
       {
         EEPROM.write(addr, pgm_read_byte_near(&DefaultSystemConfig[addr]));
 
         lcd.setCursor(0, 1);
         lcd.print(F("int.EEPROM addr "));
         lcd.print(addr);
+#if DEBUG_eeprom
+        Serial.print(F("Default SYSCONFIG[] of "));
+        Serial.print(F("int.EEPROM addr  "));
+        Serial.println(addr, DEC);
+#endif
       }
 #if DEBUG_inteeprom
       Serial.println(F("FORMAT_Memory(4) / DefaultSystemConfig[] finished"));
@@ -859,7 +874,7 @@ void FORMAT_Memory(unsigned char memory)
       lcd.setCursor(0, 0);
       lcd.print(F("CLEARING WITH NULL   "));
 
-      for (unsigned int addr = 48; addr < 500; ++addr)
+      for (unsigned int addr = 48; addr < 500; addr++)
       {
         EEPROM.write(addr, 0);
 
@@ -877,13 +892,18 @@ void FORMAT_Memory(unsigned char memory)
       lcd.setCursor(0, 0);
       lcd.print(F("Default MASTERS[]   "));
 
-      for (unsigned int addr = 500; addr < 672; ++addr)
+      for (unsigned int addr = 500; addr < 672; addr++)
       {
         EEPROM.write(addr, pgm_read_byte_near(&DefaultGlobalParameters[addr - 500]));
 
         lcd.setCursor(0, 1);
         lcd.print(F("int.EEPROM addr "));
         lcd.print(addr);
+#if DEBUG_eeprom
+        Serial.print(F("Default DefaultGlobalParameters[] of "));
+        Serial.print(F("int.EEPROM addr  "));
+        Serial.println(addr, DEC);
+#endif
       }
 
 #if DEBUG_inteeprom
@@ -896,7 +916,7 @@ void FORMAT_Memory(unsigned char memory)
       lcd.setCursor(0, 0);
       lcd.print(F("CLEARING WITH NULL   "));
 
-      for (unsigned int addr = 672; addr <= EEPROM.length(); ++addr)
+      for (unsigned int addr = 672; addr <= EEPROM.length(); addr++)
       {
         EEPROM.write(addr, 0);
 
@@ -1010,4 +1030,45 @@ void READ_GlobalParameters(void)
 #if DEBUG_inteeprom
   Serial.println(F("READ_GlobalParameters()"));
 #endif
+}
+
+///////////////////////////////////////////////////////////////////////////
+// This function loads the tone name (8 characters) from EEPROM && print it on the integrated display
+///////////////////////////////////////////////////////////////////////////
+unsigned char ToneName_Load(unsigned char bank, unsigned char patch)
+{
+  unsigned char i;
+
+  // offset page = patch + 100 x bank, car il y a 100 patch par bank
+  if (bank < 5)
+    mem_1.readPage(patch + (bank * 100), dataPage); // mem2 page addr = 0 ... 511
+  else
+    mem_3.readPage(patch + ((bank - 5) * 100), dataPage);
+
+  for (i = 0; i < 8; i++)
+    ToneName[i] = dataPage[i]; // name of tone
+
+  // compatibility
+  for (i = 0; i < 8; i++) {
+    if (ToneName[i] < 0x20) // cf ASCII tables
+      ToneName[i] = ToneName[i] + 0x40; // +64 (0x40) compatible with Matrix 1000 patch names
+    else
+      ToneName[i] = ToneName[i];
+  }
+
+#if DEBUG_eeprom
+  Serial.print(F("ToneName #")); Serial.print(patch + (bank * 100), DEC); Serial.print(F(" is "));
+  for (i = 0; i < 8; i++)
+    Serial.write(ToneName[i]);
+  Serial.println();
+#endif
+
+   // print the name on the display top right corner :
+   
+//  //(ne marche pas / requete de T.Heckmann 15 aout 2021)
+//  lcd.setCursor(12, 0); // 12,0
+//  for (i = 0; i < 8; i++)  LCD_PrintChar(ToneName[i]);
+
+  return 1;
+
 }

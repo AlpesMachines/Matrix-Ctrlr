@@ -37,7 +37,7 @@ void ZONE_Init(void)
 
   zActive = false;
 
-  ZONE_Save();
+  //ZONE_Save();
 }
 
 ///////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ void ZONE_Load(void)
   // read EEPROM values of ZONE[][]:
   for (unsigned char i = 0; i < 4; i++)
   {
-    for (unsigned char j = 0; i < 5; j++)
+    for (unsigned char j = 0; j < 5; j++)
     {
       ZONE[i][j] = EEPROM.read(EEPROM_ZONE + 5 * i + j); // addr + 4x5
     }
@@ -144,5 +144,101 @@ void ZoneNoteOn(byte channel, byte pitch, byte velocity)
   }
   else
     HandleNoteOn(channel, pitch, velocity);
+
+}
+
+///////////////////////////////////////////////////////////
+// assign and route a Control message to a zone
+///////////////////////////////////////////////////////////
+void ZoneControlChange(byte CCchannel, byte CCnumber, byte CCvalue)
+{
+#if DEBUG_router
+  Serial.println(F("ZoneControlChange()"));
+#endif
+
+  MIDI_Incoming = true; // show that we receive midi message
+
+  if (zActive == true) {
+    for (unsigned char z = ZONEA; z <= ZONED; ++z)
+    {
+      if ((CCchannel == ZONE[z][Z_RCH])) { // rCH ZONEA
+        HandleControlChange(ZONE[z][Z_TCH], CCnumber, CCvalue);
+      }
+    }
+  }
+  else
+    HandleControlChange(CCchannel, CCnumber, CCvalue);
+
+}
+
+///////////////////////////////////////////////////////////
+// assign and route an aftertouch message to a zone 
+///////////////////////////////////////////////////////////
+void ZoneAfterTouchChannel(byte channel, byte pressure)
+{
+#if DEBUG_router
+  Serial.println(F("ZoneControlChange()"));
+#endif
+
+  MIDI_Incoming = true; // show that we receive midi message
+
+  if (zActive == true) {
+    for (unsigned char z = ZONEA; z <= ZONED; ++z)
+    {
+      if ((channel == ZONE[z][Z_RCH])) { // rCH ZONEA
+        HandleAfterTouchChannel(ZONE[z][Z_TCH], pressure);
+      }
+    }
+  }
+  else
+    HandleAfterTouchChannel(channel, pressure);
+
+}
+
+///////////////////////////////////////////////////////////
+// assign and route a pitchbend message to a zone 
+///////////////////////////////////////////////////////////
+void ZonePitchBend(byte channel, int bend)
+{
+#if DEBUG_router
+  Serial.println(F("ZoneControlChange()"));
+#endif
+
+  MIDI_Incoming = true; // show that we receive midi message
+
+  if (zActive == true) {
+    for (unsigned char z = ZONEA; z <= ZONED; ++z)
+    {
+      if ((channel == ZONE[z][Z_RCH])) { // rCH ZONEA
+        HandlePitchBend(ZONE[z][Z_TCH], bend);
+      }
+    }
+  }
+  else
+    HandlePitchBend(channel, bend);
+
+}
+
+///////////////////////////////////////////////////////////
+// assign and route a aftertouch message to a zone 
+///////////////////////////////////////////////////////////
+void ZoneProgramChange(byte channel, byte program)
+{
+#if DEBUG_router
+  Serial.println(F("ZoneProgramChange()"));
+#endif
+
+  MIDI_Incoming = true; // show that we receive midi message
+
+  if (zActive == true) {
+    for (unsigned char z = ZONEA; z <= ZONED; ++z)
+    {
+      if ((channel == ZONE[z][Z_RCH])) { // rCH ZONEA
+        HandleProgramChange(ZONE[z][Z_TCH], program);
+      }
+    }
+  }
+  else
+    HandleProgramChange(channel, program);
 
 }

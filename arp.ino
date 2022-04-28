@@ -101,7 +101,7 @@ const unsigned char Default_ArpParameters[20][3] PROGMEM = {
 void ArpParameters_Load(unsigned char device)
 {
   // only work when device = A
-  if (device != Matrix_Device_A)
+  if (device != MATRIX_DEVICE_A)
     return; // quit
 
   else
@@ -153,7 +153,7 @@ void ArpParameters_Load(unsigned char device)
 void ArpParameters_Store(unsigned char device)
 {
   // only do job when device = A
-  if (device != Matrix_Device_A)
+  if (device != MATRIX_DEVICE_A)
     return; // quit
   else
   {
@@ -194,7 +194,7 @@ void ArpParameters_Store(unsigned char device)
 void ArpParameters_Init(unsigned char device)
 {
   // only work when device = A
-  if (device != Matrix_Device_A)
+  if (device != MATRIX_DEVICE_A)
     return; // quit
   else
   {
@@ -242,7 +242,7 @@ void ARP_GLOBAL_INIT(unsigned char device)
 #endif
 
   // only work when device = A
-  if (device != Matrix_Device_A)
+  if (device != MATRIX_DEVICE_A)
     return; // quit
 
   ARP2(); // does empty the stack
@@ -262,7 +262,7 @@ void ARP_GLOBAL_INIT(unsigned char device)
 void Init_aChord(void)
 {
   // only work when device = A
-  if (device != Matrix_Device_A)
+  if (device != MATRIX_DEVICE_A)
     return; // quit
 
   for (byte i = 0; i < 8; i++)

@@ -28,16 +28,16 @@ void Device_Init(unsigned char device)
   
   // set interface
   switch (device) {
-    case Matrix_Device_A: INTERFACE_SERIAL = INTERFACE_SERIAL1; matrix_modele = matrix_model_A; break;
-    case Matrix_Device_B: INTERFACE_SERIAL = INTERFACE_SERIAL2; matrix_modele = matrix_model_B; break;
+    case MATRIX_DEVICE_A: INTERFACE_SERIAL = INTERFACE_SERIAL1; matrix_modele = matrix_model_A; break;
+    case MATRIX_DEVICE_B: INTERFACE_SERIAL = INTERFACE_SERIAL2; matrix_modele = matrix_model_B; break;
 #if SOFTSERIAL_ENABLED
-    case Matrix_Device_C: INTERFACE_SERIAL = INTERFACE_SERIAL4; matrix_modele = matrix_model_C; break;
-    case Matrix_Device_D: INTERFACE_SERIAL = INTERFACE_SERIAL5; matrix_modele = matrix_model_D; break;
+    case MATRIX_DEVICE_C: INTERFACE_SERIAL = INTERFACE_SERIAL4; matrix_modele = matrix_model_C; break;
+    case MATRIX_DEVICE_D: INTERFACE_SERIAL = INTERFACE_SERIAL5; matrix_modele = matrix_model_D; break;
 #endif
     default: break;
   }
   
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
     MIDI_EnterRemoteEditMode(INTERFACE_SERIAL);
     
   Show_Selected_Device(device);
@@ -86,22 +86,22 @@ void Device_Select(unsigned char pin)  // unsigned char Device_Select(unsigned c
   switch (pin)
   {
     case DIN_MATRIX_A: //
-      device = Matrix_Device_A; // port midi
+      device = MATRIX_DEVICE_A; // port midi
       matrix_modele = matrix_model_A; // regle de gestion des sysex
       break;
 
     case DIN_MATRIX_B: //
-      device = Matrix_Device_B;
+      device = MATRIX_DEVICE_B;
       matrix_modele = matrix_model_B;
       break;
 
     case DIN_MATRIX_C: //
-      device = Matrix_Device_C;
+      device = MATRIX_DEVICE_C;
       matrix_modele = matrix_model_C;
       break;
 
     case DIN_MATRIX_D: //
-      device = Matrix_Device_D;
+      device = MATRIX_DEVICE_D;
       matrix_modele = matrix_model_D;
       break;
 
@@ -113,7 +113,7 @@ void Device_Select(unsigned char pin)  // unsigned char Device_Select(unsigned c
 #if DEBUG_device
   Serial.print(F("Device_Select() / "));
   Serial.print(F("device is ")); Serial.print(device + 0x0a, HEX); //Serial.print(F(", written in ROM addr = ")); Serial.println(EEPROM_DEVICE);
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
     Serial.println(F(" & modele is Matrix 6 "));
   else
     Serial.println(F(" & modele is Matrix 1000 "));
@@ -132,20 +132,20 @@ void Device_Select(unsigned char pin)  // unsigned char Device_Select(unsigned c
   // set interface
   switch (device)
   {
-    case Matrix_Device_A:
+    case MATRIX_DEVICE_A:
       INTERFACE_SERIAL = INTERFACE_SERIAL1;
       break;
 
-    case Matrix_Device_B:
+    case MATRIX_DEVICE_B:
       INTERFACE_SERIAL = INTERFACE_SERIAL2;
       break;
 
 #if SOFTSERIAL_ENABLED
-    case Matrix_Device_C:
+    case MATRIX_DEVICE_C:
       INTERFACE_SERIAL = INTERFACE_SERIAL4;
       break;
 
-    case Matrix_Device_D:
+    case MATRIX_DEVICE_D:
       INTERFACE_SERIAL = INTERFACE_SERIAL5;
       break;
 #endif
@@ -158,7 +158,7 @@ void Device_Select(unsigned char pin)  // unsigned char Device_Select(unsigned c
 #endif
 
   // send a special sysex if device is a Matrix6 in order to receive Livepanel order
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
     MIDI_EnterRemoteEditMode(INTERFACE_SERIAL);
 
 
@@ -183,28 +183,28 @@ void Show_Selected_Device(unsigned char device)
 #endif
 
   switch (device) {
-    case Matrix_Device_A: //
+    case MATRIX_DEVICE_A: //
       DOUT_PinSet1(DIN_ConfigMap[DIN_MATRIX_A].dout_pin); // set the A LED On
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_B].dout_pin); // rest is Off
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_C].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_D].dout_pin);
       break;
 
-    case Matrix_Device_B: //
+    case MATRIX_DEVICE_B: //
       DOUT_PinSet1(DIN_ConfigMap[DIN_MATRIX_B].dout_pin); // set the B LED On
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_A].dout_pin); // rest is Off
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_C].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_D].dout_pin);
       break;
 
-    case Matrix_Device_C: //
+    case MATRIX_DEVICE_C: //
       DOUT_PinSet1(DIN_ConfigMap[DIN_MATRIX_C].dout_pin); // set the C LED On
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_A].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_B].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_D].dout_pin);
       break;
 
-    case Matrix_Device_D: //
+    case MATRIX_DEVICE_D: //
       DOUT_PinSet1(DIN_ConfigMap[DIN_MATRIX_D].dout_pin); // set the D LED On
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_A].dout_pin);
       DOUT_PinSet0(DIN_ConfigMap[DIN_MATRIX_B].dout_pin);

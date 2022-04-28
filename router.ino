@@ -29,6 +29,21 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity)
 
   MIDI_Incoming = true; // show that we receive midi message
 
+  // playing ChordMemorised:
+  if (channel == MIDI_CHANNEL && learningChord == false && currentChords != 0) {
+    PLAY_CHORD( pitch, velocity, channel, currentChords, OFF); //play the chord off
+    return;
+  }
+  
+  // chords memory
+  if (channel == MIDI_CHANNEL && learningChord == true) {
+    LEARN_CHORD(pitch, velocity, channel, currentChords, 0); // stop feeding the chord memo array (see chords.ino) at the first note released
+    learningChord = false; // stop learning midi chords
+    UI_Display_Arp(); // update display
+  }
+
+
+
   // MIDI THRU in software : MIDI IN A -> MIDI OUT CORE
   if (softMIDITHRU) {
     if (channel == MIDI_CHANNEL)
@@ -210,6 +225,17 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
   // rimshot = 37
   MIDI_Incoming = true;
 
+  // play the chord On
+  if (channel == MIDI_CHANNEL && learningChord == (false) && currentChords != 0) {
+    PLAY_CHORD( pitch, velocity, channel, currentChords, ON);
+    return;
+  }
+  
+  // feed the chord memory array with notes :
+  if (channel == MIDI_CHANNEL && learningChord == true) {
+    LEARN_CHORD( pitch, velocity, channel, currentChords, 1);
+
+  }
 
   // MIDI THRU in software : MIDI IN A -> MIDI OUT CORE
   if (softMIDITHRU) {
@@ -218,11 +244,11 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity)
   }
 
   // learn split pitch A/S if we are in ARP menu page4 :
-  if ( ui_aSplitLearning && channel == MIDI_CHANNEL && SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE4) {  
+  if ( ui_aSplitLearning && channel == MIDI_CHANNEL && SoftPanel.Mode == Arp && SoftPanel.Page == SOFT_PAGE4) {
     ui_aSplit = pitch; // pitch note on received learned
     UI_Display_Arp(); // update displayed value
     ui_aSplitLearning = false; // stop learning
-    // notice we hear the note. if we don't want to listen it/ problem with arp[] activated, do quit using return: 
+    // notice we hear the note. if we don't want to listen it/ problem with arp[] activated, do quit using return:
     return;
   }
 
@@ -531,25 +557,25 @@ void HandleControlChange(byte channel, byte controlNumber, byte value)
         if (channel == MIDI_CHANNEL && mThru_XCc) // case A
         {
           MIDI_SendVoiceParam(INTERFACE_SERIAL1, Translate_CC_SX(controlNumber), value, false);
-          update_EditBuffer(Matrix_Device_A, Translate_CC_SX(controlNumber), value);
+          update_EditBuffer(MATRIX_DEVICE_A, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 1) && mThru_XCc) // case B
         {
           MIDI_SendVoiceParam(INTERFACE_SERIAL2, Translate_CC_SX(controlNumber), value, false);
-          update_EditBuffer(Matrix_Device_B, Translate_CC_SX(controlNumber), value);
+          update_EditBuffer(MATRIX_DEVICE_B, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 2) && mThru_XCc) // case C
         {
           MIDI_SendVoiceParam(INTERFACE_SERIAL4, Translate_CC_SX(controlNumber), value, false);
-          update_EditBuffer(Matrix_Device_C, Translate_CC_SX(controlNumber), value);
+          update_EditBuffer(MATRIX_DEVICE_C, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else if (channel == (MIDI_CHANNEL + 3) && mThru_XCc) // case D
         {
           MIDI_SendVoiceParam(INTERFACE_SERIAL5, Translate_CC_SX(controlNumber), value, false);
-          update_EditBuffer(Matrix_Device_D, Translate_CC_SX(controlNumber), value);
+          update_EditBuffer(MATRIX_DEVICE_D, Translate_CC_SX(controlNumber), value);
           UpdateDinStates();
         }
         else
@@ -596,8 +622,8 @@ void HandleProgramChange(byte channel, byte program)
   {
     //if you want to display stuff received :
     // // device = channel + 0x09; /// pas bon P.M bug M1000 26.2.17
-    device = channel + Matrix_Device_A - MIDI_CHANNEL;
-    uPatch[channel + Matrix_Device_A - MIDI_CHANNEL] = program;
+    device = channel + MATRIX_DEVICE_A - MIDI_CHANNEL;
+    uPatch[channel + MATRIX_DEVICE_A - MIDI_CHANNEL] = program;
     Show_Selected_Device(device);
     //INTERFACE_SERIAL = channel;
 
@@ -607,17 +633,17 @@ void HandleProgramChange(byte channel, byte program)
     Serial.print(F("program = "));
     Serial.println(program, DEC);
     Serial.print(F("device = "));
-    Serial.println(channel + Matrix_Device_A - MIDI_CHANNEL, DEC);
+    Serial.println(channel + MATRIX_DEVICE_A - MIDI_CHANNEL, DEC);
     Serial.print(F("INTERFACE_SERIAL = "));
     Serial.println(INTERFACE_SERIAL, DEC);
     Serial.print(F("uPatch[device] = "));
     Serial.println(uPatch[device], DEC);
 #endif
-    // Read_Patch_From_BS(channel + Matrix_Device_A - MIDI_CHANNEL, uBank[channel + Matrix_Device_A - MIDI_CHANNEL], uPatch[channel + Matrix_Device_A - MIDI_CHANNEL]);
+    // Read_Patch_From_BS(channel + MATRIX_DEVICE_A - MIDI_CHANNEL, uBank[channel + MATRIX_DEVICE_A - MIDI_CHANNEL], uPatch[channel + MATRIX_DEVICE_A - MIDI_CHANNEL]);
 
     switch (device)
     {
-      case Matrix_Device_A:
+      case MATRIX_DEVICE_A:
         ARP_GLOBAL_INIT(device);
         Reset_UI_ARP();                                            // stop arp parameters
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
@@ -627,21 +653,21 @@ void HandleProgramChange(byte channel, byte program)
         ArpParameters_Load(device);                                      // load arp parameters
         break;
 
-      case Matrix_Device_B:
+      case MATRIX_DEVICE_B:
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
         UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL2);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL2, UnisonDetune[device]); // send Unison detune value
         break;
 
-      case Matrix_Device_C:
+      case MATRIX_DEVICE_C:
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
         UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL4);
         MIDI_Send_UNISONDETUNE(INTERFACE_SERIAL4, UnisonDetune[device]); // send Unison detune value
         break;
 
-      case Matrix_Device_D:
+      case MATRIX_DEVICE_D:
         Read_Patch_From_BS(device, uBank[device], uPatch[device]); // read into BS
         UpdateDinStates();                                         // mise à jour des Leds
         SendEditBuffer(device, INTERFACE_SERIAL5);
@@ -696,33 +722,33 @@ void HandleAfterTouchChannel(byte channel, byte pressure)
 /////////////////////////////////////////////////////////////////////////
 //  pitchbend router handler
 ////////////////////////////////////////////////////////////////////////
-void HandlePitchBend(byte channel, int pitchValue)
+void HandlePitchBend(byte channel, int bend)
 {
   MIDI_Incoming = true;
 
   // ça merdouille :/
   if (channel == MIDI_CHANNEL + 0)
-    MIDI1.sendPitchBend(pitchValue, channel);
+    MIDI1.sendPitchBend(bend, channel);
 
   if (channel == MIDI_CHANNEL + 1)
-    MIDI2.sendPitchBend(pitchValue, channel);
+    MIDI2.sendPitchBend(bend, channel);
 
   //if(channel == MIDI_CHANNEL+8)
-  //     MIDI3.sendPitchBend(pitchValue, channel);
+  //     MIDI3.sendPitchBend(bend, channel);
 
 #if SOFTSERIAL_ENABLED
   if (channel == MIDI_CHANNEL + 2)
-    MIDI4.sendPitchBend(pitchValue, channel);
+    MIDI4.sendPitchBend(bend, channel);
 
   if (channel == MIDI_CHANNEL + 3)
-    MIDI5.sendPitchBend(pitchValue, channel);
+    MIDI5.sendPitchBend(bend, channel);
 #endif
 
 #if DEBUG_router
   Serial.print(F("Pitchbend handled and sent : "));
   Serial.print(channel, DEC);
   Serial.print(F(" pitchbend = "));
-  Serial.println(pitchValue, DEC);
+  Serial.println(bend, DEC);
 #endif
 }
 
@@ -1138,14 +1164,14 @@ unsigned int HandleReceivedSysEx(byte *sysex, unsigned int length)
           // update system cfg parameters in RAM
           MIDI_CHANNEL = sysex[4];
           FilterSustainMode = sysex[5];
-          uBank[Matrix_Device_A] = sysex[6];
-          uPatch[Matrix_Device_A] = sysex[7];
-          uBank[Matrix_Device_B] = sysex[8];
-          uPatch[Matrix_Device_B] = sysex[9];
-          uBank[Matrix_Device_C] = sysex[10];
-          uPatch[Matrix_Device_C] = sysex[11];
-          uBank[Matrix_Device_D] = sysex[12];
-          uPatch[Matrix_Device_D] = sysex[13];
+          uBank[MATRIX_DEVICE_A] = sysex[6];
+          uPatch[MATRIX_DEVICE_A] = sysex[7];
+          uBank[MATRIX_DEVICE_B] = sysex[8];
+          uPatch[MATRIX_DEVICE_B] = sysex[9];
+          uBank[MATRIX_DEVICE_C] = sysex[10];
+          uPatch[MATRIX_DEVICE_C] = sysex[11];
+          uBank[MATRIX_DEVICE_D] = sysex[12];
+          uPatch[MATRIX_DEVICE_D] = sysex[13];
           device = sysex[14];
           matrix_model_A = sysex[15];
           matrix_model_B = sysex[16];
@@ -1184,14 +1210,14 @@ unsigned int HandleReceivedSysEx(byte *sysex, unsigned int length)
           // update system cfg parameters in ROM
           EEPROM.update(EEPROM_MIDI_CHANNEL, MIDI_CHANNEL);
           EEPROM.update(EEPROM_FILTERSUSTAIN_MODE, FilterSustainMode); // save this
-          EEPROM.update(EEPROM_LASTBANKA, uBank[Matrix_Device_A]);
-          EEPROM.update(EEPROM_LASTPATCHA, uPatch[Matrix_Device_A]);
-          EEPROM.update(EEPROM_LASTBANKB, uBank[Matrix_Device_B]);
-          EEPROM.update(EEPROM_LASTPATCHB, uPatch[Matrix_Device_B]);
-          EEPROM.update(EEPROM_LASTBANKC, uBank[Matrix_Device_C]);
-          EEPROM.update(EEPROM_LASTPATCHC, uPatch[Matrix_Device_C]);
-          EEPROM.update(EEPROM_LASTBANKD, uBank[Matrix_Device_D]);
-          EEPROM.update(EEPROM_LASTPATCHD, uPatch[Matrix_Device_D]);
+          EEPROM.update(EEPROM_LASTBANKA, uBank[MATRIX_DEVICE_A]);
+          EEPROM.update(EEPROM_LASTPATCHA, uPatch[MATRIX_DEVICE_A]);
+          EEPROM.update(EEPROM_LASTBANKB, uBank[MATRIX_DEVICE_B]);
+          EEPROM.update(EEPROM_LASTPATCHB, uPatch[MATRIX_DEVICE_B]);
+          EEPROM.update(EEPROM_LASTBANKC, uBank[MATRIX_DEVICE_C]);
+          EEPROM.update(EEPROM_LASTPATCHC, uPatch[MATRIX_DEVICE_C]);
+          EEPROM.update(EEPROM_LASTBANKD, uBank[MATRIX_DEVICE_D]);
+          EEPROM.update(EEPROM_LASTPATCHD, uPatch[MATRIX_DEVICE_D]);
           EEPROM.update(EEPROM_DEVICE, device); // save last device used (note : don't use too much write eeprom)
           EEPROM.update(EEPROM_MATRIX_MODELE_A, matrix_model_A);
           EEPROM.update(EEPROM_MATRIX_MODELE_B, matrix_model_B);
@@ -1264,10 +1290,10 @@ void enableMidiCallbacks(void)
   /////// Midi CORE IN //////////////////
   MIDI3.setHandleNoteOff(ZoneNoteOff);
   MIDI3.setHandleNoteOn(ZoneNoteOn);
-  MIDI3.setHandleControlChange(HandleControlChange);
+  MIDI3.setHandleControlChange(ZoneControlChange);
   MIDI3.setHandleProgramChange(HandleProgramChange);
-  MIDI3.setHandleAfterTouchChannel(HandleAfterTouchChannel);
-  MIDI3.setHandlePitchBend(HandlePitchBend);
+  MIDI3.setHandleAfterTouchChannel(ZoneAfterTouchChannel);
+  MIDI3.setHandlePitchBend(ZonePitchBend);
   MIDI3.setHandleSystemExclusive(HandleSystemExclusive);
   MIDI3.setHandleClock(HandleClock);
   MIDI3.setHandleStart(HandleStart);
@@ -1277,10 +1303,10 @@ void enableMidiCallbacks(void)
   /////// Midi IN A /////////////////////
   MIDI1.setHandleNoteOff(ZoneNoteOff);
   MIDI1.setHandleNoteOn(ZoneNoteOn);
-  MIDI1.setHandleControlChange(HandleControlChange);
+  MIDI1.setHandleControlChange(ZoneControlChange);
   MIDI1.setHandleProgramChange(HandleProgramChange);
-  MIDI1.setHandleAfterTouchChannel(HandleAfterTouchChannel);
-  MIDI1.setHandlePitchBend(HandlePitchBend);
+  MIDI1.setHandleAfterTouchChannel(ZoneAfterTouchChannel);
+  MIDI1.setHandlePitchBend(ZonePitchBend);
   MIDI1.setHandleSystemExclusive(HandleSystemExclusive);
 }
 
@@ -1324,7 +1350,7 @@ void disableMidiCallbacks(void)
   //  byte sysex_patch[] = {0xf0, 0x10,0x06,0x04,0x01,programRequested,0xf7};
 
   // set bank to request
-  if (matrix_modele == matrix_6)
+  if (matrix_modele == MATRIX_6)
   {
     bankRequested = 0;
   }

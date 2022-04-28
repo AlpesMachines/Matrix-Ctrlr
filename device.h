@@ -2,14 +2,14 @@
 #define device_h
 
 // declare the Oberheim matrix hardware :
-#define Matrix_Device_A 0 //0x0a // matrix connected to Serial1 
-#define Matrix_Device_B 1 //0x0b // matrix connected to Serial2
-#define Matrix_Device_C 2 //0x0c // matrix connected to Serial4
-#define Matrix_Device_D 3 //0x0d // matrix connected to Serial5
+#define MATRIX_DEVICE_A 0 //0x0a // matrix connected to Serial1 
+#define MATRIX_DEVICE_B 1 //0x0b // matrix connected to Serial2
+#define MATRIX_DEVICE_C 2 //0x0c // matrix connected to Serial4
+#define MATRIX_DEVICE_D 3 //0x0d // matrix connected to Serial5
 /*
   #define matrix_model_A matrix_1000
   #define matrix_model_B matrix_1000
-  #define matrix_model_C matrix_6
+  #define matrix_model_C MATRIX_6
   #define matrix_model_D matrix_1000
 */
 //// status of matrix_model
@@ -29,8 +29,8 @@ extern bool matrix_model_B;
 extern bool matrix_model_C;
 extern bool matrix_model_D;
 
-#define matrix_6    1		// 1 if Matrix6/6R , 0 if Matrix 1000
-#define matrix_1000 0
+#define MATRIX_6    1		// 1 if Matrix6/6R , 0 if Matrix 1000
+#define MATRIX_1000 0
 
 //device var used in chaosmatrix.c and else
 extern bool matrix_modele; // indicate if matrix6 or 1000
